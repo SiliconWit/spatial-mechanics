@@ -1,0 +1,520 @@
+---
+title: "Lesson 2: Planar Transformations and Mathematical Foundations"
+description: "Building 3D spatial mechanics foundations through 2D planar robot analysis using complex numbers and homogeneous coordinates"
+contributors: "sam-macharia,jack-kojiro"
+pubDate: 2025-08-28
+tags: ["spatial-mechanics", "planar-transformations", "complex-analysis", "homogeneous-coordinates", "SCARA-robot"]
+excerpt: "Master planar transformation mathematics through SCARA robot programming, covering complex number analysis, homogeneous coordinates, and transformation matrix composition as foundation for 3D spatial mechanics."
+---
+
+import SpatialMechanicsComments from '../../../../components/spatial-mechanics/SpatialMechanicsComments.astro';
+import UniversalContentContributors from '../../../../components/UniversalContentContributors.astro';
+import TawkWidget from '../../../../components/TawkWidget.astro';
+import Copyright from '../../../../components/Copyright.astro';
+import BionicText from '../../../../components/BionicText.astro';
+import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Card, CardGrid, Badge, Steps } from '@astrojs/starlight/components';
+
+<UniversalContentContributors 
+  contributors={frontmatter.contributors}
+/>
+
+## 🎯 Learning Objectives
+
+By the end of this lesson, you will be able to:
+
+1. **Apply** complex number analysis for planar rotations and translations  
+2. **Implement** homogeneous coordinates for unified transformation representation
+3. **Compose** multiple planar transformations using matrix multiplication
+4. **Program** precise 2D trajectories for SCARA robot motion control
+
+## 🔧 Real-World System Problem: SCARA Robot Programming
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+SCARA (Selective Compliance Assembly Robot Arm) robots dominate electronics manufacturing and precision assembly. These 2D planar robots require precise mathematical control of position and orientation to place components with micrometer accuracy while maintaining high-speed operation.
+</BionicText>
+
+### System Description
+
+**SCARA Robot Architecture:**
+- **Shoulder Joint** (revolute, vertical axis rotation)
+- **Elbow Joint** (revolute, vertical axis rotation) 
+- **Vertical Actuator** (prismatic, Z-axis motion)
+- **Wrist Rotation** (revolute, tool orientation)
+- **End-Effector** (gripper or specialized tool)
+- **Vision System** (part recognition and alignment)
+
+### The Planar Motion Challenge
+
+SCARA programming requires precise control of:
+
+:::note[Critical Motion Requirements]
+- **Position accuracy** to ±0.01 mm for component placement
+- **Orientation control** for proper part alignment before insertion  
+- **Trajectory optimization** for minimum cycle time with smooth motion
+- **Workspace utilization** maximizing reachable area within joint limits
+- **Collision avoidance** with fixtures and other components
+:::
+
+> **Engineering Question:** How do we mathematically represent and program complex 2D trajectories that combine rotations, translations, and tool orientations in a systematic, precise manner?
+
+### Why Planar Mathematics Matters
+
+**Consequences of Poor Mathematical Foundation:**
+- **Programming errors** leading to collision or missed placements
+- **Inefficient trajectories** with unnecessary motion and longer cycle times
+- **Orientation errors** causing assembly failures  
+- **Workspace limitations** from inadequate mathematical modeling
+- **Calibration difficulties** without systematic transformation framework
+
+**Benefits of Systematic Planar Analysis:**
+- **Precise motion programming** using mathematical transformation tools
+- **Optimal trajectory planning** through systematic matrix composition  
+- **Consistent coordinate frame management** across different work areas
+- **Scalable programming methods** applicable to complex 3D systems
+
+## 📚 Fundamental Theory: Planar Transformation Mathematics
+
+### Complex Number Representation of Planar Motion
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Complex numbers provide an elegant mathematical framework for representing 2D rotations and translations. Every point in the plane can be represented as a complex number z = x + iy, and transformations become simple algebraic operations.
+</BionicText>
+
+<Card title="🔢 Complex Number Planar Point" icon="document">
+$$z = x + iy = r e^{i\theta}$$
+
+**Where:**
+- $z$ = Complex number representing 2D point
+- $x, y$ = Cartesian coordinates (real and imaginary parts)
+- $r$ = Distance from origin (magnitude)
+- $\theta$ = Angle from positive real axis (phase)
+
+**Physical Meaning:** Every 2D point corresponds to a unique complex number, enabling algebraic manipulation of geometric transformations.
+</Card>
+
+<Tabs>
+  <TabItem label="Pure Rotation">
+    
+    <Card title="🔄 Complex Rotation Operator" icon="document">
+    **Rotation by angle α:**
+    $$z' = z \cdot e^{i\alpha} = z \cdot (\cos\alpha + i\sin\alpha)$$
+    
+    **Matrix form:**
+    $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} \cos\alpha & -\sin\alpha \\ \sin\alpha & \cos\alpha \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$$
+    
+    **Physical Meaning:** Multiplying by $e^{i\alpha}$ rotates any point counterclockwise by angle α about the origin.
+    </Card>
+    
+  </TabItem>
+  <TabItem label="Pure Translation">
+    
+    <Card title="↔️ Complex Translation Operation" icon="document">
+    **Translation by vector (a, b):**
+    $$z' = z + (a + ib)$$
+    
+    **Matrix form (requires homogeneous coordinates):**
+    $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} x \\ y \end{bmatrix} + \begin{bmatrix} a \\ b \end{bmatrix}$$
+    
+    **Physical Meaning:** Adding a complex constant shifts all points by the same displacement vector.
+    </Card>
+    
+  </TabItem>
+  <TabItem label="Combined Motion">
+    
+    <Card title="🔄↔️ General Planar Transformation" icon="document">
+    **Rotation followed by translation:**
+    $$z' = z \cdot e^{i\alpha} + (a + ib)$$
+    
+    **Translation followed by rotation:**
+    $$z' = (z + (a + ib)) \cdot e^{i\alpha}$$
+    
+    **Physical Meaning:** Order matters! Different sequences of rotation and translation produce different final positions.
+    </Card>
+    
+  </TabItem>
+</Tabs>
+
+### Homogeneous Coordinates for Unified Representation
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Homogeneous coordinates solve the fundamental problem that translation cannot be represented as matrix multiplication in Cartesian coordinates. By adding a third coordinate, both rotation and translation become matrix multiplications.
+</BionicText>
+
+<Card title="🎯 Homogeneous Coordinate Representation" icon="document">
+**2D point in homogeneous coordinates:**
+$$\begin{bmatrix} x \\ y \\ 1 \end{bmatrix} \text{ represents point } (x, y)$$
+
+**General transformation matrix:**
+$$T = \begin{bmatrix} R_{11} & R_{12} & t_x \\ R_{21} & R_{22} & t_y \\ 0 & 0 & 1 \end{bmatrix}$$
+
+**Where:**
+- $R_{ij}$ = Rotation matrix elements
+- $t_x, t_y$ = Translation vector components
+
+**Physical Meaning:** Homogeneous coordinates enable all 2D transformations to be represented as 3×3 matrix multiplications.
+</Card>
+
+<Tabs>
+  <TabItem label="Basic Transformations">
+    
+    **Pure Translation:**
+    $$T_{trans} = \begin{bmatrix} 1 & 0 & a \\ 0 & 1 & b \\ 0 & 0 & 1 \end{bmatrix}$$
+    
+    **Pure Rotation:**
+    $$T_{rot} = \begin{bmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+    
+    **Identity Transformation:**
+    $$T_{identity} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+    
+  </TabItem>
+  <TabItem label="Composition Rules">
+    
+    **Sequential transformations:**
+    $$T_{total} = T_n \cdot T_{n-1} \cdot ... \cdot T_2 \cdot T_1$$
+    
+    **Order significance:**
+    - $T_1$ applied first, $T_n$ applied last
+    - Matrix multiplication is **non-commutative**
+    - $T_A \cdot T_B \neq T_B \cdot T_A$ in general
+    
+    **Inverse transformations:**
+    $$T^{-1} = \begin{bmatrix} R^T & -R^T \mathbf{t} \\ 0 & 1 \end{bmatrix}$$
+    
+  </TabItem>
+  <TabItem label="Rotation About Arbitrary Point">
+    
+    **Three-step process:**
+    1. Translate to move rotation center to origin
+    2. Rotate about origin  
+    3. Translate back to original position
+    
+    $$T = T_{back} \cdot R(\theta) \cdot T_{to\_origin}$$
+    
+    **Combined result:**
+    $$T = \begin{bmatrix} \cos\theta & -\sin\theta & p_x(1-\cos\theta) + p_y\sin\theta \\ \sin\theta & \cos\theta & p_y(1-\cos\theta) - p_x\sin\theta \\ 0 & 0 & 1 \end{bmatrix}$$
+    
+  </TabItem>
+</Tabs>
+
+## 🔧 Application: SCARA Robot Trajectory Programming
+
+Let's program a complete pick-and-place operation for electronics assembly.
+
+:::note[Problem Statement]
+**SCARA Robot Electronics Assembly Programming**
+
+**What we need to determine:**
+1. **Forward kinematics** from joint angles to end-effector position
+2. **Transformation matrices** for coordinate frame management  
+3. **Trajectory interpolation** for smooth motion between waypoints
+4. **Inverse solutions** for multiple path options to same destination
+
+**Key Question:** How do we program precise component placement trajectories that minimize cycle time while ensuring accurate positioning?
+:::
+
+<hr />
+
+**System Parameters:**
+- SCARA robot: Link 1 = **`L₁`** = 400 mm, Link 2 = **`L₂`** = 300 mm  
+- Joint ranges: θ₁ = ±150°, θ₂ = ±135°, Z = ±50 mm, φ = ±180°
+- Positioning accuracy: **`±0.01 mm`** and **`±0.1°`**
+- Workpiece: Electronic component **`5×3 mm`** with **`0.2 mm`** placement tolerance
+- Pick location: (200, 100) mm, Place location: (450, 250) mm
+- Required tool rotation: **`45°`** for proper component orientation
+
+<hr />
+
+### Step 1: Forward Kinematics Using Complex Numbers
+
+<details>
+<summary>**Click to reveal forward kinematics calculations**</summary>
+
+<Steps>
+
+1. **Joint coordinate representation:**
+   
+   Using complex number approach:
+   $$z_1 = L_1 e^{i\theta_1} = 400 e^{i\theta_1}$$
+   $$z_2 = L_2 e^{i(\theta_1 + \theta_2)} = 300 e^{i(\theta_1 + \theta_2)}$$
+
+2. **End-effector position:**
+   
+   $$z_{end} = z_1 + z_2 = L_1 e^{i\theta_1} + L_2 e^{i(\theta_1 + \theta_2)}$$
+   
+   In Cartesian form:
+   $$x = L_1\cos\theta_1 + L_2\cos(\theta_1 + \theta_2)$$
+   $$y = L_1\sin\theta_1 + L_2\sin(\theta_1 + \theta_2)$$
+
+3. **Matrix representation:**
+   
+   $$\begin{bmatrix} x \\ y \\ 1 \end{bmatrix} = \begin{bmatrix} L_1\cos\theta_1 + L_2\cos(\theta_1 + \theta_2) \\ L_1\sin\theta_1 + L_2\sin(\theta_1 + \theta_2) \\ 1 \end{bmatrix}$$
+
+4. **Tool orientation:**
+   
+   Tool angle = θ₁ + θ₂ + φ (wrist rotation)
+
+</Steps>
+
+</details>
+
+### Step 2: Transformation Matrix Development
+
+<details>
+<summary>**Click to reveal transformation matrix calculations**</summary>
+
+<Steps>
+
+1. **Base to Link 1 transformation:**
+   
+   $$T_1 = \begin{bmatrix} \cos\theta_1 & -\sin\theta_1 & 0 \\ \sin\theta_1 & \cos\theta_1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+2. **Link 1 to Link 2 transformation:**
+   
+   $$T_2 = \begin{bmatrix} \cos\theta_2 & -\sin\theta_2 & L_1 \\ \sin\theta_2 & \cos\theta_2 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+3. **Combined base to end-effector:**
+   
+   $$T_{total} = T_1 \cdot T_2$$
+   
+   $$T_{total} = \begin{bmatrix} \cos(\theta_1+\theta_2) & -\sin(\theta_1+\theta_2) & L_1\cos\theta_1 \\ \sin(\theta_1+\theta_2) & \cos(\theta_1+\theta_2) & L_1\sin\theta_1 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+4. **Tool frame transformation:**
+   
+   Including tool offset and rotation:
+   $$T_{tool} = T_{total} \cdot T_{wrist} \cdot T_{offset}$$
+
+</Steps>
+
+</details>
+
+### Step 3: Trajectory Planning and Interpolation
+
+<details>
+<summary>**Click to reveal trajectory planning calculations**</summary>
+
+<Steps>
+
+1. **Waypoint definition:**
+   
+   - **Home position:** (350, 0) mm, θ₁ = 0°, θ₂ = 0°
+   - **Pick approach:** (200, 120) mm (20 mm above component)  
+   - **Pick position:** (200, 100) mm
+   - **Place approach:** (450, 270) mm (20 mm above target)
+   - **Place position:** (450, 250) mm
+
+2. **Linear interpolation in Cartesian space:**
+   
+   For path from point A to point B:
+   $$\mathbf{P}(t) = \mathbf{A} + t(\mathbf{B} - \mathbf{A})$$, where $t \in [0,1]$
+   
+   Position: $(x(t), y(t)) = (x_A, y_A) + t((x_B, y_B) - (x_A, y_A))$
+   
+   Orientation: $\phi(t) = \phi_A + t(\phi_B - \phi_A)$
+
+3. **Transformation matrix interpolation:**
+   
+   For smooth rotation interpolation:
+   $$R(t) = R_A \cdot \exp(t \log(R_A^T R_B))$$
+   
+   Translation interpolation:
+   $$\mathbf{t}(t) = (1-t)\mathbf{t}_A + t\mathbf{t}_B$$
+
+4. **Velocity profile generation:**
+   
+   Trapezoidal velocity profile:
+   - Acceleration phase: $v(t) = a \cdot t$
+   - Constant velocity: $v(t) = v_{max}$  
+   - Deceleration phase: $v(t) = v_{max} - a(t - t_{decel})$
+
+</Steps>
+
+</details>
+
+### Step 4: Inverse Kinematics Solutions
+
+<details>
+<summary>**Click to reveal inverse kinematics calculations**</summary>
+
+<Steps>
+
+1. **Geometric approach for 2-DoF SCARA:**
+   
+   Given end-effector position (x, y):
+   $$r = \sqrt{x^2 + y^2}$$
+   $$\cos\theta_2 = \frac{r^2 - L_1^2 - L_2^2}{2L_1L_2}$$
+
+2. **Two solutions for elbow configuration:**
+   
+   **Elbow up:** $\theta_2 = +\arccos\left(\frac{r^2 - L_1^2 - L_2^2}{2L_1L_2}\right)$
+   
+   **Elbow down:** $\theta_2 = -\arccos\left(\frac{r^2 - L_1^2 - L_2^2}{2L_1L_2}\right)$
+
+3. **Shoulder angle calculation:**
+   
+   $$\theta_1 = \arctan2(y,x) - \arctan2(L_2\sin\theta_2, L_1 + L_2\cos\theta_2)$$
+
+4. **Solution selection criteria:**
+   
+   - Choose configuration avoiding joint limits
+   - Minimize joint motion from current position  
+   - Avoid singularities (θ₂ = 0° or ±180°)
+   - Consider obstacle avoidance
+
+</Steps>
+
+</details>
+
+## 📊 SCARA Programming Analysis Summary
+
+<CardGrid>
+  <Card title="Forward Kinematics" icon="approve">
+    **Complex method:** Elegant rotation representation  
+    **Matrix method:** Systematic composition  
+    **Accuracy:** Sub-millimeter precision  
+    **Status:** <Badge text="Multiple approaches available" variant="success" />
+  </Card>
+  
+  <Card title="Trajectory Planning" icon="information">
+    **Interpolation:** Linear and circular paths  
+    **Velocity:** Trapezoidal profiles  
+    **Smoothness:** C¹ continuous motion  
+    **Status:** <Badge text="Optimized for cycle time" variant="tip" />
+  </Card>
+  
+  <Card title="Inverse Solutions" icon="star">
+    **Multiple configs:** Elbow up/down options  
+    **Selection:** Optimization criteria  
+    **Singularity:** Systematic avoidance  
+    **Status:** <Badge text="Robust solution methods" variant="caution" />
+  </Card>
+</CardGrid>
+
+## 🎯 Advanced Analysis: Concatenation and Composition
+
+### Transformation Sequence Analysis
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Understanding transformation composition is critical for complex motion programming. The order of operations fundamentally affects the final result, making systematic matrix composition essential for reliable robot programming.
+</BionicText>
+
+<Tabs>
+  <TabItem label="Order Dependency">
+    
+    **Rotation then Translation vs Translation then Rotation:**
+    
+    **Case 1:** Rotate 45° then translate (2, 0)
+    $$T_1 = T_{trans}(2,0) \cdot T_{rot}(45°)$$
+    
+    **Case 2:** Translate (2, 0) then rotate 45°  
+    $$T_2 = T_{rot}(45°) \cdot T_{trans}(2,0)$$
+    
+    **Result:** Different final positions despite same operations!
+    
+  </TabItem>
+  <TabItem label="Frame Conventions">
+    
+    **Local vs Global transformations:**
+    
+    **Local (body-fixed) frame:**
+    $$T = T_1 \cdot T_2 \cdot T_3$$ (right multiplication)
+    
+    **Global (world-fixed) frame:**  
+    $$T = T_3 \cdot T_2 \cdot T_1$$ (left multiplication)
+    
+    **Programming implication:** Choose consistent convention
+    
+  </TabItem>
+  <TabItem label="Practical Applications">
+    
+    **Tool coordinate programming:**
+    1. Define tool frame relative to wrist
+    2. Compose with wrist-to-base transformation
+    3. Result: Tool position in base coordinates
+    
+    **Workpiece coordinate systems:**
+    1. Calibrate workpiece frame
+    2. Program in workpiece coordinates  
+    3. Transform to robot base coordinates
+    
+  </TabItem>
+</Tabs>
+
+## 🛠️ Design Guidelines for Planar Motion Programming
+
+### Programming Best Practices
+
+:::note[Systematic Programming Approach]
+1. **Define coordinate frames** clearly with consistent conventions
+2. **Use homogeneous coordinates** for all transformation representations  
+3. **Validate inverse solutions** against workspace and joint limits
+4. **Plan trajectories** with consideration for acceleration limits
+5. **Implement singularity detection** and avoidance strategies
+:::
+
+### Performance Optimization
+
+<Tabs>
+  <TabItem label="Computational Efficiency">
+    
+    **Matrix pre-computation:**
+    - Calculate transformation matrices offline when possible
+    - Use lookup tables for common angles
+    - Optimize trigonometric function calls
+    
+    **Numerical stability:**  
+    - Use robust inverse kinematics algorithms
+    - Implement numerical conditioning checks
+    - Handle near-singular configurations gracefully
+    
+  </TabItem>
+  <TabItem label="Motion Smoothness">
+    
+    **Trajectory continuity:**
+    - Ensure C¹ continuity (continuous velocity)
+    - Use spline interpolation for smooth curves  
+    - Implement blending between motion segments
+    
+    **Acceleration limiting:**
+    - Apply joint acceleration limits
+    - Use S-curve velocity profiles
+    - Coordinate multiple axes for smooth motion
+    
+  </TabItem>
+  <TabItem label="Error Handling">
+    
+    **Robustness measures:**
+    - Detect and handle unreachable positions  
+    - Implement workspace boundary checking
+    - Provide graceful degradation for errors
+    
+    **Calibration considerations:**
+    - Account for kinematic parameter uncertainties
+    - Implement online calibration when possible
+    - Use redundancy for error detection
+    
+  </TabItem>
+</Tabs>
+
+## 📋 Summary and Next Steps
+
+In this lesson, you learned to:
+
+1. **Apply** complex number mathematics for elegant planar transformation representation
+2. **Implement** homogeneous coordinates for unified rotation and translation operations
+3. **Compose** transformation matrices systematically for complex motion sequences  
+4. **Program** SCARA robots with precise trajectory control and multiple solution handling
+
+**Key Mathematical Insights:**
+- <Badge text="Complex numbers elegantly represent 2D rotations" variant="tip" />
+- <Badge text="Homogeneous coordinates unify all 2D transformations" variant="note" />
+- <Badge text="Matrix composition order critically affects results" variant="caution" />
+
+**Critical Foundation:** Homogeneous transformation matrices: $T = \begin{bmatrix} R & \mathbf{t} \\ 0 & 1 \end{bmatrix}$
+
+**Coming Next**: In Lesson 3, we'll extend these 2D concepts to full 3D spatial transformations, covering rotation matrices, Euler angles, and complex 3D orientation control for 6-DOF industrial robot arms.
+
+<SpatialMechanicsComments />
+<TawkWidget />
+<Copyright />
