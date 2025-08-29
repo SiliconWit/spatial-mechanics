@@ -1,172 +1,70 @@
 ---
-title: "Spatial Mechanics: Theory and Applications"
-description: "Comprehensive analysis and design of three-dimensional mechanical systems through real-world mechatronic applications"
-contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-08-28
-tags: ["spatial-mechanics", "3d-kinematics", "transformation-matrices", "robotic-systems", "mechanism-analysis"]
-excerpt: "Master spatial mechanics through systematic analysis of 3D mechanical systems, from joint-level kinematics to complex multi-body simulations, using real industrial mechatronic applications."
+title: Spatial Mechanics
+description: Understanding motion and force transmission in three-dimensional mechanical systems for precise mechatronic design
 ---
 
-import SpatialMechanicsComments from '../../../../components/spatial-mechanics/SpatialMechanicsComments.astro';
-import UniversalContentContributors from '../../../../components/UniversalContentContributors.astro';
-import TawkWidget from '../../../../components/TawkWidget.astro';
 import Copyright from '../../../../components/Copyright.astro';
-import BionicText from '../../../../components/BionicText.astro';
-import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
 import { Card, CardGrid, Badge } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
-<UniversalContentContributors 
-  contributors={frontmatter.contributors}
-/>
+**Spatial Mechanics**, also called **3D Kinematics**, **Spatial Kinematics**, or **Three-Dimensional Mechanism Analysis**, is the branch of engineering that studies motion and force transmission in three-dimensional mechanical systems. This fundamental discipline provides the mathematical foundation for designing precise, reliable mechatronic systems from robotic arms to spacecraft attitude control systems.
 
-# 🌐 Spatial Mechanics: Theory and Applications
+This course explores how mechanical systems move and transmit forces in three-dimensional space—knowledge essential for designing sophisticated mechatronic systems that require precise spatial positioning and orientation control.
 
-<BionicText method="advanced" intensity="medium" class="highlight">
-Spatial mechanics governs the motion and force transmission in three-dimensional mechanical systems. From robotic arms to spacecraft attitude control, understanding 3D kinematics and dynamics is essential for designing precise, reliable mechatronic systems.
-</BionicText>
+## Lesson Structure & Approach
 
-## 🎯 Course Philosophy: Systems-Based 3D Analysis
+Each lesson follows our systems-based pedagogical approach:
 
-Unlike traditional approaches that teach abstract mathematical concepts in isolation, this course grounds every principle in **real-world mechatronic systems**. Each lesson follows our proven four-stage pedagogical cycle:
+<Steps>
+1. **🔧 Real-World System Problem**
+   Begin with complete mechatronic systems (modular robots, industrial arms, Stewart platforms) facing specific spatial analysis challenges.
 
-1. **🔧 Real-World System Problem** - Complete 3D mechanical system with authentic challenges
-2. **📚 Fundamental Theory** - Mathematical foundations for spatial analysis
-3. **🔧 Return to System Application** - Apply theory to solve practical engineering problems  
-4. **📊 Step-by-Step Solution** - Detailed methodology with design verification
+2. **📚 Fundamental Theory**
+   Develop the mathematical and kinematic principles needed to analyze and solve the spatial motion problem.
 
-## 📚 Course Structure: 6 Comprehensive Lessons
+3. **🎯 System Application**
+   Apply theory to the original system with step-by-step kinematic solutions and design verification.
 
-<CardGrid>
-  <Card title="Lesson 1: Kinematic Joints & DoF" icon="puzzle">
-    **System:** Modular Robot Joint Library  
-    **Focus:** Joint types, degrees of freedom, constraint analysis  
-    **Duration:** 120 minutes  
-    **Level:** <Badge text="Intermediate" variant="note" />
-  </Card>
-  
-  <Card title="Lesson 2: Planar Transformations" icon="document">
-    **System:** 2D Planar Robot (SCARA)  
-    **Focus:** Complex analysis, homogeneous coordinates, 2D foundations  
-    **Duration:** 135 minutes  
-    **Level:** <Badge text="Intermediate" variant="note" />
-  </Card>
-  
-  <Card title="Lesson 3: 3D Rotations" icon="rocket">
-    **System:** 6-DOF Industrial Robot  
-    **Focus:** Rotation matrices, Euler angles, spatial transformations  
-    **Duration:** 150 minutes  
-    **Level:** <Badge text="Advanced" variant="caution" />
-  </Card>
-  
-  <Card title="Lesson 4: Matrix Methods" icon="setting">
-    **System:** Stewart Platform (Hexapod)  
-    **Focus:** DH parameters, elementary matrices, systematic modeling  
-    **Duration:** 145 minutes  
-    **Level:** <Badge text="Advanced" variant="caution" />
-  </Card>
-  
-  <Card title="Lesson 5: Advanced Mechanisms" icon="star">
-    **System:** Humanoid Robot Hand  
-    **Focus:** Spatial linkages, spherical mechanisms, constraint analysis  
-    **Duration:** 160 minutes  
-    **Level:** <Badge text="Expert" variant="danger" />
-  </Card>
-  
-  <Card title="Lesson 6: Computer Simulation" icon="laptop">
-    **System:** Multi-Robot Coordination  
-    **Focus:** Numerical methods, real-time simulation, system integration  
-    **Duration:** 140 minutes  
-    **Level:** <Badge text="Expert" variant="danger" />
-  </Card>
-</CardGrid>
+4. **🛠️ Design Guidelines**
+   Extract practical rules and best practices for professional spatial mechanism design.
+</Steps>
 
-## 🎓 Learning Outcomes
+## Learning Path
 
-Upon completing this course, you will be able to:
+<Steps>
+1. **Build Spatial Foundations**
+   Master joint analysis and degrees of freedom that form the basis for all spatial mechanism design.
 
-✅ **Analyze degrees of freedom** in complex 3D mechanical systems using systematic constraint analysis  
-✅ **Apply transformation matrices** for precise spatial motion representation and composition  
-✅ **Design kinematic chains** using elementary matrix methods and DH parameters  
-✅ **Model spatial mechanisms** including spherical joints, universal joints, and closed-loop systems  
-✅ **Simulate multi-body systems** using computational methods for real-time applications  
-✅ **Optimize spatial mechanisms** for workspace, singularity avoidance, and dynamic performance
+2. **Understand 3D Mathematics**
+   Learn transformation matrices, rotation representations, and spatial coordinate systems.
 
-## 🔧 Mechatronic Systems Featured
+3. **Apply Systematic Methods**
+   Use matrix methods and standardized approaches for complex spatial system analysis.
 
-### **Primary Systems**
-- **Modular Robotic Systems** - Universal joint libraries and reconfigurable mechanisms
-- **Industrial Robot Arms** - 6-DOF manipulation with complex tool orientations
-- **Stewart Platforms** - Parallel kinematics for flight simulation and precision positioning
-- **Humanoid Robotics** - Multi-fingered hands and coordinated multi-body motion
+4. **Design Real Systems**
+   Apply spatial mechanics principles to advanced mechatronic challenges including parallel robots and multi-body systems.
+</Steps>
 
-### **Supporting Applications**
-- **CNC Machine Tools** - Multi-axis machining with complex part geometries
-- **Spacecraft Systems** - Attitude control and robotic arm deployment
-- **Medical Robotics** - Surgical robots with constrained motion requirements
-- **Autonomous Vehicles** - 3D path planning and obstacle avoidance
+## Course Structure
 
-## 📋 Prerequisites
+<Steps>
+1. **[Kinematic Joints and Degrees of Freedom](./kinematic-joints-degrees-freedom)**
+   Analyze joint types and constraint relationships through modular robot design, covering all joint types and DoF calculations.
 
-**Essential Background:**
-- **Linear Algebra**: Matrix operations, eigenvalues, vector spaces
-- **Trigonometry**: Sin/cos identities, angle relationships
-- **Complex Numbers**: Polar form, exponential representation
-- **Basic Programming**: For computational simulation lessons
+2. **[Planar Transformations and Mathematical Foundations](./planar-transformations-foundations)**  
+   Build 3D foundations through 2D SCARA robot analysis using complex numbers and homogeneous coordinates.
 
-**Recommended Preparation:**
-- Planar Mechanics (2D kinematics and dynamics)
-- Basic understanding of robotic systems
-- Familiarity with CAD software for 3D visualization
+3. **[3D Rotation Matrices and Spatial Transformations](./spatial-rotations-transformations)**
+   Master spatial orientation control through 6-DOF robot programming with rotation matrices and transformations.
 
-## 🚀 Interactive Learning Features
+4. **[Elementary Matrix Methods and Link Modeling](./matrix-methods-link-modeling)**
+   Learn systematic kinematic modeling through Stewart Platform analysis using DH parameters and elementary matrices.
 
-### **3D Visualizations**
-- **Joint Motion Simulators** - Interactive exploration of all joint types
-- **Transformation Visualizers** - Real-time matrix operations in 3D space
-- **Robot Arm Controllers** - Direct manipulation of 6-DOF systems
-- **Mechanism Analyzers** - Workspace and singularity visualization
+5. **[Advanced Spatial Mechanisms Analysis](./advanced-spatial-mechanisms)**
+   Explore complex spatial linkages through humanoid robot hand design with spherical and universal joints.
 
-### **Computational Tools**
-- **Matrix Calculators** - Step-by-step transformation composition
-- **Kinematic Solvers** - Forward/inverse kinematics with multiple solutions
-- **Simulation Engines** - Multi-body dynamics with collision detection
-- **Design Optimizers** - Performance trade-off analysis tools
+6. **[Computer Simulation and System Integration](./computer-simulation-integration)**
+   Master computational spatial mechanics through multi-robot coordination systems and real-time simulation.
+</Steps>
 
-## 🌟 Why Spatial Mechanics Matters
-
-<BionicText method="advanced" intensity="medium" class="highlight">
-Modern mechatronic systems operate in three-dimensional space with unprecedented precision and complexity. From manufacturing robots that position parts to nanometer accuracy, to spacecraft that maintain precise orientation while orbiting Earth, spatial mechanics provides the mathematical foundation for controlling motion in 3D space.
-</BionicText>
-
-**Real-World Impact:**
-- **Manufacturing**: 6-DOF robot arms for complex assembly operations
-- **Aerospace**: Spacecraft attitude control and robotic arm deployment  
-- **Medical**: Surgical robots with constrained motion in confined spaces
-- **Automotive**: Multi-axis assembly robots and autonomous vehicle navigation
-- **Entertainment**: Motion simulators and animatronic systems
-
-## 📊 Course Progression Map
-
-```
-Lesson 1: Joint Types & DoF Analysis
-    ↓
-Lesson 2: 2D Mathematical Foundations  
-    ↓
-Lesson 3: 3D Rotation & Transformation Mathematics
-    ↓
-Lesson 4: Systematic Kinematic Modeling
-    ↓  
-Lesson 5: Complex Spatial Mechanism Analysis
-    ↓
-Lesson 6: Computational Simulation & Integration
-```
-
-Each lesson builds systematically on the previous, progressing from **topological analysis** → **2D mathematics** → **3D mathematics** → **systematic modeling** → **complex analysis** → **computational methods**.
-
----
-
-**Ready to master spatial mechanics?** Begin with [Lesson 1: Kinematic Joints and Degrees of Freedom](./kinematic-joints-degrees-freedom) to explore the fundamental building blocks of 3D mechanical systems through modular robotic joint design.
-
-<SpatialMechanicsComments />
-<TawkWidget />
 <Copyright />
