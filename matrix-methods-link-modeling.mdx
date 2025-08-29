@@ -82,7 +82,7 @@ Stewart Platform design requires sophisticated analysis:
 The Denavit-Hartenberg convention provides a systematic way to assign coordinate frames and parameterize any kinematic chain. Four parameters completely describe the geometric relationship between adjacent links, enabling automated model generation and analysis.
 </BionicText>
 
-<Card title="📐 DH Parameter Definitions" icon="document">
+<Card title="DH Parameter Definitions" icon="document">
 **Four parameters per joint:**
 - **θᵢ** = Joint angle (rotation about zᵢ₋₁ axis)
 - **dᵢ** = Link offset (translation along zᵢ₋₁ axis)  
@@ -110,7 +110,7 @@ The Denavit-Hartenberg convention provides a systematic way to assign coordinate
   </TabItem>
   <TabItem label="Transformation Matrix">
     
-    <Card title="🔄 DH Transformation Matrix" icon="document">
+    <Card title="DH Transformation Matrix" icon="document">
     **Standard DH transformation:**
     $$T_i = \begin{bmatrix} 
     \cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
@@ -143,7 +143,7 @@ The Denavit-Hartenberg convention provides a systematic way to assign coordinate
 
 ### Elementary Matrix Operations
 
-<Card title="⚙️ Elementary Transformation Types" icon="document">
+<Card title="Elementary Transformation Types" icon="document">
 **Pure translations:**
 $$T_{trans}(x,y,z) = \begin{bmatrix} I_{3×3} & \begin{bmatrix} x \\ y \\ z \end{bmatrix} \\ 0 & 1 \end{bmatrix}$$
 

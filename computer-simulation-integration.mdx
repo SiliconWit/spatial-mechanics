@@ -124,7 +124,7 @@ Real-time multi-robot systems require efficient numerical methods capable of com
     3. **Select configuration:** Choose optimal from multiple solutions
     
     **Iterative methods for general cases:**
-    $$\mathbf{q}_{k+1} = \mathbf{q}_k + J^†(\mathbf{x}_{desired} - \mathbf{x}_k)$$
+    $$\mathbf{q}_{k+1} = \mathbf{q}_k + J^+(\mathbf{x}_{desired} - \mathbf{x}_k)$$
     
     **Optimization:** Use warm starts from previous positions
     
@@ -135,7 +135,7 @@ Real-time multi-robot systems require efficient numerical methods capable of com
     $$\kappa = \frac{\sigma_{max}(J)}{\sigma_{min}(J)}$$
     
     **Singularity handling:**
-    - Damped least squares: $J^† = J^T(JJ^T + λI)^{-1}$
+    - Damped least squares: $J^+ = J^T(JJ^T + λI)^{-1}$
     - Configuration switching when approaching singularities
     - Redundancy utilization for singularity avoidance
     
