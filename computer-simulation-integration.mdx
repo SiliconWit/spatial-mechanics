@@ -90,9 +90,9 @@ Real-time multi-robot systems require efficient numerical methods capable of com
 - **Force control:** 10+ kHz for stable contact
 
 **Computational constraints:**
-- **Forward kinematics:** <10 μs per robot per cycle
-- **Inverse kinematics:** <100 μs per robot per cycle
-- **Collision detection:** <500 μs total system per cycle
+- **Forward kinematics:** $< 10\,\mu$s per robot per cycle
+- **Inverse kinematics:** $< 100\,\mu$s per robot per cycle
+- **Collision detection:** $< 500\,\mu$s total system per cycle
 
 **Physical Meaning:** Real-time constraints demand highly optimized numerical algorithms and computational architectures to maintain stable, responsive control.
 </Card>
@@ -103,10 +103,10 @@ Real-time multi-robot systems require efficient numerical methods capable of com
     **Optimized matrix computation:**
     
     **Pre-computed trigonometric functions:**
-    $$\sin θ_i, \cos θ_i = \text{lookup table or fast approximation}$$
+    $$\sin \theta_i, \cos \theta_i = \text{lookup table or fast approximation}$$
     
     **Incremental matrix updates:**
-    $$T_i^{new} = T_i^{old} \cdot \Delta T_i(\Delta θ_i)$$
+    $$T_i^{new} = T_i^{old} \cdot \Delta T_i(\Delta \theta_i)$$
     
     **Parallel computation:**
     - Compute multiple transformation matrices simultaneously
@@ -135,7 +135,7 @@ Real-time multi-robot systems require efficient numerical methods capable of com
     $$\kappa = \frac{\sigma_{max}(J)}{\sigma_{min}(J)}$$
     
     **Singularity handling:**
-    - Damped least squares: $J^+ = J^T(JJ^T + λI)^{-1}$
+    - Damped least squares: $J^+ = J^T(JJ^T + \lambda I)^{-1}$
     - Configuration switching when approaching singularities
     - Redundancy utilization for singularity avoidance
     
@@ -159,7 +159,7 @@ $$\mathbf{q}_{k+1} = \mathbf{q}_k + h \dot{\mathbf{q}}_k$$
 $$\mathbf{q}_{k+1} = \mathbf{q}_k + \frac{h}{6}(\mathbf{k}_1 + 2\mathbf{k}_2 + 2\mathbf{k}_3 + \mathbf{k}_4)$$
 
 **Adams-Bashforth (efficient for real-time applications):**
-$$\mathbf{q}_{k+1} = \mathbf{q}_k + h \sum_{i=0}^{n-1} β_i \dot{\mathbf{q}}_{k-i}$$
+$$\mathbf{q}_{k+1} = \mathbf{q}_k + h \sum_{i=0}^{n-1} \beta_i \dot{\mathbf{q}}_{k-i}$$
 
 **Physical Meaning:** Integration methods determine how accurately and efficiently the simulation can predict system behavior over time.
 </Card>
@@ -169,7 +169,7 @@ $$\mathbf{q}_{k+1} = \mathbf{q}_k + h \sum_{i=0}^{n-1} β_i \dot{\mathbf{q}}_{k-
     
     **Differential-Algebraic Equations (DAE):**
     
-    $$M\ddot{\mathbf{q}} = \mathbf{f}(\mathbf{q}, \dot{\mathbf{q}}, t) + \mathbf{J}^T \boldsymbol{λ}$$
+    $$M\ddot{\mathbf{q}} = \mathbf{f}(\mathbf{q}, \dot{\mathbf{q}}, t) + \mathbf{J}^T \boldsymbol{\lambda}$$
     $$\mathbf{g}(\mathbf{q}) = 0$$
     
     Where $\mathbf{g}$ represents kinematic constraints
@@ -276,7 +276,7 @@ Let's develop a complete multi-robot coordination system.
 2. **Optimized forward kinematics:**
    
    **Pre-computed DH matrices with incremental updates:**
-   $$T_i^{new} = T_i^{current} \cdot R_z(\Delta θ_i) \cdot T_{offset}$$
+   $$T_i^{new} = T_i^{current} \cdot R_z(\Delta \theta_i) \cdot T_{offset}$$
    
    **SIMD matrix multiplication:**
    - Process 4×4 matrices using vectorized operations
@@ -288,8 +288,8 @@ Let's develop a complete multi-robot coordination system.
    **Geometric solution for KR210 (spherical wrist):**
    
    **Position solution (joints 1-3):**
-   $$θ_1 = \arctan2(p_y, p_x)$$
-   $$θ_3 = \pm \arccos\left(\frac{p_x^2 + p_y^2 + (p_z-d_1)^2 - a_2^2 - d_4^2}{2a_2d_4}\right)$$
+   $$\theta_1 = \arctan2(p_y, p_x)$$
+   $$\theta_3 = \pm \arccos\left(\frac{p_x^2 + p_y^2 + (p_z-d_1)^2 - a_2^2 - d_4^2}{2a_2d_4}\right)$$
    
    **Orientation solution (joints 4-6):**
    From wrist rotation matrix $R_6^3 = (R_3^0)^{-1} R_6^0$
@@ -297,10 +297,10 @@ Let's develop a complete multi-robot coordination system.
 4. **Performance benchmarking:**
    
    **Target timing (per robot):**
-   - Forward kinematics: 8 μs
-   - Inverse kinematics: 85 μs  
-   - Jacobian computation: 45 μs
-   - **Total per robot:** 138 μs (4 robots = 552 μs < 1000 μs budget)
+   - Forward kinematics: 8 $\mu$s
+   - Inverse kinematics: 85 $\mu$s  
+   - Jacobian computation: 45 $\mu$s
+   - **Total per robot:** 138 $\mu$s (4 robots = 552 $\mu$s < 1000 $\mu$s budget)
 
 </Steps>
 
@@ -463,9 +463,9 @@ Let's develop a complete multi-robot coordination system.
 
 <CardGrid>
   <Card title="Real-Time Performance" icon="approve">
-    **Kinematics computation:** 552 μs for 4 robots  
-    **Collision detection:** 348 μs average case  
-    **Total computation:** 900 μs < 1000 μs budget  
+    **Kinematics computation:** 552 $\mu$s for 4 robots  
+    **Collision detection:** 348 $\mu$s average case  
+    **Total computation:** 900 $\mu$s < 1000 $\mu$s budget  
     **Status:** <Badge text="Real-time requirements met" variant="success" />
   </Card>
   
@@ -478,7 +478,7 @@ Let's develop a complete multi-robot coordination system.
   
   <Card title="System Integration" icon="star">
     **Fault tolerance:** 1-robot failure handling  
-    **Communication:** <1 ms deterministic latency  
+    **Communication:** $< 1$ ms deterministic latency  
     **Scalability:** Supports up to 8 robots  
     **Status:** <Badge text="Production-ready integration" variant="caution" />
   </Card>

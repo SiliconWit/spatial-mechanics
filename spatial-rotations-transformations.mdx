@@ -261,12 +261,10 @@ Let's program complex tool orientations for aerospace composite layup.
 
 2. **Individual transformation matrices:**
    
-   $$T_i = \begin{bmatrix} 
-   \cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
-   \sin\theta_i & \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\
-   0 & \sin\alpha_i & \cos\alpha_i & d_i \\
-   0 & 0 & 0 & 1
-   \end{bmatrix}$$
+   **Standard DH transformation matrix:**
+   Each link transformation uses the 4×4 homogeneous matrix with DH parameters:
+   - $\theta_i$ = Joint angle, $d_i$ = Link offset
+   - $a_i$ = Link length, $\alpha_i$ = Link twist
 
 3. **Forward kinematics solution:**
    

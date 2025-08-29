@@ -83,12 +83,12 @@ Humanoid hand design involves unprecedented complexity:
 Spherical joints provide three rotational degrees of freedom about a common center point. Unlike simple revolute joints, spherical joints require careful mathematical treatment to handle the coupled nature of three-dimensional rotations and avoid representation singularities.
 </BionicText>
 
-<Card title="⚪ Spherical Joint Transformation" icon="document">
+<Card title="Spherical Joint Transformation" icon="document">
 **Three-parameter representation:**
-$$R_{spherical}(α, β, γ) = R_z(γ) R_y(β) R_x(α)$$
+$$R_{spherical}(\alpha, \beta, \gamma) = R_z(\gamma) R_y(\beta) R_x(\alpha)$$
 
 **Alternative axis-angle form:**
-$$R_{spherical}(\mathbf{k}, θ) = I + \sin θ [\mathbf{k}]_× + (1-\cos θ) [\mathbf{k}]_×^2$$
+$$R_{spherical}(\mathbf{k}, \theta) = I + \sin \theta [\mathbf{k}]_\times + (1-\cos \theta) [\mathbf{k}]_\times^2$$
 
 **Constraint:** Translation completely constrained, 3 rotational DoF remain
 
@@ -100,14 +100,14 @@ $$R_{spherical}(\mathbf{k}, θ) = I + \sin θ [\mathbf{k}]_× + (1-\cos θ) [\ma
     
     **ZYX Euler angles for spherical joint:**
     
-    $$R = R_x(α) R_y(β) R_z(γ)$$
+    $$R = R_x(\alpha) R_y(\beta) R_z(\gamma)$$
     
     **Joint limits:**
-    - α (roll): ±60° typical for biological joints  
-    - β (pitch): ±90° depending on anatomy
-    - γ (yaw): ±30° for finger metacarpal joints
+    - $\alpha$ (roll): ±60° typical for biological joints  
+    - $\beta$ (pitch): ±90° depending on anatomy
+    - $\gamma$ (yaw): ±30° for finger metacarpal joints
     
-    **Singularity:** When β = ±90°, α and γ rotations become indistinguishable
+    **Singularity:** When $\beta = \pm 90°$, $\alpha$ and $\gamma$ rotations become indistinguishable
     
   </TabItem>
   <TabItem label="Axis-Angle Method">
@@ -115,10 +115,10 @@ $$R_{spherical}(\mathbf{k}, θ) = I + \sin θ [\mathbf{k}]_× + (1-\cos θ) [\ma
     **Rodriguez formula application:**
     
     **Rotation axis:** $\mathbf{k} = [k_x, k_y, k_z]^T$ (unit vector)
-    **Rotation angle:** θ ∈ [0, π]
+    **Rotation angle:** $\theta \in [0, \pi]$
     
     **Advantages:**
-    - No singularities for θ ∈ [0, π)
+    - No singularities for $\theta \in [0, \pi)$
     - Intuitive physical interpretation
     - Efficient composition of rotations
     
@@ -126,32 +126,28 @@ $$R_{spherical}(\mathbf{k}, θ) = I + \sin θ [\mathbf{k}]_× + (1-\cos θ) [\ma
     
   </TabItem>
   <TabItem label="Quaternion Approach">
-    
     **Unit quaternion representation:**
-    $$q = q_0 + q_1\mathbf{i} + q_2\mathbf{j} + q_3\mathbf{k}$$
     
-    **Constraint:** $|q|^2 = q_0^2 + q_1^2 + q_2^2 + q_3^2 = 1$
+    Unit quaternions provide a 4-parameter representation: $q = q_0 + q_1\mathbf{i} + q_2\mathbf{j} + q_3\mathbf{k}$
+    
+    **Constraint:** Unit magnitude constraint $|q|^2 = q_0^2 + q_1^2 + q_2^2 + q_3^2 = 1$
     
     **Rotation matrix extraction:**
-    $$R = \begin{bmatrix} 
-    1-2(q_2^2+q_3^2) & 2(q_1q_2-q_0q_3) & 2(q_1q_3+q_0q_2) \\
-    2(q_1q_2+q_0q_3) & 1-2(q_1^2+q_3^2) & 2(q_2q_3-q_0q_1) \\
-    2(q_1q_3-q_0q_2) & 2(q_2q_3+q_0q_1) & 1-2(q_1^2+q_2^2)
-    \end{bmatrix}$$
     
+    Standard quaternion to rotation matrix conversion applies with 3x3 orthogonal matrix output.
   </TabItem>
 </Tabs>
 
 ### Universal Joint Analysis
 
-<Card title="🔗 Universal Joint (Hooke's Joint) Kinematics" icon="document">
+<Card title="Universal Joint (Hooke's Joint) Kinematics" icon="document">
 **Two-axis rotation system:**
-- **First axis rotation:** θ₁ about fixed axis
-- **Second axis rotation:** θ₂ about perpendicular moving axis  
+- **First axis rotation:** $\theta_1$ about fixed axis
+- **Second axis rotation:** $\theta_2$ about perpendicular moving axis  
 - **Coupling constraint:** Second axis orientation depends on first rotation
 
 **Transformation sequence:**
-$$T_{universal} = R_{z}(θ_1) R_{x'}(θ_2)$$
+$$T_{universal} = R_{z}(\theta_1) R_{x'}(\theta_2)$$
 
 **Physical Meaning:** Universal joints transmit rotation between shafts at varying angles, commonly used in drive trains and robotic wrist mechanisms.
 </Card>
@@ -161,10 +157,10 @@ $$T_{universal} = R_{z}(θ_1) R_{x'}(θ_2)$$
     
     **Input-output relationship:**
     
-    For equal input angular velocities ω₁:
-    $$ω_2 = ω_1 \frac{\cos θ_1}{1 - \sin^2 θ_1 \sin^2 α}$$
+    For equal input angular velocities $\omega_1$:
+    $$\omega_2 = \omega_1 \frac{\cos \theta_1}{1 - \sin^2 \theta_1 \sin^2 \alpha}$$
     
-    Where α is the angle between shaft axes
+    Where $\alpha$ is the angle between shaft axes
     
     **Velocity fluctuation:** Output speed varies periodically even with constant input
     
@@ -207,7 +203,7 @@ $$T_{universal} = R_{z}(θ_1) R_{x'}(θ_2)$$
 Spatial four-bar mechanisms extend planar four-bar concepts to three dimensions, creating complex motion patterns impossible with planar linkages. These mechanisms are fundamental building blocks for many robotic finger and limb designs.
 </BionicText>
 
-<Card title="🔄 Spatial Four-Bar Linkage Analysis" icon="document">
+<Card title="Spatial Four-Bar Linkage Analysis" icon="document">
 **Four links connected by four spatial joints:**
 - **Ground link:** Fixed reference frame
 - **Input link:** Driven by actuator  
@@ -260,24 +256,24 @@ Let's analyze a complete multi-finger humanoid hand system.
 1. **MCP joint workspace (spherical joint):**
    
    **Parameterization using Euler angles:**
-   $$R_{MCP}(α, β, γ) = R_z(γ) R_y(β) R_x(α)$$
+   $$R_{MCP}(\alpha, \beta, \gamma) = R_z(\gamma) R_y(\beta) R_x(\alpha)$$
    
    **Joint limits:**
-   - α (abduction/adduction): ±20°
-   - β (flexion/extension): 0° to 90°  
-   - γ (rotation): ±10°
+   - $\alpha$ (abduction/adduction): ±20°
+   - $\beta$ (flexion/extension): 0° to 90°  
+   - $\gamma$ (rotation): ±10°
 
 2. **Reachable orientation set:**
    
    **Solid angle calculation:**
-   $$\Omega = \int_{\alpha_{min}}^{\alpha_{max}} \int_{\beta_{min}}^{\beta_{max}} \int_{\gamma_{min}}^{\gamma_{max}} \sin β \, d\alpha \, d\beta \, d\gamma$$
+   $$\Omega = \int_{\alpha_{\text{min}}}^{\alpha_{\text{max}}} \int_{\beta_{\text{min}}}^{\beta_{\text{max}}} \int_{\gamma_{\text{min}}}^{\gamma_{\text{max}}} \sin \beta \, d\alpha \, d\beta \, d\gamma$$
    
    Result: Ω = 0.31 steradians (≈ 1800 square degrees)
 
 3. **Fingertip workspace volume:**
    
    **Proximal phalanx contribution:**
-   Sphere of radius L₁ = 45 mm around MCP center
+   Sphere of radius $L_1 = 45$ mm around MCP center
    
    **Distal joints contribution:**  
    Additional workspace expansion from 2-DoF PIP and DIP joints
@@ -287,7 +283,7 @@ Let's analyze a complete multi-finger humanoid hand system.
 4. **Workspace optimization:**
    
    **Condition number minimization:**
-   Adjust joint angle distributions to minimize $\kappa = σ_{max}/σ_{min}$
+   Adjust joint angle distributions to minimize $\kappa = \sigma_{\text{max}}/\sigma_{\text{min}}$
    
    **Isotropy index:** Target κ < 5 for good manipulation capability
 
@@ -351,7 +347,7 @@ Let's analyze a complete multi-finger humanoid hand system.
 1. **Individual finger singularities:**
    
    **Type 1 - Boundary singularities:**
-   - Joint limits reached: θᵢ = θᵢ,max or θᵢ,min
+   - Joint limits reached: $\theta_i = \theta_{i,\text{max}}$ or $\theta_{i,\text{min}}$
    - Workspace boundary configurations
    
    **Type 2 - Alignment singularities:**  
@@ -373,7 +369,7 @@ Let's analyze a complete multi-finger humanoid hand system.
 3. **Singularity detection algorithms:**
    
    **Condition number monitoring:**
-   $$\kappa_i = \frac{\sigma_{max}(J_i)}{\sigma_{min}(J_i)}$$
+   $$\kappa_i = \frac{\sigma_{\text{max}}(J_i)}{\sigma_{\text{min}}(J_i)}$$
    
    **Grasp quality metrics:**
    $$Q = \min_{\|\mathbf{w}\|=1} \|\mathbf{f}\|$$ (force ellipsoid analysis)
@@ -530,7 +526,7 @@ Real-world mechanisms often contain multiple closed loops, creating complex cons
     **Position-orientation workspace:**
     
     For each position, determine achievable orientations:
-    $$\Phi(x,y,z) = \{(α,β,γ) | \text{inverse kinematics solvable}\}$$
+    $$\Phi(x,y,z) = \{(\alpha,\beta,\gamma) | \text{inverse kinematics solvable}\}$$
     
     **Visualization techniques:**
     - 3D position workspace with orientation capability indicators
@@ -542,9 +538,9 @@ Real-world mechanisms often contain multiple closed loops, creating complex cons
     
     **Local dexterity metrics:**
     
-    **Condition number:** $\kappa = σ_{max}/σ_{min}$
+    **Condition number:** $\kappa = \sigma_{\text{max}}/\sigma_{\text{min}}$
     **Manipulability:** $m = \sqrt{\det(JJ^T)}$
-    **Isotropy index:** $I = σ_{min}/σ_{max}$
+    **Isotropy index:** $I = \sigma_{\text{min}}/\sigma_{\text{max}}$
     
     **Global dexterity:**
     $$D_{global} = \frac{1}{|W|} \int_W D_{local}(\mathbf{q}) d\mathbf{q}$$

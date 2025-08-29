@@ -98,13 +98,13 @@ $$z = x + iy = r e^{i\theta}$$
   <TabItem label="Pure Rotation">
     
     <Card title="🔄 Complex Rotation Operator" icon="document">
-    **Rotation by angle α:**
+    **Rotation by angle $\alpha$:**
     $$z' = z \cdot e^{i\alpha} = z \cdot (\cos\alpha + i\sin\alpha)$$
     
     **Matrix form:**
     $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} \cos\alpha & -\sin\alpha \\ \sin\alpha & \cos\alpha \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$$
     
-    **Physical Meaning:** Multiplying by $e^{i\alpha}$ rotates any point counterclockwise by angle α about the origin.
+    **Physical Meaning:** Multiplying by $e^{i\alpha}$ rotates any point counterclockwise by angle $\alpha$ about the origin.
     </Card>
     
   </TabItem>
@@ -217,8 +217,8 @@ Let's program a complete pick-and-place operation for electronics assembly.
 <hr />
 
 **System Parameters:**
-- SCARA robot: Link 1 = **`L₁`** = 400 mm, Link 2 = **`L₂`** = 300 mm  
-- Joint ranges: θ₁ = ±150°, θ₂ = ±135°, Z = ±50 mm, φ = ±180°
+- SCARA robot: Link 1 = **$L_1$** = 400 mm, Link 2 = **$L_2$** = 300 mm  
+- Joint ranges: $\theta_1 = \pm 150°$, $\theta_2 = \pm 135°$, $Z = \pm 50$ mm, $\phi = \pm 180°$
 - Positioning accuracy: **`±0.01 mm`** and **`±0.1°`**
 - Workpiece: Electronic component **`5×3 mm`** with **`0.2 mm`** placement tolerance
 - Pick location: (200, 100) mm, Place location: (450, 250) mm
@@ -253,7 +253,7 @@ Let's program a complete pick-and-place operation for electronics assembly.
 
 4. **Tool orientation:**
    
-   Tool angle = θ₁ + θ₂ + φ (wrist rotation)
+   Tool angle = $\theta_1 + \theta_2 + \phi$ (wrist rotation)
 
 </Steps>
 
@@ -298,7 +298,7 @@ Let's program a complete pick-and-place operation for electronics assembly.
 
 1. **Waypoint definition:**
    
-   - **Home position:** (350, 0) mm, θ₁ = 0°, θ₂ = 0°
+   - **Home position:** (350, 0) mm, $\theta_1 = 0°$, $\theta_2 = 0°$
    - **Pick approach:** (200, 120) mm (20 mm above component)  
    - **Pick position:** (200, 100) mm
    - **Place approach:** (450, 270) mm (20 mm above target)
@@ -359,7 +359,7 @@ Let's program a complete pick-and-place operation for electronics assembly.
    
    - Choose configuration avoiding joint limits
    - Minimize joint motion from current position  
-   - Avoid singularities (θ₂ = 0° or ±180°)
+   - Avoid singularities ($\theta_2 = 0°$ or $\pm 180°$)
    - Consider obstacle avoidance
 
 </Steps>
