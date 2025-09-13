@@ -2,7 +2,7 @@
 title: "Lesson 2: Planar Transformations and Mathematical Foundations"
 description: "Building 3D spatial mechanics foundations through 2D planar robot analysis using complex numbers and homogeneous coordinates"
 contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-09-10
+pubDate: 2025-09-13
 tags: ["spatial-mechanics", "planar-transformations", "complex-analysis", "homogeneous-coordinates", "SCARA-robot"]
 excerpt: "Master planar transformation mathematics through SCARA robot programming, covering complex number analysis, homogeneous coordinates, and transformation matrix composition as foundation for 3D spatial mechanics."
 ---
@@ -10,6 +10,7 @@ excerpt: "Master planar transformation mathematics through SCARA robot programmi
 import SpatialMechanicsComments from '../../../../components/spatial-mechanics/SpatialMechanicsComments.astro';
 import TawkWidget from '../../../../components/TawkWidget.astro';
 import UniversalContentContributors from '../../../../components/UniversalContentContributors.astro';
+import InArticleAd from '../../../../components/InArticleAd.astro';
 import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
@@ -117,6 +118,7 @@ $$z = x + iy = r e^{i\theta}$$
     **Matrix form (requires homogeneous coordinates):**
     $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} x \\ y \end{bmatrix} + \begin{bmatrix} a \\ b \end{bmatrix}$$
     
+
     **Physical Meaning:** Adding a complex constant shifts all points by the same displacement vector.
     </Card>
     
@@ -137,6 +139,9 @@ $$z = x + iy = r e^{i\theta}$$
 </Tabs>
 
 ### Homogeneous Coordinates for Unified Representation
+
+
+<InArticleAd />
 
 <BionicText method="advanced" intensity="medium" class="highlight">
 Homogeneous coordinates solve the fundamental problem that translation cannot be represented as matrix multiplication in Cartesian coordinates. By adding a third coordinate, both rotation and translation become matrix multiplications.
@@ -393,6 +398,9 @@ Let's program a complete pick-and-place operation for electronics assembly.
 
 ## 🎯 Advanced Analysis: Concatenation and Composition
 
+
+<InArticleAd />
+
 ### Transformation Sequence Analysis
 
 <BionicText method="advanced" intensity="medium" class="highlight">
@@ -515,6 +523,7 @@ In this lesson, you learned to:
 
 **Coming Next**: In Lesson 3, we'll extend these 2D concepts to full 3D spatial transformations, covering rotation matrices, Euler angles, and complex 3D orientation control for 6-DOF industrial robot arms.
 
+<InArticleAd />
 <SpatialMechanicsComments />
 <TawkWidget />
 <Copyright />

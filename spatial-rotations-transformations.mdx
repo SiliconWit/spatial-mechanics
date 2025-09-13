@@ -2,7 +2,7 @@
 title: "Lesson 3: 3D Rotation Matrices and Spatial Transformations"
 description: "Mastering spatial orientation control through 6-DOF robot arm programming using rotation matrices and transformation composition"
 contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-09-10
+pubDate: 2025-09-13
 tags: ["spatial-mechanics", "3d-rotations", "transformation-matrices", "6dof-robotics", "euler-angles"]
 excerpt: "Learn spatial transformation mathematics through 6-DOF industrial robot programming, covering rotation matrices, Euler angle sequences, homogeneous transformations, and complex 3D orientation control."
 ---
@@ -10,6 +10,7 @@ excerpt: "Learn spatial transformation mathematics through 6-DOF industrial robo
 import SpatialMechanicsComments from '../../../../components/spatial-mechanics/SpatialMechanicsComments.astro';
 import TawkWidget from '../../../../components/TawkWidget.astro';
 import UniversalContentContributors from '../../../../components/UniversalContentContributors.astro';
+import InArticleAd from '../../../../components/InArticleAd.astro';
 import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
@@ -114,6 +115,7 @@ Complex manufacturing operations require:
     
     **Physical Meaning:** Rotation about Z-axis corresponds to "yaw" motion - like an aircraft turning left or right.
     **Invariant:** Z-coordinate remains unchanged, X and Y coordinates rotate in XY plane.
+
     </Card>
     
   </TabItem>
@@ -131,6 +133,9 @@ Complex manufacturing operations require:
 </Card>
 
 ### Euler Angle Representations
+
+
+<InArticleAd />
 
 <BionicText method="advanced" intensity="medium" class="highlight">
 Euler angles provide an intuitive way to describe 3D orientations using three sequential rotations about coordinate axes. However, different sequences exist and singularities must be carefully managed.
@@ -360,6 +365,9 @@ Let's program complex tool orientations for aerospace composite layup.
 
 ### Step 4: Inverse Kinematics and Joint Angle Solutions
 
+
+<InArticleAd />
+
 <details>
 <summary>**Click to reveal inverse kinematics solutions**</summary>
 
@@ -587,6 +595,7 @@ In this lesson, you learned to:
 
 **Coming Next**: In Lesson 4, we'll develop systematic kinematic modeling using elementary matrices and DH parameters for Stewart Platform analysis, providing a structured approach to complex parallel mechanism design.
 
+<InArticleAd />
 <SpatialMechanicsComments />
 <TawkWidget />
 <Copyright />
