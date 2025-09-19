@@ -2,7 +2,7 @@
 title: "Lesson 1: Kinematic Joints and Degrees of Freedom in 3D Systems"
 description: "Analyzing joint types and constraint relationships in modular robotic systems through systematic DoF analysis"
 contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-09-15
+pubDate: 2025-09-18
 tags: ["spatial-mechanics", "kinematic-joints", "degrees-freedom", "modular-robotics", "constraint-analysis"]
 excerpt: "Learn kinematic joint analysis through modular robot design, covering all joint types, degrees of freedom calculations, and constraint relationships in 3D mechanical systems."
 ---
@@ -24,10 +24,10 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
 
 By the end of this lesson, you will be able to:
 
-1. **Classify** all kinematic joint types and their motion characteristics in 3D space
-2. **Calculate** degrees of freedom for spatial mechanisms using Grübler's equation
-3. **Analyze** constraint relationships and mobility in modular robotic systems  
-4. **Design** joint libraries for reconfigurable mechatronic applications
+1. **Classify** all kinematic <Badge text="joint types" variant="caution" /> and their motion characteristics in 3D space
+2. **Calculate** <Badge text="degrees of freedom" variant="caution" /> for spatial mechanisms using Grübler's equation
+3. **Analyze** <Badge text="constraint relationships" variant="caution" /> and mobility in modular robotic systems  
+4. **Design** <Badge text="joint libraries" variant="caution" /> for reconfigurable mechatronic applications
 
 ## 🔧 Real-World System Problem: Modular Robot Joint Library
 
@@ -58,8 +58,8 @@ When designing modular systems, engineers face critical decisions:
 
 > **Engineering Question:** How do we systematically analyze and catalog the motion capabilities of different joint types to create a comprehensive modular robot library?
 
-### Why Joint Analysis Matters
-
+<details>
+<summary>**Click to Reveal: Why Joint Analysis Matters**</summary>
 **Consequences of Poor Joint Selection:**
 - **Motion limitations** preventing required tasks
 - **Over-constrained systems** with binding and excessive forces
@@ -72,6 +72,7 @@ When designing modular systems, engineers face critical decisions:
 - **Predictable system behavior** through constraint understanding
 - **Efficient designs** with minimum complexity
 - **Reliable operation** with singularity avoidance
+</details>
 
 ## 📚 Fundamental Theory: Joint Types and Constraints
 
@@ -80,31 +81,64 @@ When designing modular systems, engineers face critical decisions:
 In 3D space, kinematic joints can be classified by the **number of constraints** they impose:
 
 <Tabs>
-  <TabItem label="Lower Pairs">
+  <TabItem label="Lower DoF Pairs">
     
     **Lower pairs maintain surface contact between links:**
     
-    <Card title="🔄 Revolute Joint" icon="document">
+    <Card title="🔄 Revolute (Hinge) Joint" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Revolute Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/revolute-joint-ls-group.gif)
+  </TailwindWrapper>
+</div> 
     **Motion:** 1 rotational DoF about fixed axis  
     **Constraints:** 5 (removes 2 translations + 1 rotation perpendicular to axis + 2 rotations about other axes)  
     **DoF:** 1  
-    
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ❌  |
+| Rotation    | ❌     | ✅     | ❌   |
+  
     **Applications:** Robot arm joints, wheel axles, door hinges
     </Card>
     
     <Card title="↕️ Prismatic Joint" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Prismatic Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/prismatic-joint-ls-group.gif)
+  </TailwindWrapper>
+</div> 
     **Motion:** 1 translational DoF along fixed axis  
     **Constraints:** 5 (removes 2 translations perpendicular to axis + 3 rotations)  
     **DoF:** 1  
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ✅     |
+| Rotation    | ❌     | ❌     | ❌     |
     
     **Applications:** Linear actuators, telescoping mechanisms, sliding doors
     </Card>
     
     <Card title="🌀 Helical Joint" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Helical Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/helical-joint-ls-group.gif)
+  </TailwindWrapper>
+</div>
     **Motion:** Combined rotation and translation (screw motion)  
     **Constraints:** 5 (coupled rotation-translation motion)  
     **DoF:** 1  
-    
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ✅     |
+| Rotation    | ❌     | ❌     | ✅     |
+
+:::tip[Understanding Helical Joint]
+- A **helical joint** has a **single degree of freedom** because its rotation and translation are **mechanically coupled** — you can't have one without the other. This is different from a **cylindrical joint**, which has **two independent degrees of freedom** (rotation and translation along the same axis).  
+- Think of the motion not as separate rotation and translation, but as a **single, combined helical motion**.  
+- A helpful analogy is a **zipper on a backpack**: the zipper pull moves by both **sliding along the track** and **zipping or unzipping** at the same time. You can't do one without the other — it's one continuous motion.
+:::
+  
     **Applications:** Lead screws, propeller shafts, screw jacks
     </Card>
     
@@ -114,25 +148,52 @@ In 3D space, kinematic joints can be classified by the **number of constraints**
     **Multiple degree-of-freedom joint connections:**
     
     <Card title="🎯 Cylindrical Joint" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+    ![Cylindrical Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/cylindrical-joint-laas.gif)
+  </TailwindWrapper>
+</div>    
     **Motion:** 1 rotation + 1 translation along same axis  
     **Constraints:** 4 (removes 2 translations + 2 rotations perpendicular to axis)  
     **DoF:** 2  
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ✅     |
+| Rotation    | ❌     | ❌     | ✅     |
     
     **Applications:** Hydraulic cylinders, telescoping robot arms
     </Card>
     
-    <Card title="⚪ Spherical Joint" icon="document">  
+    <Card title="⚽ Spherical (Ball) Joint" icon="document">  
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Spherical Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/spherical-joint-laas.gif)
+  </TailwindWrapper>
+</div> 
     **Motion:** 3 rotations about intersecting axes
     **Constraints:** 3 (removes all translations)  
     **DoF:** 3  
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ❌     |
+| Rotation    | ✅     | ✅     | ✅     |
     
     **Applications:** Ball joints, robot wrists, universal connections
     </Card>
     
     <Card title="📋 Planar Joint" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Planar Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/planar-joint-laas.gif)
+  </TailwindWrapper>
+</div> 
     **Motion:** 2 translations + 1 rotation in plane  
     **Constraints:** 3 (removes 1 translation + 2 rotations perpendicular to plane)  
     **DoF:** 3  
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ✅     | ✅     | ❌     |
+| Rotation    | ❌     | ❌     | ✅     |
     
     **Applications:** 2D sliding mechanisms, planar robot bases
     </Card>
@@ -143,22 +204,83 @@ In 3D space, kinematic joints can be classified by the **number of constraints**
     **Specialized joint mechanisms:**
     
     <Card title="🔗 Universal Joint (Hooke's Joint)" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Universal Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/universal-joint-wikimedia.gif)
+  </TailwindWrapper>
+</div> 
     **Motion:** 2 rotations about perpendicular axes  
     **Constraints:** 4 (removes 3 translations + 1 rotation about longitudinal axis)  
     **DoF:** 2  
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ❌     |
+| Rotation    | ❌     | ✅     | ✅     |
     
     **Applications:** Drive shafts, robotic wrists, gimbal systems
     </Card>
     
-    <Card title="⚙️ Agitation Mechanism" icon="document">
-    **Motion:** Complex 3D oscillatory motion  
-    **Constraints:** Variable (depends on specific mechanism design)  
-    **DoF:** 1-3 (typically constrained oscillation)  
+    <Card title="⚙️ Vibratory Metal Finishing Machine (Agitation Mechanism)" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Vibratory Metal Finishing Machine](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/vibro-finishing-machine.gif)
+  </TailwindWrapper>
+</div> 
+    **Motion:** Complex 3D oscillatory motion (helical/toroidal)  
+    **Constraints:** Constrained by the machine's bowl or tub geometry  
+    **DoF:** Varies; the bowl typically has 2-3 DoF, while the parts inside exhibit complex, multi-DoF chaotic motion  
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ✅     | ✅?     | ✅     |
+| Rotation    | ✅?     | ❌     | ❌     |
     
-    **Applications:** Mixing systems, vibrating conveyors, agitators
+    **Applications:** Deburring, polishing, radiusing, and cleaning metal parts
     </Card>
     
   </TabItem>
+  
+<TabItem label="Extreme Cases">
+
+<Card title="🎈 Free Joint (Conceptual)" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Prismatic Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/free-joint-ls-group.gif)
+  </TailwindWrapper>
+</div> 
+**Motion:** All 3 translations + all 3 rotations 
+
+**Constraints:** 0 (no constraints) 
+
+**DoF:** 6 
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ✅     | ✅     | ✅     |
+| Rotation    | ✅     | ✅     | ✅     |
+
+**Applications:** A free-floating object in space, theoretical baseline for kinematics
+</Card>
+
+<Card title="🧱 Fixed Joint" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Prismatic Joint](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/fixed-joint-ls-group.gif)
+  </TailwindWrapper>
+</div> 
+**Motion:** 0 (no relative motion)
+
+**Constraints:** 6 (removes all translations and all rotations)
+| Motion      | X-Axis | Y-Axis | Z-Axis |
+|-------------|--------|--------|--------|
+| Translation | ❌     | ❌     | ❌     |
+| Rotation    | ❌     | ❌     | ❌     |
+
+**DoF: 0**
+
+**Applications:** Welded connections, bolted flanges, structural supports
+</Card>
+
+</TabItem>
+  
 </Tabs>
 
 ### Degrees of Freedom Analysis
@@ -181,6 +303,8 @@ A **free body in 3D space** has 6 degrees of freedom:
 - **3 rotations** (about X, Y, Z axes)
 
 Each joint **removes some of these freedoms** through constraints.
+> If the mechanism's <Badge text="unconstrained motion" variant="caution" /> is **within 3 DoFs**, it's probably a **2D (planar) mechanism**.
+> If it involves **more than 3 DoFs**, it's almost certainly a **3D (spatial) mechanism**.
 :::
 
 ### Systematic Joint Analysis Process
