@@ -2,7 +2,7 @@
 title: "Lesson 1: Kinematic Joints and Degrees of Freedom in 3D Systems"
 description: "Analyzing joint types and constraint relationships in modular robotic systems through systematic DoF analysis"
 contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-09-18
+pubDate: 2025-09-19
 tags: ["spatial-mechanics", "kinematic-joints", "degrees-freedom", "modular-robotics", "constraint-analysis"]
 excerpt: "Learn kinematic joint analysis through modular robot design, covering all joint types, degrees of freedom calculations, and constraint relationships in 3D mechanical systems."
 ---
@@ -216,6 +216,12 @@ In 3D space, kinematic joints can be classified by the **number of constraints**
 |-------------|--------|--------|--------|
 | Translation | ❌     | ❌     | ❌     |
 | Rotation    | ❌     | ✅     | ✅     |
+
+:::tip[Understanding Universal Joint]
+- Unlike the helical joint, where rotation and translation are inseparable, the universal joint permits **two distinct rotational motions**.  
+- The shafts are constrained so that one shaft’s rotation always drives the other, but the joint can still bend at different angles — that bending is an **independent rotational DoF**.  
+- A helpful analogy is a **wrist joint**: you can both **twist your hand** (rotate about the forearm axis) and **bend it up or down** (rotation about a perpendicular axis). These are two separate, independent motions.
+:::
     
     **Applications:** Drive shafts, robotic wrists, gimbal systems
     </Card>
