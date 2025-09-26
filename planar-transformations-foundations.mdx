@@ -2,7 +2,7 @@
 title: "Lesson 2: Planar Transformations and Mathematical Foundations"
 description: "Building 3D spatial mechanics foundations through 2D planar robot analysis using complex numbers and homogeneous coordinates"
 contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-09-19
+pubDate: 2025-09-26
 tags: ["spatial-mechanics", "planar-transformations", "complex-analysis", "homogeneous-coordinates", "SCARA-robot"]
 excerpt: "Master planar transformation mathematics through SCARA robot programming, covering complex number analysis, homogeneous coordinates, and transformation matrix composition as foundation for 3D spatial mechanics."
 ---
@@ -20,14 +20,16 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
   contributors={frontmatter.contributors}
 />
 
+Master planar transformation mathematics through SCARA robot programming, covering complex number analysis, homogeneous coordinates, and transformation matrix composition as foundation for 3D spatial mechanics.
+
 ## 🎯 Learning Objectives
 
 By the end of this lesson, you will be able to:
 
-1. **Apply** complex number analysis for planar rotations and translations  
-2. **Implement** homogeneous coordinates for unified transformation representation
-3. **Compose** multiple planar transformations using matrix multiplication
-4. **Program** precise 2D trajectories for SCARA robot motion control
+1. **Apply** <Badge text="complex number analysis" variant="caution" /> for <Badge text="planar rotations" variant="tip" /> and <Badge text="translations" variant="note" />
+2. **Implement** <Badge text="homogeneous coordinates" variant="caution" /> for <Badge text="unified transformation" variant="tip" /> representation
+3. **Compose** multiple planar transformations using <Badge text="matrix multiplication" variant="caution" />
+4. **Program** precise <Badge text="2D trajectories" variant="caution" /> for <Badge text="SCARA robot" variant="tip" /> motion control
 
 ## 🔧 Real-World System Problem: SCARA Robot Programming
 
@@ -198,6 +200,737 @@ $$T = \begin{bmatrix} R_{11} & R_{12} & t_x \\ R_{21} & R_{22} & t_y \\ 0 & 0 & 
     
   </TabItem>
 </Tabs>
+
+### Composite Homogeneous Transformations for Robotics
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Real robot control requires precise composition of multiple rotations and translations. Understanding the systematic rules for matrix multiplication order is essential for accurate end-effector positioning and complex trajectory programming.
+</BionicText>
+
+<Card title="🔧 Transformation Composition Rules" icon="document">
+**Matrix multiplication is non-commutative - order matters!**
+
+**For robot positioning with multiple transformations:**
+
+1. **Initial state:** Fixed and mobile frames are coincident → **Identity matrix**
+2. **Fixed frame operations:** Rotate/translate about fixed axes (X,Y,Z) → **Pre-multiply** current matrix
+3. **Mobile frame operations:** Rotate/translate about mobile axes (A,B,C) → **Post-multiply** current matrix
+
+**General composition:** **$H = H_n · H_{n-1} · ... · H_2 · H_1$**
+
+Where transformations are applied in sequence: H_1 first, H_n last.
+</Card>
+
+<Tabs>
+  <TabItem label="Basic Examples">
+
+    <details>
+    <summary>**Example 1: Simple rotation and translation sequence**</summary>
+
+    <Steps>
+
+    1. **Problem:** 40° rotation about OX-axis, then 7 units translation along mobile B-axis
+
+       **Setup:** **H = H(x,40°) · I · H(B,7)**
+
+    2. **Matrix composition:**
+
+       $$
+       \begin{aligned}
+       H &= \begin{bmatrix}
+       1 & 0 & 0 & 0 \\
+       0 & \cos(40°) & -\sin(40°) & 0 \\
+       0 & \sin(40°) & \cos(40°) & 0 \\
+       0 & 0 & 0 & 1
+       \end{bmatrix} \cdot \begin{bmatrix}
+       1 & 0 & 0 & 0 \\
+       0 & 1 & 0 & 7 \\
+       0 & 0 & 1 & 0 \\
+       0 & 0 & 0 & 1
+       \end{bmatrix}
+       \end{aligned}
+       $$
+
+    3. **Final result:**
+
+       $$
+       H = \begin{bmatrix}
+       1 & 0 & 0 & 0 \\
+       0 & 0.7660 & -0.6428 & 5.3620 \\
+       0 & 0.6428 & 0.7660 & 4.4996 \\
+       0 & 0 & 0 & 1
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+  <TabItem label="Complex Sequences">
+
+    <details>
+    <summary>**Example 2: Multi-step transformation sequence**</summary>
+
+    <Steps>
+
+    1. **Problem:** Complex robotic motion sequence
+       - 50° rotation about OX-axis
+       - 4 units translation along OX-axis
+       - -6 units translation along OC-axis
+       - 25° rotation about OB-axis
+
+    2. **Matrix sequence:** **H = H(x,4) · H(x,50°) · I · H(c,-6) · H(b,25°)**
+
+    3. **Step-by-step computation:**
+
+       $$
+       \begin{aligned}
+       H &= \begin{bmatrix}1 & 0 & 0 & 4 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
+       \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 0.6428 & -0.7660 & 0 \\ 0 & 0.7660 & 0.6428 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+       &\times \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & -6 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
+       \begin{bmatrix}0.9063 & 0 & 0.4226 & 0 \\ 0 & 1 & 0 & 0 \\ -0.4226 & 0 & 0.9063 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    4. **Final transformation matrix:**
+
+       $$
+       H = \begin{bmatrix}
+       0.9063 & 0 & 0.4226 & 4.0 \\
+       0.3237 & 0.6428 & -0.6943 & 4.596 \\
+       -0.2717 & 0.766 & 0.5826 & -3.857 \\
+       0 & 0 & 0 & 1.0
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+  <TabItem label="Vision System Applications">
+
+    <details>
+    <summary>**Example 3: Robot vision system coordinate transformations**</summary>
+
+    <Steps>
+
+    1. **System setup:** Robotic work cell with camera and 6-joint robot
+       - **H₁**: Camera to cube transformation
+       - **H₂**: Camera to robot base transformation
+       - **H₃**: Base to gripper transformation
+
+    2. **Given transformation matrices:**
+
+       $$
+       \begin{aligned}
+       H_1 &= \begin{bmatrix}0 & 1 & 0 & 4 \\ 1 & 0 & 0 & 3 \\ 0 & 0 & -1 & 7 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+       H_2 &= \begin{bmatrix}1 & 0 & 0 & -15 \\ 0 & -1 & 0 & 5 \\ 0 & 0 & -1 & 6 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+       H_3 &= \begin{bmatrix}1 & 0 & 0 & 7 \\ 0 & 1 & 0 & 2 \\ 0 & 0 & 1 & 3 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    3. **Object position relative to robot base:**
+
+       $$
+       \begin{aligned}
+       {}^{base}T_{object} &= {}^{base}T_{camera} \cdot {}^{camera}T_{object} \\
+       &= [H_2]^{-1} \cdot [H_1] \\
+       &= \begin{bmatrix}0 & 1 & 0 & 19 \\ -1 & 0 & 0 & 2 \\ 0 & 0 & 1 & -1 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    4. **Object position relative to gripper:**
+
+       $$
+       \begin{aligned}
+       {}^{gripper}T_{object} &= {}^{gripper}T_{base} \cdot {}^{base}T_{object} \\
+       &= [H_3]^{-1} \cdot [H_2]^{-1} \cdot [H_1] \\
+       &= \begin{bmatrix}0 & 1 & 0 & 12 \\ -1 & 0 & 0 & 0 \\ 0 & 0 & 1 & -4 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+</Tabs>
+
+### Advanced Multi-Body Transformations
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Complex robotic systems require systematic handling of multiple coordinate frames, object manipulations, and dynamic transformations. Mastering these principles enables precise control of sophisticated manufacturing and assembly operations.
+</BionicText>
+
+<details>
+<summary>**Advanced Example: Triangular prism manipulation**</summary>
+
+<Steps>
+
+1. **Problem setup:** Triangular prism with vertices A(1,3,0), B(-1,3,0), C(-1,3,2), D(1,3,2), E(1,5,2), F(-1,5,2)
+
+   **Required transformations:**
+   - +60° rotation about X-axis
+   - -60° rotation about Z-axis
+   - +5 units translation in Y-direction
+
+2. **Transformation matrix composition:**
+
+   $$H = H_{trans}(0,5,0) \cdot H(z,-60°) \cdot H(x,+60°) \cdot I_4$$
+
+3. **Matrix multiplication sequence:**
+
+   $$
+   \begin{aligned}
+   H &= \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 5 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
+   \begin{bmatrix}\frac{1}{2} & \frac{\sqrt{3}}{2} & 0 & 0 \\ -\frac{\sqrt{3}}{2} & \frac{1}{2} & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+   &\times \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & \frac{1}{2} & -\frac{\sqrt{3}}{2} & 0 \\ 0 & \frac{\sqrt{3}}{2} & \frac{1}{2} & 0 \\ 0 & 0 & 0 & 1\end{bmatrix}
+   \end{aligned}
+   $$
+
+4. **Final transformation matrix:**
+
+   $$
+   H = \begin{bmatrix}
+   \frac{1}{2} & \frac{\sqrt{3}}{4} & -\frac{3}{4} & 0 \\
+   -\frac{\sqrt{3}}{2} & \frac{1}{4} & -\frac{\sqrt{3}}{4} & 5 \\
+   0 & \frac{\sqrt{3}}{2} & \frac{1}{2} & 0 \\
+   0 & 0 & 0 & 1
+   \end{bmatrix}
+   $$
+
+5. **New vertex coordinates:** Apply H to each vertex
+
+   **Example for vertex A:**
+   $$
+   [A_{new}] = H \cdot \begin{bmatrix}1 \\ 3 \\ 0 \\ 1\end{bmatrix} = \begin{bmatrix}\frac{1}{2} + \frac{3\sqrt{3}}{4} \\ \frac{23}{4} - \frac{\sqrt{3}}{2} \\ \frac{3\sqrt{3}}{2} \\ 1\end{bmatrix}
+   $$
+
+</Steps>
+
+</details>
+
+### Key Principles for Robot Programming
+
+<Card title="🎯 Essential Transformation Guidelines" icon="star">
+**Critical Success Factors:**
+
+1. **Frame Convention Consistency:** Always clearly define fixed vs. mobile frame operations
+2. **Matrix Order Verification:** Pre-multiply for fixed frame, post-multiply for mobile frame
+3. **Inverse Relationship Understanding:** Use H⁻¹ for reverse transformations
+4. **Numerical Precision:** Account for floating-point errors in complex sequences
+5. **Physical Validation:** Verify results against expected geometric relationships
+
+**Common Programming Errors:**
+- ❌ Incorrect matrix multiplication order
+- ❌ Mixing fixed and mobile frame conventions
+- ❌ Forgetting to account for intermediate coordinate frames
+- ❌ Using wrong inverse transformation relationships
+</Card>
+
+## 🌐 Extending to 3D: Rotations About XYZ Axes
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+While SCARA robots operate primarily in 2D, understanding 3D rotations is essential for complete spatial mechanics mastery. 3D rotations about individual coordinate axes form the foundation for complex orientation control in 6-DOF industrial robots.
+</BionicText>
+
+### Fundamental 3D Rotation Matrices
+
+Following the established axis convention where counterclockwise rotation is positive, we can derive rotation matrices for each coordinate axis. Each rotation transforms a mobile frame (A, B, C) relative to a fixed frame (X, Y, Z).
+
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Axes Convention](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/axes-convention.svg)
+  </TailwindWrapper>
+</div>
+
+<Tabs>
+  <TabItem label="X-Axis Rotation">
+
+    **Rotation about X-axis by angle α:**
+
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <TailwindWrapper>
+    	![Rotation about X Axis](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/rotation-about-x-axis.svg)
+      </TailwindWrapper>
+    </div>
+
+    **Geometric Analysis:**
+
+    After rotating axis B:
+    $$
+    \begin{aligned}
+    \cos(\alpha) &= \frac{+y}{B} \quad \Rightarrow \quad b = B \cos(\alpha) \\
+    \sin(\alpha) &= \frac{+z}{B} \quad \Rightarrow \quad c = B \sin(\alpha)
+    \end{aligned}
+    $$
+
+    After rotating axis C:
+    $$
+    \begin{aligned}
+    \cos(\alpha) &= \frac{+z}{C} \quad \Rightarrow \quad c = C \cos(\alpha) \\
+    \sin(\alpha) &= \frac{-y}{C} \quad \Rightarrow \quad b = -C \sin(\alpha)
+    \end{aligned}
+    $$
+
+    **Transformation Summary:**
+
+    | Before | After |
+    |--------|-------|
+    | A(1,0,0) | A(1,0,0) |
+    | B(0,1,0) | B(0, cos α, sin α) |
+    | C(0,0,1) | C(0, -sin α, cos α) |
+
+    <Card title="🔄 X-Axis Rotation Matrix" icon="document">
+    $$
+    R(x, \alpha) = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & \cos(\alpha) & -\sin(\alpha) \\
+    0 & \sin(\alpha) & \cos(\alpha)
+    \end{bmatrix}
+    $$
+
+    **Physical Meaning:** Rotates vectors around the X-axis, leaving X-coordinates unchanged while rotating Y and Z components in the YZ-plane.
+    </Card>
+
+  </TabItem>
+  <TabItem label="Y-Axis Rotation">
+
+    **Rotation about Y-axis by angle β:**
+
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <TailwindWrapper>
+    	![Rotation about Y Axis](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/rotation-about-y-axis.svg)
+      </TailwindWrapper>
+    </div>
+
+    **Geometric Analysis:**
+
+    After rotating axis A:
+    $$
+    \begin{aligned}
+    \cos(\beta) &= \frac{+x}{A} \quad \Rightarrow \quad a = A \cos(\beta) \\
+    \sin(\beta) &= \frac{-z}{A} \quad \Rightarrow \quad c = -A \sin(\beta)
+    \end{aligned}
+    $$
+
+    After rotating axis C:
+    $$
+    \begin{aligned}
+    \cos(\beta) &= \frac{+z}{C} \quad \Rightarrow \quad c = C \cos(\beta) \\
+    \sin(\beta) &= \frac{+x}{C} \quad \Rightarrow \quad a = C \sin(\beta)
+    \end{aligned}
+    $$
+
+    **Transformation Summary:**
+
+    | Before | After |
+    |--------|-------|
+    | A(1,0,0) | A(cos β, 0, -sin β) |
+    | B(0,1,0) | B(0,1,0) |
+    | C(0,0,1) | C(sin β, 0, cos β) |
+
+    <Card title="🔄 Y-Axis Rotation Matrix" icon="document">
+    $$
+    R(y, \beta) = \begin{bmatrix}
+    \cos(\beta) & 0 & \sin(\beta) \\
+    0 & 1 & 0 \\
+    -\sin(\beta) & 0 & \cos(\beta)
+    \end{bmatrix}
+    $$
+
+    **Physical Meaning:** Rotates vectors around the Y-axis, leaving Y-coordinates unchanged while rotating X and Z components in the XZ-plane.
+    </Card>
+
+  </TabItem>
+  <TabItem label="Z-Axis Rotation">
+
+    **Rotation about Z-axis by angle γ:**
+
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <TailwindWrapper>
+    	![Rotation about Z Axis](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/rotation-about-z-axis.svg)
+      </TailwindWrapper>
+    </div>
+
+    **Geometric Analysis:**
+
+    After rotating axis A:
+    $$
+    \begin{aligned}
+    \cos(\gamma) &= \frac{+x}{A} \quad \Rightarrow \quad a = A \cos(\gamma) \\
+    \sin(\gamma) &= \frac{+y}{A} \quad \Rightarrow \quad b = A \sin(\gamma)
+    \end{aligned}
+    $$
+
+    After rotating axis B:
+    $$
+    \begin{aligned}
+    \cos(\gamma) &= \frac{+y}{B} \quad \Rightarrow \quad b = B \cos(\gamma) \\
+    \sin(\gamma) &= \frac{-x}{B} \quad \Rightarrow \quad a = -B \sin(\gamma)
+    \end{aligned}
+    $$
+
+    **Transformation Summary:**
+
+    | Before | After |
+    |--------|-------|
+    | A(1,0,0) | A(cos γ, sin γ, 0) |
+    | B(0,1,0) | B(-sin γ, cos γ, 0) |
+    | C(0,0,1) | C(0,0,1) |
+
+    <Card title="🔄 Z-Axis Rotation Matrix" icon="document">
+    $$
+    R(z, \gamma) = \begin{bmatrix}
+    \cos(\gamma) & -\sin(\gamma) & 0 \\
+    \sin(\gamma) & \cos(\gamma) & 0 \\
+    0 & 0 & 1
+    \end{bmatrix}
+    $$
+
+    **Physical Meaning:** Rotates vectors around the Z-axis, leaving Z-coordinates unchanged while rotating X and Y components in the XY-plane.
+    </Card>
+
+  </TabItem>
+</Tabs>
+
+### 3D Rotation Applications and Examples
+
+<details>
+<summary>**Click to reveal 3D rotation examples and calculations**</summary>
+
+<Steps>
+
+1. **Point rotation about X-axis:**
+
+   **Problem:** Point q = (3, 7, 5) rotated 60° about X-axis
+
+   **Solution:** $q_{xyz} = R(x,60°) \cdot q_{abc}$
+
+   $$
+   \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix}
+   1 & 0 & 0 \\
+   0 & 0.5 & -0.866 \\
+   0 & 0.866 & 0.5
+   \end{bmatrix} \begin{bmatrix} 3 \\ 7 \\ 5 \end{bmatrix} = \begin{bmatrix} 3 \\ -0.830 \\ 8.562 \end{bmatrix}
+   $$
+
+2. **Point rotation about Y-axis:**
+
+   **Problem:** Point p = (4, 4, 2√3) in mobile frame rotated 60° about Y-axis
+
+   **Solution:** $p_{xyz} = R(y,60°) \cdot p_{abc}$
+
+   $$
+   \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix}
+   0.5 & 0 & 0.866 \\
+   0 & 1 & 0 \\
+   -0.866 & 0 & 0.5
+   \end{bmatrix} \begin{bmatrix} 4 \\ 4 \\ 2\sqrt{3} \end{bmatrix} = \begin{bmatrix} 5 \\ 4 \\ -1.464 \end{bmatrix}
+   $$
+
+3. **Point rotation about Z-axis:**
+
+   **Problem:** Point p = (7, 6, 5) rotated 30° about Z-axis
+
+   **Solution:** $p_{xyz} = R(z,30°) \cdot p_{abc}$
+
+   $$
+   \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix}
+   0.866 & -0.5 & 0 \\
+   0.5 & 0.866 & 0 \\
+   0 & 0 & 1
+   \end{bmatrix} \begin{bmatrix} 7 \\ 6 \\ 5 \end{bmatrix} = \begin{bmatrix} 3.062 \\ 8.696 \\ 5 \end{bmatrix}
+   $$
+
+4. **Inverse transformations (world to body coordinates):**
+
+   **For Y-axis rotation:** Mobile frame rotated 60° about Y-axis
+
+   **Problem:** Points p_xyz = (2, 3, 6) and q_xyz = (4, 2, 5) in fixed frame
+
+   **Solution:** $p_{abc} = R(y,60°)^{-1} \cdot p_{xyz} = R(y,60°)^T \cdot p_{xyz}$
+
+   Since rotation matrices are orthogonal: $R^{-1} = R^T$
+
+   $$
+   p_{abc} = \begin{bmatrix}
+   0.5 & 0 & -0.866 \\
+   0 & 1 & 0 \\
+   0.866 & 0 & 0.5
+   \end{bmatrix} \begin{bmatrix} 2 \\ 3 \\ 6 \end{bmatrix} = \begin{bmatrix} -4.196 \\ 3 \\ 4.732 \end{bmatrix}
+   $$
+
+</Steps>
+
+</details>
+
+### Advanced 3D Applications
+
+<Tabs>
+  <TabItem label="Axis-Angle Identification">
+
+    **Problem:** Given rotation matrix, determine axis and angle
+
+    **Example matrix:**
+    $$
+    R = \begin{bmatrix}
+    \frac{\sqrt{3}}{2} & 0 & \frac{1}{2} \\
+    0 & 1 & 0 \\
+    -\frac{1}{2} & 0 & \frac{\sqrt{3}}{2}
+    \end{bmatrix}
+    $$
+
+    **Analysis steps:**
+    1. Compare with standard rotation matrices
+    2. Identify unchanged axis (Y-axis: middle row/column)
+    3. Calculate angle: $\cos(\theta) = \frac{\sqrt{3}}{2} \Rightarrow \theta = 30°$
+    4. **Result:** 30° rotation about Y-axis
+
+  </TabItem>
+  <TabItem label="Single-Axis Robot Control">
+
+    **Robot joint control application:**
+
+    **Problem:** Single-axis robot with mobile frame point p_M = (2, 2, 8)
+
+    **Find coordinates when:**
+    - θ₁ = 180° about Z-axis
+    - θ₂ = 0° (no rotation)
+
+    **Solutions:**
+    $$
+    (p_F)_{\theta=180°} = R(z,180°) \cdot p_M = \begin{bmatrix} -1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 2 \\ 2 \\ 8 \end{bmatrix} = \begin{bmatrix} -2 \\ -2 \\ 8 \end{bmatrix}
+    $$
+
+    $$
+    (p_F)_{\theta=0°} = R(z,0°) \cdot p_M = I \cdot p_M = \begin{bmatrix} 2 \\ 2 \\ 8 \end{bmatrix}
+    $$
+
+  </TabItem>
+  <TabItem label="Mobile Frame Analysis">
+
+    **Coordinate system transformation:**
+
+    **Problem:** Robot frame rotated 60° about X-axis
+    Point Q = (4, 2√3, 5) in base coordinates
+
+    **Find mobile frame coordinates:**
+    $$
+    Q_{mobile} = R(x,60°)^{-1} \cdot Q_{base} = R(x,60°)^T \cdot Q_{base}
+    $$
+
+    $$
+    Q_{mobile} = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 0.5 & 0.866 \\
+    0 & -0.866 & 0.5
+    \end{bmatrix} \begin{bmatrix} 4 \\ 2\sqrt{3} \\ 5 \end{bmatrix} = \begin{bmatrix} 4 \\ 6.062 \\ -0.330 \end{bmatrix}
+    $$
+
+  </TabItem>
+</Tabs>
+
+### Rotation About an Arbitrary Axis Through the Origin
+
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Rotation about an Arbitrary Axes](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/arbitrary-axes.svg)
+  </TailwindWrapper>
+</div>
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+To perform rotation about an arbitrary axis through the origin, we extend the individual axis rotation concepts to handle any vector direction. This fundamental capability enables complete 3D orientation control for advanced robotics applications.
+</BionicText>
+
+**Problem Setup:** Given a fixed frame OXYZ and an arbitrary rotation axis **V = (x,y,z)** with components **V_x, V_y, V_z**, we need to construct the rotation matrix **R(V,θ)** for rotation angle **θ**.
+
+<Card title="🔄 Arbitrary Axis Rotation Strategy" icon="document">
+**Five-step decomposition process:**
+
+1. Rotation by angle **α** about X-axis
+2. Rotation by angle **-β** about Y-axis
+3. Rotation by angle **θ** about Z-axis
+4. Rotation by angle **β** about Y-axis
+5. Rotation by angle **-α** about X-axis
+
+**Matrix composition:** **R(V,θ) = R(x,-α) R(y,β) R(z,θ) R(y,-β) R(x,α)**
+</Card>
+
+**The complete rotation matrix:**
+
+$$
+R(V,θ) = \begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\alpha & \sin\alpha \\
+0 & -\sin\alpha & \cos\alpha
+\end{bmatrix}\begin{bmatrix}
+\cos\beta & 0 & \sin\beta \\
+0 & 1 & 0 \\
+-\sin\beta & 0 & \cos\beta
+\end{bmatrix}\begin{bmatrix}
+\cos\theta & -\sin\theta & 0 \\
+\sin\theta & \cos\theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}
+\cos\beta & 0 & -\sin\beta \\
+0 & 1 & 0 \\
+\sin\beta & 0 & \cos\beta
+\end{bmatrix}\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\alpha & -\sin\alpha \\
+0 & \sin\alpha & \cos\alpha
+\end{bmatrix}
+$$
+
+**Geometric relationships:** For unit vector **|V| = 1**:
+
+$$
+\begin{aligned}
+\sin\alpha &= \frac{V_y}{\sqrt{V_y^2+V_z^2}}, \quad \cos\alpha = \frac{V_z}{\sqrt{V_y^2+V_z^2}} \\
+\sin\beta &= V_x, \quad \cos\beta = \sqrt{V_y^2+V_z^2}
+\end{aligned}
+$$
+
+<Card title="⚡ Simplified Arbitrary Axis Formula" icon="star">
+**Final rotation matrix in compact form:**
+
+$$
+R(V,θ) = \begin{bmatrix}
+V_x^2 T + C & V_x V_y T - V_z S & V_x V_z T + V_y S \\
+V_x V_y T + V_z S & V_y^2 T + C & V_y V_z T - V_x S \\
+V_x V_z T - V_y S & V_y V_z T + V_x S & V_z^2 T + C
+\end{bmatrix}
+$$
+
+**Where:** **C = cos θ**, **S = sin θ**, **T = (1 - cos θ)**
+
+**Unit vector components:**
+$$V_x = \frac{x}{\sqrt{x^2+y^2+z^2}}, \quad V_y = \frac{y}{\sqrt{x^2+y^2+z^2}}, \quad V_z = \frac{z}{\sqrt{x^2+y^2+z^2}}$$
+</Card>
+
+<Tabs>
+  <TabItem label="Example 1: Symmetric Vector">
+
+    <details>
+    <summary>**Example: 90° rotation about V = (2, 2, 2)**</summary>
+
+    <Steps>
+
+    1. **Calculate unit vector components:**
+
+       $$V_x = V_y = V_z = \frac{2}{2\sqrt{3}} = \frac{1}{\sqrt{3}}$$
+
+    2. **Calculate trigonometric values:**
+
+       $$C = \cos(90°) = 0, \quad S = \sin(90°) = 1, \quad T = 1 - 0 = 1$$
+
+    3. **Compute matrix elements:**
+
+       $$
+       \begin{aligned}
+       n_x &= V_x^2 T + C = \left(\frac{1}{\sqrt{3}}\right)^2(1) + 0 = \frac{1}{3} \\
+       n_y &= V_x V_y T + V_z S = \frac{1}{\sqrt{3}} \cdot \frac{1}{\sqrt{3}}(1) + \frac{1}{\sqrt{3}}(1) = \frac{1 + \sqrt{3}}{3} \\
+       n_z &= V_x V_z T - V_y S = \frac{1}{\sqrt{3}} \cdot \frac{1}{\sqrt{3}}(1) - \frac{1}{\sqrt{3}}(1) = \frac{1 - \sqrt{3}}{3}
+       \end{aligned}
+       $$
+
+    4. **Final rotation matrix:**
+
+       $$
+       R(V,90°) = \begin{bmatrix}
+       \frac{1}{3} & \frac{1-\sqrt{3}}{3} & \frac{1+\sqrt{3}}{3} \\
+       \frac{1+\sqrt{3}}{3} & \frac{1}{3} & \frac{1-\sqrt{3}}{3} \\
+       \frac{1-\sqrt{3}}{3} & \frac{1+\sqrt{3}}{3} & \frac{1}{3}
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+  <TabItem label="Example 2: General Vector">
+
+    <details>
+    <summary>**Example: 80° rotation about V = (2, 3, 4)**</summary>
+
+    <Steps>
+
+    1. **Calculate vector magnitude and unit components:**
+
+       $$|V| = \sqrt{2^2 + 3^2 + 4^2} = \sqrt{29}$$
+
+       $$V_x = \frac{2}{\sqrt{29}}, \quad V_y = \frac{3}{\sqrt{29}}, \quad V_z = \frac{4}{\sqrt{29}}$$
+
+    2. **Calculate trigonometric values:**
+
+       $$C = \cos(80°) = 0.1736, \quad S = \sin(80°) = 0.9848, \quad T = 0.8264$$
+
+    3. **Compute matrix elements (showing key calculations):**
+
+       $$
+       \begin{aligned}
+       n_x &= V_x^2 T + C = \left(\frac{2}{\sqrt{29}}\right)^2(0.8264) + 0.1736 = 0.2876 \\
+       s_y &= V_y^2 T + C = \left(\frac{3}{\sqrt{29}}\right)^2(0.8264) + 0.1736 = 0.4301 \\
+       q_z &= V_z^2 T + C = \left(\frac{4}{\sqrt{29}}\right)^2(0.8264) + 0.1736 = 0.6295
+       \end{aligned}
+       $$
+
+    4. **Final rotation matrix:**
+
+       $$
+       R(V,80°) = \begin{bmatrix}
+       0.2876 & -0.5605 & 0.7766 \\
+       0.9025 & 0.4301 & -0.0238 \\
+       -0.3206 & 0.7077 & 0.6295
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+  <TabItem label="Rodrigues Formula">
+
+    <Card title="⚡ Rodrigues' Rotation Formula" icon="star">
+    **Alternative approach using matrix exponentials:**
+
+    $$R(V,θ) = e^{Wθ} = I + W\sin(θ) + W^2(1-\cos(θ))$$
+
+    **Where:**
+    - **I** = 3×3 identity matrix
+    - **W** = skew-symmetric matrix of V
+
+    $$
+    W = \begin{bmatrix}
+    0 & -V_z & V_y \\
+    V_z & 0 & -V_x \\
+    -V_y & V_x & 0
+    \end{bmatrix}
+    $$
+
+    **Note:** Rodrigues formula only works for rotations about axes through the origin.
+    </Card>
+
+  </TabItem>
+</Tabs>
+
+### Applications in Spatial Mechanics
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Arbitrary axis rotation capabilities are essential for advanced 6-DOF robot programming, tool orientation control, and complex trajectory planning where rotations cannot be decomposed into simple XYZ sequences.
+</BionicText>
+
+**Key applications:**
+- **Tool orientation programming** for complex manufacturing operations
+- **Camera gimbal control** for smooth tracking and stabilization
+- **Spacecraft attitude control** using reaction wheels and thrusters
+- **Robotic welding** with precise torch angle control
+- **3D printing** with multi-axis extruder orientation
 
 ## 🔧 Application: SCARA Robot Trajectory Programming
 
