@@ -82,124 +82,777 @@ Complex manufacturing operations require:
 ### Basic Rotation Matrices About Coordinate Axes
 
 <BionicText method="advanced" intensity="medium" class="highlight">
-3D rotations are more complex than 2D because rotation order matters and multiple representations exist. Basic rotations about coordinate axes provide the building blocks for all spatial orientations.
+3D rotations are more complex than 2D because rotation order matters and multiple representations exist. Basic rotations about coordinate axes provide the building blocks for all spatial orientations. Following the established axis convention where counterclockwise rotation is positive, we can derive rotation matrices for each coordinate axis. Each rotation transforms a mobile frame (A, B, C) relative to a fixed frame (X, Y, Z).
 </BionicText>
 
-<Tabs>
-  <TabItem label="X-Axis Rotations">
-    
-    <Card title="🔄 Rotation About X-Axis" icon="document">
-    **Roll rotation by angle α:**
-    $$R_x(\alpha) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\alpha & -\sin\alpha \\ 0 & \sin\alpha & \cos\alpha \end{bmatrix}$$
-    
-    **Physical Meaning:** Rotation about X-axis corresponds to "roll" motion - like an aircraft banking left or right.
-    **Invariant:** X-coordinate remains unchanged, Y and Z coordinates rotate in YZ plane.
-    </Card>
-    
-  </TabItem>
-  <TabItem label="Y-Axis Rotations">
-    
-    <Card title="🔄 Rotation About Y-Axis" icon="document">
-    **Pitch rotation by angle β:**
-    $$R_y(\beta) = \begin{bmatrix} \cos\beta & 0 & \sin\beta \\ 0 & 1 & 0 \\ -\sin\beta & 0 & \cos\beta \end{bmatrix}$$
-    
-    **Physical Meaning:** Rotation about Y-axis corresponds to "pitch" motion - like an aircraft nose up or down.
-    **Invariant:** Y-coordinate remains unchanged, X and Z coordinates rotate in XZ plane.
-    </Card>
-    
-  </TabItem>
-  <TabItem label="Z-Axis Rotations">
-    
-    <Card title="🔄 Rotation About Z-Axis" icon="document">
-    **Yaw rotation by angle γ:**
-    $$R_z(\gamma) = \begin{bmatrix} \cos\gamma & -\sin\gamma & 0 \\ \sin\gamma & \cos\gamma & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
-    
-    **Physical Meaning:** Rotation about Z-axis corresponds to "yaw" motion - like an aircraft turning left or right.
-    **Invariant:** Z-coordinate remains unchanged, X and Y coordinates rotate in XY plane.
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Axes Convention](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/axes-convention.svg)
+  </TailwindWrapper>
+</div>
 
+<Tabs>
+  <TabItem label="X-Axis Rotation">
+
+    **Rotation about X-axis by angle α:**
+
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <TailwindWrapper>
+    	![Rotation about X Axis](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/rotation-about-x-axis.svg)
+      </TailwindWrapper>
+    </div>
+
+    **Geometric Analysis:**
+
+    After rotating axis B:
+    $$
+    \begin{aligned}
+    \cos(\alpha) &= \frac{+y}{B} \quad \Rightarrow \quad b = B \cos(\alpha) \\
+    \sin(\alpha) &= \frac{+z}{B} \quad \Rightarrow \quad c = B \sin(\alpha)
+    \end{aligned}
+    $$
+
+    After rotating axis C:
+    $$
+    \begin{aligned}
+    \cos(\alpha) &= \frac{+z}{C} \quad \Rightarrow \quad c = C \cos(\alpha) \\
+    \sin(\alpha) &= \frac{-y}{C} \quad \Rightarrow \quad b = -C \sin(\alpha)
+    \end{aligned}
+    $$
+
+    **Transformation Summary:**
+
+    | Before | After |
+    |--------|-------|
+    | A(1,0,0) | A(1,0,0) |
+    | B(0,1,0) | B(0, cos α, sin α) |
+    | C(0,0,1) | C(0, -sin α, cos α) |
+
+    <Card title="🔄 X-Axis Rotation Matrix" icon="document">
+    $$
+    R_x(\alpha) = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & \cos(\alpha) & -\sin(\alpha) \\
+    0 & \sin(\alpha) & \cos(\alpha)
+    \end{bmatrix}
+    $$
+
+    **Physical Meaning:** Rotation about X-axis corresponds to "roll" motion - like an aircraft banking left or right. Rotates vectors around the X-axis, leaving X-coordinates unchanged while rotating Y and Z components in the YZ-plane.
     </Card>
-    
+
+  </TabItem>
+  <TabItem label="Y-Axis Rotation">
+
+    **Rotation about Y-axis by angle β:**
+
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <TailwindWrapper>
+    	![Rotation about Y Axis](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/rotation-about-y-axis.svg)
+      </TailwindWrapper>
+    </div>
+
+    **Geometric Analysis:**
+
+    After rotating axis A:
+    $$
+    \begin{aligned}
+    \cos(\beta) &= \frac{+x}{A} \quad \Rightarrow \quad a = A \cos(\beta) \\
+    \sin(\beta) &= \frac{-z}{A} \quad \Rightarrow \quad c = -A \sin(\beta)
+    \end{aligned}
+    $$
+
+    After rotating axis C:
+    $$
+    \begin{aligned}
+    \cos(\beta) &= \frac{+z}{C} \quad \Rightarrow \quad c = C \cos(\beta) \\
+    \sin(\beta) &= \frac{+x}{C} \quad \Rightarrow \quad a = C \sin(\beta)
+    \end{aligned}
+    $$
+
+    **Transformation Summary:**
+
+    | Before | After |
+    |--------|-------|
+    | A(1,0,0) | A(cos β, 0, -sin β) |
+    | B(0,1,0) | B(0,1,0) |
+    | C(0,0,1) | C(sin β, 0, cos β) |
+
+    <Card title="🔄 Y-Axis Rotation Matrix" icon="document">
+    $$
+    R_y(\beta) = \begin{bmatrix}
+    \cos(\beta) & 0 & \sin(\beta) \\
+    0 & 1 & 0 \\
+    -\sin(\beta) & 0 & \cos(\beta)
+    \end{bmatrix}
+    $$
+
+    **Physical Meaning:** Rotation about Y-axis corresponds to "pitch" motion - like an aircraft nose up or down. Rotates vectors around the Y-axis, leaving Y-coordinates unchanged while rotating X and Z components in the XZ-plane.
+    </Card>
+
+  </TabItem>
+  <TabItem label="Z-Axis Rotation">
+
+    **Rotation about Z-axis by angle γ:**
+
+    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <TailwindWrapper>
+    	![Rotation about Z Axis](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/rotation-about-z-axis.svg)
+      </TailwindWrapper>
+    </div>
+
+    **Geometric Analysis:**
+
+    After rotating axis A:
+    $$
+    \begin{aligned}
+    \cos(\gamma) &= \frac{+x}{A} \quad \Rightarrow \quad a = A \cos(\gamma) \\
+    \sin(\gamma) &= \frac{+y}{A} \quad \Rightarrow \quad b = A \sin(\gamma)
+    \end{aligned}
+    $$
+
+    After rotating axis B:
+    $$
+    \begin{aligned}
+    \cos(\gamma) &= \frac{+y}{B} \quad \Rightarrow \quad b = B \cos(\gamma) \\
+    \sin(\gamma) &= \frac{-x}{B} \quad \Rightarrow \quad a = -B \sin(\gamma)
+    \end{aligned}
+    $$
+
+    **Transformation Summary:**
+
+    | Before | After |
+    |--------|-------|
+    | A(1,0,0) | A(cos γ, sin γ, 0) |
+    | B(0,1,0) | B(-sin γ, cos γ, 0) |
+    | C(0,0,1) | C(0,0,1) |
+
+    <Card title="🔄 Z-Axis Rotation Matrix" icon="document">
+    $$
+    R_z(\gamma) = \begin{bmatrix}
+    \cos(\gamma) & -\sin(\gamma) & 0 \\
+    \sin(\gamma) & \cos(\gamma) & 0 \\
+    0 & 0 & 1
+    \end{bmatrix}
+    $$
+
+    **Physical Meaning:** Rotation about Z-axis corresponds to "yaw" motion - like an aircraft turning left or right. Rotates vectors around the Z-axis, leaving Z-coordinates unchanged while rotating X and Y components in the XY-plane.
+    </Card>
+
+  </TabItem>
+</Tabs>
+
+### 3D Rotation Applications and Examples
+
+<details>
+<summary>**Click to reveal 3D rotation examples and calculations**</summary>
+
+<Steps>
+
+1. **Point rotation about X-axis:**
+
+   **Problem:** Point q = (3, 7, 5) rotated 60° about X-axis
+
+   **Solution:** $q_{xyz} = R_x(60°) \cdot q_{abc}$
+
+   $$
+   \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix}
+   1 & 0 & 0 \\
+   0 & 0.5 & -0.866 \\
+   0 & 0.866 & 0.5
+   \end{bmatrix} \begin{bmatrix} 3 \\ 7 \\ 5 \end{bmatrix} = \begin{bmatrix} 3 \\ -0.830 \\ 8.562 \end{bmatrix}
+   $$
+
+2. **Point rotation about Y-axis:**
+
+   **Problem:** Point p = (4, 4, 2√3) in mobile frame rotated 60° about Y-axis
+
+   **Solution:** $p_{xyz} = R_y(60°) \cdot p_{abc}$
+
+   $$
+   \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix}
+   0.5 & 0 & 0.866 \\
+   0 & 1 & 0 \\
+   -0.866 & 0 & 0.5
+   \end{bmatrix} \begin{bmatrix} 4 \\ 4 \\ 2\sqrt{3} \end{bmatrix} = \begin{bmatrix} 5 \\ 4 \\ -1.464 \end{bmatrix}
+   $$
+
+3. **Point rotation about Z-axis:**
+
+   **Problem:** Point p = (7, 6, 5) rotated 30° about Z-axis
+
+   **Solution:** $p_{xyz} = R_z(30°) \cdot p_{abc}$
+
+   $$
+   \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix}
+   0.866 & -0.5 & 0 \\
+   0.5 & 0.866 & 0 \\
+   0 & 0 & 1
+   \end{bmatrix} \begin{bmatrix} 7 \\ 6 \\ 5 \end{bmatrix} = \begin{bmatrix} 3.062 \\ 8.696 \\ 5 \end{bmatrix}
+   $$
+
+4. **Inverse transformations (world to body coordinates):**
+
+   **For Y-axis rotation:** Mobile frame rotated 60° about Y-axis
+
+   **Problem:** Points p_xyz = (2, 3, 6) and q_xyz = (4, 2, 5) in fixed frame
+
+   **Solution:** $p_{abc} = R_y(60°)^{-1} \cdot p_{xyz} = R_y(60°)^T \cdot p_{xyz}$
+
+   Since rotation matrices are orthogonal: $R^{-1} = R^T$
+
+   $$
+   p_{abc} = \begin{bmatrix}
+   0.5 & 0 & -0.866 \\
+   0 & 1 & 0 \\
+   0.866 & 0 & 0.5
+   \end{bmatrix} \begin{bmatrix} 2 \\ 3 \\ 6 \end{bmatrix} = \begin{bmatrix} -4.196 \\ 3 \\ 4.732 \end{bmatrix}
+   $$
+
+</Steps>
+
+</details>
+
+### Advanced 3D Applications
+
+<Tabs>
+  <TabItem label="Axis-Angle Identification">
+
+    **Problem:** Given rotation matrix, determine axis and angle
+
+    **Example matrix:**
+    $$
+    R = \begin{bmatrix}
+    \frac{\sqrt{3}}{2} & 0 & \frac{1}{2} \\
+    0 & 1 & 0 \\
+    -\frac{1}{2} & 0 & \frac{\sqrt{3}}{2}
+    \end{bmatrix}
+    $$
+
+    **Analysis steps:**
+    1. Compare with standard rotation matrices
+    2. Identify unchanged axis (Y-axis: middle row/column)
+    3. Calculate angle: $\cos(\theta) = \frac{\sqrt{3}}{2} \Rightarrow \theta = 30°$
+    4. **Result:** 30° rotation about Y-axis
+
+  </TabItem>
+  <TabItem label="Single-Axis Robot Control">
+
+    **Robot joint control application:**
+
+    **Problem:** Single-axis robot with mobile frame point p_M = (2, 2, 8)
+
+    **Find coordinates when:**
+    - θ₁ = 180° about Z-axis
+    - θ₂ = 0° (no rotation)
+
+    **Solutions:**
+    $$
+    (p_F)_{\theta=180°} = R_z(180°) \cdot p_M = \begin{bmatrix} -1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 2 \\ 2 \\ 8 \end{bmatrix} = \begin{bmatrix} -2 \\ -2 \\ 8 \end{bmatrix}
+    $$
+
+    $$
+    (p_F)_{\theta=0°} = R_z(0°) \cdot p_M = I \cdot p_M = \begin{bmatrix} 2 \\ 2 \\ 8 \end{bmatrix}
+    $$
+
+  </TabItem>
+  <TabItem label="Mobile Frame Analysis">
+
+    **Coordinate system transformation:**
+
+    **Problem:** Robot frame rotated 60° about X-axis
+    Point Q = (4, 2√3, 5) in base coordinates
+
+    **Find mobile frame coordinates:**
+    $$
+    Q_{mobile} = R_x(60°)^{-1} \cdot Q_{base} = R_x(60°)^T \cdot Q_{base}
+    $$
+
+    $$
+    Q_{mobile} = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 0.5 & 0.866 \\
+    0 & -0.866 & 0.5
+    \end{bmatrix} \begin{bmatrix} 4 \\ 2\sqrt{3} \\ 5 \end{bmatrix} = \begin{bmatrix} 4 \\ 6.062 \\ -0.330 \end{bmatrix}
+    $$
+
   </TabItem>
 </Tabs>
 
 ### Rotation Matrix Properties
 
 <Card title="📐 Essential Rotation Matrix Properties" icon="document">
-**Orthogonality:** $R^T R = I$ (columns are orthonormal vectors)  
-**Determinant:** $\det(R) = +1$ (proper rotations, no reflections)  
-**Inverse:** $R^{-1} = R^T$ (transpose equals inverse)  
+**Orthogonality:** $R^T R = I$ (columns are orthonormal vectors)
+**Determinant:** $\det(R) = +1$ (proper rotations, no reflections)
+**Inverse:** $R^{-1} = R^T$ (transpose equals inverse)
 **Composition:** $R_3 R_2 R_1$ applies $R_1$ first, then $R_2$, then $R_3$
 
 **Physical Meaning:** Rotation matrices preserve lengths and angles, representing pure rotations without scaling or reflection in 3D space.
 </Card>
 
-### Euler Angle Representations
+### 4×4 Homogeneous Transformation Matrices
 
 <BionicText method="advanced" intensity="medium" class="highlight">
-Euler angles provide an intuitive way to describe 3D orientations using three sequential rotations about coordinate axes. However, different sequences exist and singularities must be carefully managed.
+Extending the 2D homogeneous coordinate concept to 3D, we use 4×4 matrices to unify rotation and translation into a single mathematical operation. This powerful framework is the foundation for all modern robot kinematics and computer graphics.
 </BionicText>
 
+<Card title="🎯 Spatial Transformation Matrix" icon="document">
+**General 4×4 transformation:**
+$$T = \begin{bmatrix} R_{3×3} & \mathbf{t}_{3×1} \\ \mathbf{0}_{1×3} & 1 \end{bmatrix}$$
+
+**Where:**
+- $R_{3×3}$ = 3×3 rotation matrix
+- $\mathbf{t}_{3×1}$ = 3×1 translation vector
+- $\mathbf{0}_{1×3}$ = [0 0 0] zero vector
+- Last element = 1 (homogeneous coordinate)
+
+**Physical Meaning:** 4×4 matrices unify rotation and translation into single mathematical operation for 3D spatial transformations.
+</Card>
+
+### Composite 3D Transformations for Robotics
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Real robot control requires precise composition of multiple rotations and translations in 3D space. Understanding the systematic rules for matrix multiplication order is essential for accurate end-effector positioning and complex trajectory programming.
+</BionicText>
+
+<Card title="🔧 3D Transformation Composition Rules" icon="document">
+**Matrix multiplication is non-commutative - order matters!**
+
+**For robot positioning with multiple transformations:**
+
+1. **Initial state:** Fixed and mobile frames are coincident → **Identity matrix**
+2. **Fixed frame operations:** Rotate/translate about fixed axes (X,Y,Z) → **Pre-multiply** current matrix
+3. **Mobile frame operations:** Rotate/translate about mobile axes (A,B,C) → **Post-multiply** current matrix
+
+**General composition:** **$H = H_n · H_{n-1} · ... · H_2 · H_1$**
+
+Where transformations are applied in sequence: H_1 first, H_n last.
+</Card>
+
 <Tabs>
-  <TabItem label="ZYX Convention">
-    
-    <Card title="🎯 ZYX Euler Angles (Roll-Pitch-Yaw)" icon="document">
-    **Sequential rotations:**
-    1. Rotate γ about Z-axis (yaw)
-    2. Rotate β about new Y-axis (pitch)  
-    3. Rotate α about final X-axis (roll)
-    
-    **Combined rotation matrix:**
-    $$R_{ZYX}(\gamma, \beta, \alpha) = R_x(\alpha) R_y(\beta) R_z(\gamma)$$
-    
-    **Physical Meaning:** Most intuitive for aircraft and vehicle orientation (heading, elevation, bank angle).
-    </Card>
-    
+  <TabItem label="Basic 3D Examples">
+
+    <details>
+    <summary>**Example 1: Simple 3D rotation and translation sequence**</summary>
+
+    <Steps>
+
+    1. **Problem:** 40° rotation about X-axis, then 7 units translation along mobile B-axis
+
+       **Setup:** **H = H(x,40°) · I · H(B,7)**
+
+    2. **Matrix composition:**
+
+       $$
+       \begin{aligned}
+       H &= \begin{bmatrix}
+       1 & 0 & 0 & 0 \\
+       0 & \cos(40°) & -\sin(40°) & 0 \\
+       0 & \sin(40°) & \cos(40°) & 0 \\
+       0 & 0 & 0 & 1
+       \end{bmatrix} \cdot \begin{bmatrix}
+       1 & 0 & 0 & 0 \\
+       0 & 1 & 0 & 7 \\
+       0 & 0 & 1 & 0 \\
+       0 & 0 & 0 & 1
+       \end{bmatrix}
+       \end{aligned}
+       $$
+
+    3. **Final result:**
+
+       $$
+       H = \begin{bmatrix}
+       1 & 0 & 0 & 0 \\
+       0 & 0.7660 & -0.6428 & 5.3620 \\
+       0 & 0.6428 & 0.7660 & 4.4996 \\
+       0 & 0 & 0 & 1
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
   </TabItem>
-  <TabItem label="ZYZ Convention">
-    
-    <Card title="🎯 ZYZ Euler Angles (Classical)" icon="document">
-    **Sequential rotations:**
-    1. Rotate γ about Z-axis  
-    2. Rotate β about new Y-axis
-    3. Rotate α about final Z-axis
-    
-    **Combined rotation matrix:**
-    $$R_{ZYZ}(\gamma, \beta, \alpha) = R_z(\alpha) R_y(\beta) R_z(\gamma)$$
-    
-    **Physical Meaning:** Classical mechanics convention, useful for gyroscope and spacecraft analysis.
-    </Card>
-    
+  <TabItem label="Complex Sequences">
+
+    <details>
+    <summary>**Example 2: Multi-step 3D transformation sequence**</summary>
+
+    <Steps>
+
+    1. **Problem:** Complex robotic motion sequence
+       - 50° rotation about X-axis
+       - 4 units translation along X-axis
+       - -6 units translation along C-axis
+       - 25° rotation about B-axis
+
+    2. **Matrix sequence:** **H = H(x,4) · H(x,50°) · I · H(c,-6) · H(b,25°)**
+
+    3. **Step-by-step computation:**
+
+       $$
+       \begin{aligned}
+       H &= \begin{bmatrix}1 & 0 & 0 & 4 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
+       \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 0.6428 & -0.7660 & 0 \\ 0 & 0.7660 & 0.6428 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+       &\times \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & -6 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
+       \begin{bmatrix}0.9063 & 0 & 0.4226 & 0 \\ 0 & 1 & 0 & 0 \\ -0.4226 & 0 & 0.9063 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    4. **Final transformation matrix:**
+
+       $$
+       H = \begin{bmatrix}
+       0.9063 & 0 & 0.4226 & 4.0 \\
+       0.3237 & 0.6428 & -0.6943 & 4.596 \\
+       -0.2717 & 0.766 & 0.5826 & -3.857 \\
+       0 & 0 & 0 & 1.0
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
   </TabItem>
-  <TabItem label="Singularity Issues">
-    
-    **Gimbal Lock phenomenon:**
-    - Occurs when middle rotation angle = ±90°
-    - Results in loss of one degree of freedom
-    - Two axes become parallel (gimbal lock)
-    
-    **ZYX singularity:** β = ±90° (pitch = vertical)
-    **ZYZ singularity:** β = 0° or 180° (Y-rotation = 0)
-    
-    **Avoidance strategies:**
-    - Use alternative representations near singularities  
-    - Switch between different Euler conventions
-    - Employ quaternion representations
-    
+  <TabItem label="Vision System Applications">
+
+    <details>
+    <summary>**Example 3: Robot vision system coordinate transformations**</summary>
+
+    <Steps>
+
+    1. **System setup:** Robotic work cell with camera and 6-joint robot
+       - **H₁**: Camera to object transformation
+       - **H₂**: Camera to robot base transformation
+       - **H₃**: Base to gripper transformation
+
+    2. **Given transformation matrices:**
+
+       $$
+       \begin{aligned}
+       H_1 &= \begin{bmatrix}0 & 1 & 0 & 4 \\ 1 & 0 & 0 & 3 \\ 0 & 0 & -1 & 7 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+       H_2 &= \begin{bmatrix}1 & 0 & 0 & -15 \\ 0 & -1 & 0 & 5 \\ 0 & 0 & -1 & 6 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
+       H_3 &= \begin{bmatrix}1 & 0 & 0 & 7 \\ 0 & 1 & 0 & 2 \\ 0 & 0 & 1 & 3 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    3. **Object position relative to robot base:**
+
+       $$
+       \begin{aligned}
+       {}^{base}T_{object} &= {}^{base}T_{camera} \cdot {}^{camera}T_{object} \\
+       &= [H_2]^{-1} \cdot [H_1] \\
+       &= \begin{bmatrix}0 & 1 & 0 & 19 \\ -1 & 0 & 0 & 2 \\ 0 & 0 & 1 & -1 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    4. **Object position relative to gripper:**
+
+       $$
+       \begin{aligned}
+       {}^{gripper}T_{object} &= {}^{gripper}T_{base} \cdot {}^{base}T_{object} \\
+       &= [H_3]^{-1} \cdot [H_2]^{-1} \cdot [H_1] \\
+       &= \begin{bmatrix}0 & 1 & 0 & 12 \\ -1 & 0 & 0 & 0 \\ 0 & 0 & 1 & -4 \\ 0 & 0 & 0 & 1\end{bmatrix}
+       \end{aligned}
+       $$
+
+    </Steps>
+
+    </details>
+
   </TabItem>
 </Tabs>
 
-### Rotation About Arbitrary Axis
+### Euler Angle Representations
 
-<Card title="🌀 Rodriguez Formula - Arbitrary Axis Rotation" icon="document">
-**Rotation by angle θ about unit vector k = (k_x, k_y, k_z):**
+<BionicText method="advanced" intensity="medium" class="highlight">
+Euler angles provide an intuitive way to describe 3D orientations using three sequential rotations about coordinate axes. However, different sequences exist and singularities must be carefully managed. Additionally, the terminology (roll, pitch, yaw) depends heavily on which coordinate system convention is being used.
+</BionicText>
 
-$$R(\mathbf{k}, \theta) = I + \sin\theta [\mathbf{k}]_× + (1-\cos\theta) [\mathbf{k}]_×^2$$
+:::note[Important: Coordinate System Conventions Matter!]
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+    <img src="https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/roll-pitch-yaw.gif" alt="Roll, Pitch, and Yaw rotations visualization" style={{ maxWidth: '100%', height: 'auto' }} />
+  </TailwindWrapper>
+</div>
 
-**Where skew-symmetric matrix:**
-$$[\mathbf{k}]_× = \begin{bmatrix} 0 & -k_z & k_y \\ k_z & 0 & -k_x \\ -k_y & k_x & 0 \end{bmatrix}$$
+The physical meanings of **roll**, **pitch**, and **yaw** don't change, but **which mathematical axis (X, Y, Z) corresponds to which rotation depends entirely on your coordinate system**. Always verify which coordinate system convention is being used when working with Euler angles! Different fields use different conventions:
 
-**Physical Meaning:** Any 3D rotation can be represented as a single rotation about some axis, providing the most general rotation representation.
+**Aerospace/Aviation Convention:**
+- **Axes:** X = forward (nose), Y = right (wing), Z = down (belly)
+- **Rotations:** Roll = rotation about X (longitudinal), Pitch = rotation about Y (lateral), Yaw = rotation about Z (vertical)
+
+**Mathematics/Robotics Convention *(used in this course)*:**
+- **Axes:** X = right, Y = up, Z = forward
+- **Rotations:** Roll = rotation about Z (longitudinal), Pitch = rotation about X (lateral), Yaw = rotation about Y (vertical)
+
+**Key Point:** Roll always means "banking" (rotating around the forward-pointing axis), Pitch means "nodding" (tilting up/down), and Yaw means "turning" (spinning left/right). But which axis is X, Y, or Z depends on your coordinate system!
+
+:::
+
+<Tabs>
+  <TabItem label="ZYX Convention">
+
+    <Card title="🎯 ZYX Euler Angles" icon="document">
+    **Sequential rotations:**
+    1. Rotate γ about Z-axis (Roll in Math/Robotics convention)
+    2. Rotate β about new Y-axis (Yaw in Math/Robotics convention)
+    3. Rotate α about final X-axis (Pitch in Math/Robotics convention)
+
+    **Combined rotation matrix:**
+    $$R_{ZYX}(\gamma, \beta, \alpha) = R_x(\alpha) R_y(\beta) R_z(\gamma)$$
+
+    **Physical Meaning:** Commonly used in robotics and computer graphics. The sequence applies Z rotation first, then Y rotation, then X rotation.
+
+    **Note:** Matrix multiplication order is right-to-left, so $R_z(\gamma)$ is applied first to the vector, then $R_y(\beta)$, then $R_x(\alpha)$.
+    </Card>
+
+  </TabItem>
+  <TabItem label="ZYZ Convention">
+
+    <Card title="🎯 ZYZ Euler Angles (Classical)" icon="document">
+    **Sequential rotations:**
+    1. Rotate γ about Z-axis (first Z rotation)
+    2. Rotate β about new Y-axis (nutation angle)
+    3. Rotate α about final Z-axis (second Z rotation)
+
+    **Combined rotation matrix:**
+    $$R_{ZYZ}(\gamma, \beta, \alpha) = R_z(\alpha) R_y(\beta) R_z(\gamma)$$
+
+    **Physical Meaning:** Classical mechanics convention, particularly useful for:
+    - Gyroscope orientation analysis
+    - Spacecraft attitude control
+    - Systems with natural symmetry about one axis
+
+    **Advantage:** Often more natural for systems with cylindrical or axial symmetry.
+    </Card>
+
+  </TabItem>
+  <TabItem label="Singularity Issues">
+
+    **Gimbal Lock phenomenon:**
+    - Occurs when middle rotation angle reaches critical values
+    - Results in loss of one degree of freedom
+    - Two rotation axes become parallel (aligned)
+    - Mathematical: Jacobian matrix becomes singular
+
+    **ZYX singularity:** β = ±90° (pitch vertical - looking straight up or down)
+    **ZYZ singularity:** β = 0° or 180° (middle Y-rotation collapses)
+
+    **At singularity:**
+    - Cannot uniquely determine all three angles
+    - Small changes in orientation cause large angle changes
+    - Numerical instability in conversions
+
+    **Avoidance strategies:**
+    - Use alternative Euler angle sequences near singularities
+    - Switch between different conventions dynamically
+    - Employ quaternion representations (no singularities)
+    - Plan trajectories to avoid singular configurations
+
+  </TabItem>
+</Tabs>
+
+### Rotation About an Arbitrary Axis Through the Origin
+
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Rotation about an Arbitrary Axes](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/arbitrary-axes.svg)
+  </TailwindWrapper>
+</div>
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+To perform rotation about an arbitrary axis through the origin, we extend the individual axis rotation concepts to handle any vector direction. This fundamental capability enables complete 3D orientation control for advanced robotics applications.
+</BionicText>
+
+**Problem Setup:** Given a fixed frame OXYZ and an arbitrary rotation axis **V = (x,y,z)** with components **V_x, V_y, V_z**, we need to construct the rotation matrix **R(V,θ)** for rotation angle **θ**.
+
+<Card title="🔄 Arbitrary Axis Rotation Strategy" icon="document">
+**Five-step decomposition process:**
+
+1. Rotation by angle **α** about X-axis
+2. Rotation by angle **-β** about Y-axis
+3. Rotation by angle **θ** about Z-axis
+4. Rotation by angle **β** about Y-axis
+5. Rotation by angle **-α** about X-axis
+
+**Matrix composition:** **R(V,θ) = R(x,-α) R(y,β) R(z,θ) R(y,-β) R(x,α)**
 </Card>
+
+**The complete rotation matrix:**
+
+$$
+R(V,θ) = \begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\alpha & \sin\alpha \\
+0 & -\sin\alpha & \cos\alpha
+\end{bmatrix}\begin{bmatrix}
+\cos\beta & 0 & \sin\beta \\
+0 & 1 & 0 \\
+-\sin\beta & 0 & \cos\beta
+\end{bmatrix}\begin{bmatrix}
+\cos\theta & -\sin\theta & 0 \\
+\sin\theta & \cos\theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}\begin{bmatrix}
+\cos\beta & 0 & -\sin\beta \\
+0 & 1 & 0 \\
+\sin\beta & 0 & \cos\beta
+\end{bmatrix}\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\alpha & -\sin\alpha \\
+0 & \sin\alpha & \cos\alpha
+\end{bmatrix}
+$$
+
+**Geometric relationships:** For unit vector **|V| = 1**:
+
+$$
+\begin{aligned}
+\sin\alpha &= \frac{V_y}{\sqrt{V_y^2+V_z^2}}, \quad \cos\alpha = \frac{V_z}{\sqrt{V_y^2+V_z^2}} \\
+\sin\beta &= V_x, \quad \cos\beta = \sqrt{V_y^2+V_z^2}
+\end{aligned}
+$$
+
+<Card title="⚡ Simplified Arbitrary Axis Formula" icon="star">
+**Final rotation matrix in compact form:**
+
+$$
+R(V,θ) = \begin{bmatrix}
+V_x^2 T + C & V_x V_y T - V_z S & V_x V_z T + V_y S \\
+V_x V_y T + V_z S & V_y^2 T + C & V_y V_z T - V_x S \\
+V_x V_z T - V_y S & V_y V_z T + V_x S & V_z^2 T + C
+\end{bmatrix}
+$$
+
+**Where:** **C = cos θ**, **S = sin θ**, **T = (1 - cos θ)**
+
+**Unit vector components:**
+$$V_x = \frac{x}{\sqrt{x^2+y^2+z^2}}, \quad V_y = \frac{y}{\sqrt{x^2+y^2+z^2}}, \quad V_z = \frac{z}{\sqrt{x^2+y^2+z^2}}$$
+</Card>
+
+<Tabs>
+  <TabItem label="Example 1: Symmetric Vector">
+
+    <details>
+    <summary>**Example: 90° rotation about V = (2, 2, 2)**</summary>
+
+    <Steps>
+
+    1. **Calculate unit vector components:**
+
+       $$V_x = V_y = V_z = \frac{2}{2\sqrt{3}} = \frac{1}{\sqrt{3}}$$
+
+    2. **Calculate trigonometric values:**
+
+       $$C = \cos(90°) = 0, \quad S = \sin(90°) = 1, \quad T = 1 - 0 = 1$$
+
+    3. **Compute matrix elements:**
+
+       $$
+       \begin{aligned}
+       n_x &= V_x^2 T + C = \left(\frac{1}{\sqrt{3}}\right)^2(1) + 0 = \frac{1}{3} \\
+       n_y &= V_x V_y T + V_z S = \frac{1}{\sqrt{3}} \cdot \frac{1}{\sqrt{3}}(1) + \frac{1}{\sqrt{3}}(1) = \frac{1 + \sqrt{3}}{3} \\
+       n_z &= V_x V_z T - V_y S = \frac{1}{\sqrt{3}} \cdot \frac{1}{\sqrt{3}}(1) - \frac{1}{\sqrt{3}}(1) = \frac{1 - \sqrt{3}}{3}
+       \end{aligned}
+       $$
+
+    4. **Final rotation matrix:**
+
+       $$
+       R(V,90°) = \begin{bmatrix}
+       \frac{1}{3} & \frac{1-\sqrt{3}}{3} & \frac{1+\sqrt{3}}{3} \\
+       \frac{1+\sqrt{3}}{3} & \frac{1}{3} & \frac{1-\sqrt{3}}{3} \\
+       \frac{1-\sqrt{3}}{3} & \frac{1+\sqrt{3}}{3} & \frac{1}{3}
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+  <TabItem label="Example 2: General Vector">
+
+    <details>
+    <summary>**Example: 80° rotation about V = (2, 3, 4)**</summary>
+
+    <Steps>
+
+    1. **Calculate vector magnitude and unit components:**
+
+       $$|V| = \sqrt{2^2 + 3^2 + 4^2} = \sqrt{29}$$
+
+       $$V_x = \frac{2}{\sqrt{29}}, \quad V_y = \frac{3}{\sqrt{29}}, \quad V_z = \frac{4}{\sqrt{29}}$$
+
+    2. **Calculate trigonometric values:**
+
+       $$C = \cos(80°) = 0.1736, \quad S = \sin(80°) = 0.9848, \quad T = 0.8264$$
+
+    3. **Compute matrix elements (showing key calculations):**
+
+       $$
+       \begin{aligned}
+       n_x &= V_x^2 T + C = \left(\frac{2}{\sqrt{29}}\right)^2(0.8264) + 0.1736 = 0.2876 \\
+       s_y &= V_y^2 T + C = \left(\frac{3}{\sqrt{29}}\right)^2(0.8264) + 0.1736 = 0.4301 \\
+       q_z &= V_z^2 T + C = \left(\frac{4}{\sqrt{29}}\right)^2(0.8264) + 0.1736 = 0.6295
+       \end{aligned}
+       $$
+
+    4. **Final rotation matrix:**
+
+       $$
+       R(V,80°) = \begin{bmatrix}
+       0.2876 & -0.5605 & 0.7766 \\
+       0.9025 & 0.4301 & -0.0238 \\
+       -0.3206 & 0.7077 & 0.6295
+       \end{bmatrix}
+       $$
+
+    </Steps>
+
+    </details>
+
+  </TabItem>
+  <TabItem label="Rodrigues Formula">
+
+    <Card title="⚡ Rodrigues' Rotation Formula" icon="star">
+    **Alternative approach using matrix exponentials:**
+
+    $$R(V,θ) = e^{Wθ} = I + W\sin(θ) + W^2(1-\cos(θ))$$
+
+    **Where:**
+    - **I** = 3×3 identity matrix
+    - **W** = skew-symmetric matrix of V
+
+    $$
+    W = \begin{bmatrix}
+    0 & -V_z & V_y \\
+    V_z & 0 & -V_x \\
+    -V_y & V_x & 0
+    \end{bmatrix}
+    $$
+
+    **Note:** Rodrigues formula only works for rotations about axes through the origin.
+    </Card>
+
+  </TabItem>
+</Tabs>
+
+### Applications of Arbitrary Axis Rotations in Spatial Mechanics
+
+<BionicText method="advanced" intensity="medium" class="highlight">
+Arbitrary axis rotation capabilities are essential for advanced 6-DOF robot programming, tool orientation control, and complex trajectory planning where rotations cannot be decomposed into simple XYZ sequences.
+</BionicText>
+
+**Key applications:**
+- **Tool orientation programming** for complex manufacturing operations
+- **Camera gimbal control** for smooth tracking and stabilization
+- **Spacecraft attitude control** using reaction wheels and thrusters
+- **Robotic welding** with precise torch angle control
+- **3D printing** with multi-axis extruder orientation
 
 ### 4×4 Homogeneous Transformation Matrices
 
