@@ -581,12 +581,22 @@ Euler angles provide an intuitive way to describe 3D orientations using three se
 The physical meanings of **roll**, **pitch**, and **yaw** don't change, but **which mathematical axis (X, Y, Z) corresponds to which rotation depends entirely on your coordinate system**. Always verify which coordinate system convention is being used when working with Euler angles! Different fields use different conventions:
 
 **Aerospace/Aviation Convention:**
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+    <img src="https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/aerospace-aviation-xyz-convention.svg" alt="Roll, Pitch, and Yaw Aerospace Aviation Convention" style={{ maxWidth: '100%', height: 'auto' }} />
+  </TailwindWrapper>
+</div>
 - **Axes:** X = forward (nose), Y = right (wing), Z = down (belly)
-- **Rotations:** Roll = rotation about X (longitudinal), Pitch = rotation about Y (lateral), Yaw = rotation about Z (vertical)
+- **Rotations:** Roll = rotation about X (longitudinal), Pitch = rotation about Y (lateral/horizontal), Yaw = rotation about Z (vertical)
 
 **Mathematics/Robotics Convention *(used in this course)*:**
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+    <img src="https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/math-robotics-xyz-convention.svg" alt="Roll, Pitch, and Yaw Mathematics Robotics Convention" style={{ maxWidth: '100%', height: 'auto' }} />
+  </TailwindWrapper>
+</div>
 - **Axes:** X = right, Y = up, Z = forward
-- **Rotations:** Roll = rotation about Z (longitudinal), Pitch = rotation about X (lateral), Yaw = rotation about Y (vertical)
+- **Rotations:** Roll = rotation about Z (longitudinal), Pitch = rotation about X (lateral/horizontal), Yaw = rotation about Y (vertical)
 
 **Key Point:** Roll always means "banking" (rotating around the forward-pointing axis), Pitch means "nodding" (tilting up/down), and Yaw means "turning" (spinning left/right). But which axis is X, Y, or Z depends on your coordinate system!
 
