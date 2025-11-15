@@ -1,10 +1,10 @@
 ---
 title: "Lesson 1: Kinematic Joints and Degrees of Freedom in 3D Systems"
-description: "Analyzing joint types and constraint relationships in modular robotic systems through systematic DoF analysis"
+description: "Master kinematic joint analysis and DoF calculations through industrial robotics, medical devices, and agricultural automation applications"
 contributors: "sam-macharia,jack-kojiro"
 pubDate: 2025-09-12
-tags: ["spatial-mechanics", "kinematic-joints", "degrees-freedom", "modular-robotics", "constraint-analysis"]
-excerpt: "Learn kinematic joint analysis through modular robot design, covering all joint types, degrees of freedom calculations, and constraint relationships in 3D mechanical systems."
+tags: ["spatial-mechanics", "kinematic-joints", "degrees-freedom", "robotics", "constraint-analysis", "medical-robotics", "agricultural-automation"]
+excerpt: "Learn kinematic joint analysis and degrees of freedom calculations through real-world applications: robotic welding cells, surgical instruments, and adaptive grippers. Master Grübler's equation, constraint analysis, and underactuated mechanisms for industrial, medical, and agricultural robotics."
 ---
 
 import SpatialMechanicsComments from '../../../../components/spatial-mechanics/SpatialMechanicsComments.astro';
@@ -20,60 +20,53 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
   contributors={frontmatter.contributors}
 />
 
-Learn kinematic joint analysis through modular robot design, covering all joint types, degrees of freedom calculations, and constraint relationships in 3D mechanical systems.
+Master kinematic joint analysis and degrees of freedom calculations through real-world robotics applications: industrial welding cells, minimally invasive surgical instruments, and adaptive agricultural grippers. Learn to apply Grübler's equation, analyze constraint relationships, and design mechanisms across diverse engineering domains.
 
 ## 🎯 Learning Objectives
 
 By the end of this lesson, you will be able to:
 
-1. **Classify** all kinematic <Badge text="joint types" variant="caution" /> and their <Badge text="motion characteristics" variant="tip" /> in <Badge text="3D space" variant="note" />
+1. **Classify** all kinematic <Badge text="joint types" variant="caution" /> and their <Badge text="constraint characteristics" variant="tip" /> in <Badge text="3D space" variant="note" />
 2. **Calculate** <Badge text="degrees of freedom" variant="caution" /> for spatial mechanisms using <Badge text="Grübler's equation" variant="tip" />
-3. **Analyze** <Badge text="constraint relationships" variant="caution" /> and <Badge text="mobility" variant="tip" /> in <Badge text="modular robotic systems" variant="note" />
-4. **Design** <Badge text="joint libraries" variant="caution" /> for <Badge text="reconfigurable mechatronic" variant="tip" /> applications
+3. **Analyze** <Badge text="constraint relationships" variant="caution" /> including <Badge text="closure and coupling constraints" variant="tip" />
+4. **Apply** <Badge text="DoF analysis" variant="caution" /> to <Badge text="industrial, medical, and agricultural robotics" variant="note" />
+5. **Design** <Badge text="underactuated mechanisms" variant="caution" /> with <Badge text="passive adaptability" variant="tip" />
 
-## 🔧 Real-World System Problem: Modular Robot Joint Library
+## 🔧 Real-World Engineering Challenge: Joint Selection Across Diverse Applications
 
 <BionicText method="advanced" intensity="medium" class="highlight">
-Modern manufacturing requires adaptable automation systems. Modular robots use standardized joint libraries that can be reconfigured for different tasks - from delicate assembly to heavy-duty welding. Each joint type provides specific motion capabilities and constraints that must be understood for effective system design.
+From automotive welding robots requiring multi-axis coordination, to surgical instruments constrained by 10mm trocar ports, to adaptive fruit harvesters using single-motor grippers - engineers must systematically analyze joint types and degrees of freedom to design effective mechanisms. Each application domain presents unique constraints that directly impact joint selection and system mobility.
 </BionicText>
-
-### System Description
-
-**Universal Modular Robot System Components:**
-- **Standardized Joint Library** (revolute, prismatic, spherical, universal joints)
-- **Modular Link Segments** (variable lengths and cross-sections)  
-- **Quick-Connect Interfaces** (mechanical and electrical coupling)
-- **Central Control System** (coordinates multiple joint types)
-- **Reconfiguration Tools** (rapid system redesign capabilities)
 
 ### The Joint Analysis Challenge
 
-When designing modular systems, engineers face critical decisions:
+Engineers across different domains face critical questions:
 
 :::note[Critical Design Questions]
-- **Which joint types** provide the required motion capabilities?
-- **How many joints** are needed to achieve desired degrees of freedom?
-- **What constraints** do different joint combinations impose?
-- **How do joint limitations** affect overall system performance?
-- **Which configurations** avoid kinematic singularities?
+- **Which joint types** provide required motion capabilities within space constraints?
+- **How many actuators** are needed to achieve desired degrees of freedom?
+- **What constraints** (closure, coupling, external) reduce effective mobility?
+- **How do we balance** complexity, cost, and performance in joint selection?
+- **Can underactuation** provide advantages over fully actuated systems?
 :::
 
-> **Engineering Question:** How do we systematically analyze and catalog the motion capabilities of different joint types to create a comprehensive modular robot library?
+> **Engineering Question:** How do we systematically analyze joint configurations to select optimal mechanisms for constrained environments, multi-robot coordination, and adaptive grasping tasks?
 
 <details>
-<summary>**Click to Reveal: Why Joint Analysis Matters**</summary>
-**Consequences of Poor Joint Selection:**
-- **Motion limitations** preventing required tasks
-- **Over-constrained systems** with binding and excessive forces
-- **Under-constrained systems** with uncontrolled motion
-- **Kinematic singularities** causing loss of controllability
-- **Inefficient designs** with redundant or unnecessary joints
+<summary>**Click to Reveal: Why DoF Analysis Matters**</summary>
+**Consequences of Inadequate Analysis:**
+- **Motion limitations** preventing required surgical maneuvers or assembly tasks
+- **Over-actuated designs** wasting motors, cost, and control complexity
+- **Closure constraints** causing unexpected loss of mobility in multi-robot cells
+- **Workspace restrictions** from unaccounted external constraints (trocar ports, mounting)
+- **Inefficient grippers** requiring multiple motors when one could suffice
 
-**Benefits of Systematic Analysis:**
-- **Optimal joint selection** for specific applications
-- **Predictable system behavior** through constraint understanding
-- **Efficient designs** with minimum complexity
-- **Reliable operation** with singularity avoidance
+**Benefits of Systematic DoF Analysis:**
+- **Optimal actuator count** - knowing exactly how many motors needed
+- **Constraint accounting** - predicting effective DoF under real operating conditions
+- **Design trade-offs** - comparing alternatives quantitatively (size, force, complexity)
+- **Underactuation opportunities** - exploiting passive compliance for adaptability
+- **Cost reduction** - minimizing actuators while maintaining functionality
 </details>
 
 ## 📚 Fundamental Theory: Joint Types and Constraints
@@ -329,279 +322,840 @@ Each joint **removes some of these freedoms** through constraints.
 5. **Check for special cases** (redundant constraints, passive joints)
 </Steps>
 
-## 🔧 Application: Modular Robot Joint Library Design
+### Series vs. Parallel Joint Configurations
 
-Let's analyze various joint combinations for a reconfigurable robot system.
-
-:::note[Problem Statement]
-**Modular Robot Joint Library Analysis**
-
-**What we need to determine:**
-1. **Degrees of freedom** for various joint configurations
-2. **Motion capabilities** of different joint combinations  
-3. **Constraint relationships** between joints in series and parallel
-4. **Optimal joint selection** for specific motion requirements
-
-**Key Question:** How do we design a joint library that provides maximum flexibility while maintaining predictable kinematics?
-:::
-
-<hr />
-
-**System Parameters:**
-- Universal modular robot platform with interchangeable joints
-- Standard link lengths: **`L`** = 200 mm, 400 mm, 600 mm
-- Joint library includes: revolute (R), prismatic (P), spherical (S), universal (U), cylindrical (C)
-- Maximum system complexity: **`n`** ≤ 8 links
-- Target applications: assembly, welding, material handling
-- **`Safety requirement`**: No uncontrolled motion modes
-
-<hr />
-
-### Configuration 1: Serial Chain Analysis
-
-<details>
-<summary>**Click to reveal serial chain DoF calculations**</summary>
-
-<Steps>
-
-1. **RRR Configuration (3-DoF Robot Arm):**
-   
-   - Links: n = 4 (3 moving links + ground)
-   - Joints: 3 revolute joints, each with c = 5 constraints
-   - DoF: F = 6(4-1) - 3×5 = 18 - 15 = **3 DoF**
-   - **Motion capability:** 3D positioning with fixed orientation
-
-2. **RRRRRR Configuration (6-DoF Robot Arm):**
-   
-   - Links: n = 7 (6 moving links + ground)  
-   - Joints: 6 revolute joints, each with c = 5 constraints
-   - DoF: F = 6(7-1) - 6×5 = 36 - 30 = **6 DoF**
-   - **Motion capability:** Full 3D positioning and orientation
-
-3. **PPP Configuration (3-DoF Cartesian Robot):**
-   
-   - Links: n = 4 (3 moving links + ground)
-   - Joints: 3 prismatic joints, each with c = 5 constraints  
-   - DoF: F = 6(4-1) - 3×5 = 18 - 15 = **3 DoF**
-   - **Motion capability:** Pure 3D translation, no rotation
-
-4. **Mixed Configuration (RRP):**
-   
-   - Links: n = 4 (3 moving links + ground)
-   - Joints: 2 revolute (c=5) + 1 prismatic (c=5)
-   - DoF: F = 6(4-1) - (2×5 + 1×5) = 18 - 15 = **3 DoF**
-   - **Motion capability:** Hybrid rotation-translation motion
-
-</Steps>
-
-</details>
-
-### Configuration 2: Complex Joint Analysis
-
-<details>
-<summary>**Click to reveal complex joint DoF calculations**</summary>
-
-<Steps>
-
-1. **Spherical joint configuration (RS):**
-   
-   - Links: n = 3 (2 moving links + ground)
-   - Joints: 1 revolute (c=5) + 1 spherical (c=3)  
-   - DoF: F = 6(3-1) - (1×5 + 1×3) = 12 - 8 = **4 DoF**
-   - **Motion capability:** Enhanced wrist-like motion
-
-2. **Universal joint system (UU):**
-   
-   - Links: n = 3 (2 moving links + ground)
-   - Joints: 2 universal joints, each with c = 4 constraints
-   - DoF: F = 6(3-1) - 2×4 = 12 - 8 = **4 DoF**
-   - **Motion capability:** Double gimbal motion (like drive shaft)
-
-3. **Cylindrical joint application (CC):**
-   
-   - Links: n = 3 (2 moving links + ground)  
-   - Joints: 2 cylindrical joints, each with c = 4 constraints
-   - DoF: F = 6(3-1) - 2×4 = 12 - 8 = **4 DoF**
-   - **Motion capability:** Combined telescoping and rotation
-
-4. **Planar joint configuration (PlPl):**
-   
-   - Links: n = 3 (2 moving links + ground)
-   - Joints: 2 planar joints, each with c = 3 constraints
-   - DoF: F = 6(3-1) - 2×3 = 12 - 6 = **6 DoF**  
-   - **Motion capability:** Dual planar motion systems
-
-</Steps>
-
-</details>
-
-### Configuration 3: Parallel Mechanism Analysis
-
-<details>
-<summary>**Click to reveal parallel mechanism DoF analysis**</summary>
-
-<Steps>
-
-1. **Stewart Platform (6-SPS):**
-   
-   - Links: n = 8 (6 legs + 1 platform + ground)
-   - Joints: 6 spherical (c=3) + 6 prismatic (c=5) + 6 spherical (c=3)
-   - DoF: F = 6(8-1) - (6×3 + 6×5 + 6×3) = 42 - 66 = **-24**
-   - **Correction:** Passive DoF in spherical joints
-   - **Actual DoF:** 6 (controlled by 6 prismatic actuators)
-
-2. **3-RPS Parallel Platform:**
-   
-   - Links: n = 5 (3 legs + 1 platform + ground)  
-   - Joints: 3 revolute (c=5) + 3 prismatic (c=5) + 3 spherical (c=3)
-   - DoF: F = 6(5-1) - (3×5 + 3×5 + 3×3) = 24 - 39 = **-15**
-   - **Actual DoF:** 3 (constrained platform motion)
-
-3. **Delta Robot (3-RRPaR):**
-   
-   - Links: n = 10 (complex parallel structure)
-   - Analysis requires consideration of **parallelogram constraints**
-   - **Actual DoF:** 3 (pure translation of end-effector)
-
-</Steps>
-
-</details>
-
-## 📊 Joint Library Analysis Summary
-
-<CardGrid>
-  <Card title="Simple Serial Chains" icon="approve">
-    **RRR:** 3 DoF positioning  
-    **PPP:** 3 DoF translation  
-    **RRRRRR:** 6 DoF full motion  
-    **Status:** <Badge text="Standard configurations" variant="success" />
-  </Card>
-  
-  <Card title="Enhanced Mobility Joints" icon="information">
-    **Spherical:** 3 rotational DoF  
-    **Universal:** 2 rotational DoF  
-    **Cylindrical:** 2 DoF (rotation + translation)  
-    **Status:** <Badge text="Specialized applications" variant="tip" />
-  </Card>
-  
-  <Card title="Parallel Mechanisms" icon="star">
-    **Stewart Platform:** 6 DoF high precision  
-    **Delta Robot:** 3 DoF high speed  
-    **3-RPS:** 3 DoF platform motion  
-    **Status:** <Badge text="Advanced applications" variant="caution" />
-  </Card>
-</CardGrid>
-
-## 🎯 Advanced Analysis: Constraint Relationships
-
-### Series vs. Parallel Constraints
+Understanding how joints combine is critical for designing mechanisms:
 
 <Tabs>
   <TabItem label="Series Configuration">
-    
+
     **Joints in series ADD their degrees of freedom:**
-    
+
     ```
     R + R + R = 1 + 1 + 1 = 3 DoF
-    R + P + R = 1 + 1 + 1 = 3 DoF  
+    R + P + R = 1 + 1 + 1 = 3 DoF
     S + R + R = 3 + 1 + 1 = 5 DoF
     ```
-    
-    **Design principle:** Use series for cumulative motion
-    
+
+    **Design principle:** Use series for cumulative motion and larger workspaces
+
   </TabItem>
   <TabItem label="Parallel Configuration">
-    
+
     **Joints in parallel CREATE constraints:**
-    
-    Stewart Platform example:
+
+    Example - Stewart Platform:
     - 6 parallel chains each constrain the platform
     - Result: Controlled 6-DoF motion
     - High stiffness and precision
-    
+
     **Design principle:** Use parallel for precision and stiffness
-    
+
   </TabItem>
-  <TabItem label="Hybrid Configurations">
-    
-    **Combining series and parallel elements:**
-    
-    - **Serial-parallel:** Robot with parallel wrist
-    - **Parallel-serial:** Stewart platform with serial tool
-    - **Complex hybrid:** Multi-arm coordination
-    
-    **Design principle:** Optimize for specific performance requirements
-    
+  <TabItem label="Closure Constraints">
+
+    **When mechanisms form closed loops:**
+
+    - Shared workpieces create **closure constraints**
+    - Each rigid connection removes 6 DoF
+    - Total system DoF ≠ sum of individual components
+
+    **Formula for shared workpiece:**
+    $$F_{shared} = F_1 + F_2 - 6$$
+
+    **Design principle:** Account for coupling when multiple mechanisms interact
+
   </TabItem>
 </Tabs>
 
 ### Special Considerations
 
 :::caution[Common Analysis Pitfalls]
-1. **Overconstrained systems** may have F < 0 but still be mobile
-2. **Passive joints** don't contribute to DoF count
+1. **Overconstrained systems** may have F < 0 but still be mobile (passive joints compensate)
+2. **Passive joints** don't contribute to actuator count
 3. **Redundant constraints** require special analysis methods
 4. **Instantaneous DoF** may differ from overall mechanism DoF
 5. **Singularities** can temporarily change effective DoF
+6. **Closure constraints** in multi-robot systems reduce effective DoF
 :::
 
-## 🛠️ Design Guidelines for Joint Selection
+## 🏭 Application 1: Industrial Robotic Welding Cell DoF Analysis (Automotive Manufacturing)
 
-### Selection Criteria Matrix
+A dual-robot welding cell for car frame assembly uses a 6-axis welding robot and a SCARA robot working with a shared workpiece positioner.
 
-<Tabs>
-  <TabItem label="Application Requirements">
-    
-    **Motion Requirements:**
-    - Pure positioning: Use R-R-R configuration
-    - Pure orientation: Use spherical or universal joints  
-    - Combined motion: Use 6-DoF serial or parallel
-    - High speed: Consider parallel configurations
-    - High precision: Use parallel mechanisms
-    
-  </TabItem>
-  <TabItem label="Performance Trade-offs">
-    
-    **Serial Mechanisms:**
-    - ✅ Large workspace
-    - ✅ Simple control  
-    - ❌ Lower stiffness
-    - ❌ Error accumulation
-    
-    **Parallel Mechanisms:**  
-    - ✅ High stiffness
-    - ✅ High precision
-    - ❌ Limited workspace
-    - ❌ Complex control
-    
-  </TabItem>
-  <TabItem label="Joint-Specific Guidelines">
-    
-    **Revolute Joints:** Most versatile, use for rotation
-    **Prismatic Joints:** Use for linear positioning  
-    **Spherical Joints:** Ideal for wrists and connections
-    **Universal Joints:** Good for drive applications
-    **Cylindrical Joints:** Efficient for combined motion
-    **Planar Joints:** Use for constrained planar motion
-    
-  </TabItem>
-</Tabs>
+:::note[System Problem Statement]
+- **Configuration:** Two industrial robots + shared workpiece positioner
+- **Task:** Determine total actuator requirements and system mobility
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Industrial Robotic Welding Cell](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/6-Axis-Welding-Robot-by-FANUC.png)
+  </TailwindWrapper>
+</div>
+**What we need to calculate:**
+1. **DoF for each robot** using Grübler's equation
+2. **Total independent actuators** needed for the cell
+3. **Closure constraint effects** when sharing the workpiece
+
+**Key Question:** How many motors are needed, and what is the effective DoF when robots work together?
+:::
+
+<Card title="🔧 Equivalent System Model" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Welding Cell Configuration Diagram](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/welding-cell-configuration.png)
+  </TailwindWrapper>
+</div>
+**Given:**
+- **Robot 1 (6-Axis Welder):** 6R configuration (6 revolute joints)
+- **Robot 2 (SCARA Positioner):** 3R + 1P configuration
+- **Workpiece Positioner:** 2 universal joints (2U)
+- **Task requirement:** Full 6-DoF welding capability
+</Card>
+
+### Step 1: Calculate Robot 1 DoF (6R Configuration)
+
+<details>
+<summary>**Click to reveal Robot 1 DoF calculations**</summary>
+
+<Steps>
+
+1. **Count links and joints:**
+
+   - Links: n = 7 (6 moving links + ground)
+   - Joints: j = 6 (all revolute)
+   - Constraints per revolute joint: c = 5
+
+2. **Apply Grübler's equation:**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(7-1) - 6(5)$$
+
+   $$F = 6(6) - 30 = 36 - 30 = 6 \text{ DoF}$$ ✅
+
+3. **Motion capability:**
+
+   - **Translations:** 3 (X, Y, Z)
+   - **Rotations:** 3 (roll, pitch, yaw)
+   - **Total:** Full spatial positioning ✅
+
+4. **Actuator count:**
+
+   **Motors required:** 6 (one per revolute joint) ✅
+
+</Steps>
+
+</details>
+
+### Step 2: Calculate Robot 2 DoF (SCARA: 3R + 1P)
+
+<details>
+<summary>**Click to reveal SCARA DoF calculations**</summary>
+
+<Steps>
+
+1. **Count links and joints:**
+
+   - Links: n = 5 (4 moving links + ground)
+   - Joints: j = 4 (3 revolute + 1 prismatic vertical)
+   - Total constraints: 3(5) + 1(5) = 20
+
+2. **Apply Grübler's equation:**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(5-1) - [3(5) + 1(5)]$$
+
+   $$F = 6(4) - 20 = 24 - 20 = 4 \text{ DoF}$$ ✅
+
+3. **SCARA motion breakdown:**
+
+   - **Horizontal plane:** 2 translational DoF (X, Y)
+   - **Vertical:** 1 translational DoF (Z)
+   - **Rotation:** 1 about vertical axis (θ<sub>z</sub>)
+
+   **Constraint:** Tool axis remains vertical (no tilt) ✅
+
+4. **Actuator count:**
+
+   **Motors required:** 4 (3 rotary + 1 vertical linear) ✅
+
+</Steps>
+
+</details>
+
+### Step 3: Calculate Workpiece Positioner DoF (2U)
+
+<details>
+<summary>**Click to reveal positioner DoF calculations**</summary>
+
+<Steps>
+
+1. **Count links and joints:**
+
+   - Links: n = 3 (2 moving segments + ground)
+   - Joints: j = 2 (universal joints)
+   - Constraints per universal joint: c<sub>U</sub> = 4
+
+   **Reminder:** Each universal joint allows 2 rotational DoF.
+
+2. **Apply Grübler's equation:**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(3-1) - 2(4)$$
+
+   $$F = 6(2) - 8 = 12 - 8 = 4 \text{ DoF}$$ ✅
+
+3. **Rotation capability:**
+
+   - **First universal joint:** 2 rotational DoF
+   - **Second universal joint:** 2 rotational DoF
+   - **Total:** 4 rotational DoF for workpiece orientation ✅
+
+4. **Actuator count:**
+
+   **Motors required:** 4 (2 per universal joint assembly) ✅
+
+</Steps>
+
+</details>
+
+### Step 4: Total System Analysis
+
+<details>
+<summary>**Click to reveal complete system calculations**</summary>
+
+<Steps>
+
+1. **Summary table:**
+
+   | Subsystem | Config | Links (n) | Joints (j) | Constraints (Σc) | DoF | Actuators |
+   |-----------|--------|-----------|------------|------------------|-----|-----------|
+   | Robot 1 (6-Axis Welder) | 6R | 7 | 6 | 30 | 6 | 6 |
+   | Robot 2 (SCARA) | 3R+1P | 5 | 4 | 20 | 4 | 4 |
+   | Workpiece Positioner | 2U | 3 | 2 | 8 | 4 | 4 |
+   | **TOTALS** | - | 15 | 12 | 58 | **14** | **14** |
+
+   ✅
+
+2. **Verification using individual calculations:**
+
+   $$F_{total} = F_{R1} + F_{R2} + F_{pos}$$
+
+   $$F_{total} = 6 + 4 + 4 = 14 \text{ DoF}$$ ✅
+
+   **Note:** This assumes **independent operation** (robots not sharing workpiece).
+
+3. **Total actuator requirement:**
+
+   **Independent operation:** 14 motors ✅
+
+   **Control system needs:**
+   - 14 servo motor controllers
+   - Real-time coordination computer
+   - Synchronized motion planning software
+
+4. **Redundancy analysis:**
+
+   **Robot 1 (6 DoF):**
+   - Task requires: 6 DoF (full welding orientation)
+   - Available: 6 DoF
+   - **Redundancy:** None (minimal configuration) ✅
+
+   **Robot 2 (4 DoF SCARA):**
+   - Task requires: 4 DoF (workpiece positioning)
+   - Available: 4 DoF
+   - **Redundancy:** None for full 4-DoF tasks ✅
+
+5. **Shared workpiece constraint analysis:**
+
+   When Robot 1 grips the workpiece held by the positioner:
+
+   **Closure constraints added:** 6 (rigid connection removes 6 DoF)
+
+   **Modified DoF calculation:**
+
+   $$F_{shared} = F_{R1} + F_{pos} - 6$$
+
+   $$F_{shared} = 6 + 4 - 6 = 4 \text{ DoF}$$ ✅
+
+   **Interpretation:** The combined system (Robot 1 + Positioner + Workpiece) has only 4 controllable DoF when rigidly connected.
+
+   **Practical meaning:**
+   - Positioner must coordinate with Robot 1
+   - Cannot move all 10 actuators independently
+   - 6 actuators become dependent on the other 4
+
+6. **Critical design insights:**
+
+   **Maximum motors needed:** 14 (independent operation) ✅
+
+   **Effective DoF when coordinated:**
+   - Robot 1 + Positioner + Workpiece: 4 DoF
+   - Robot 2 (SCARA): 4 DoF
+   - **Total coordinated:** 8 DoF (not 14)
+
+   **Singularity concerns:**
+   - Robot 1: Wrist singularities (3 axes align), shoulder singularity
+   - Robot 2 (SCARA): Elbow singularity (links collinear)
+   - Positioner: Gimbal lock possible ✅
+
+</Steps>
+
+:::note[Engineering Insight]
+This welding cell requires **14 independent actuators** for full mobility, but the **effective DoF** when Robot 1 shares the workpiece with the positioner is reduced to **8 DoF** due to **closure constraints**.
+
+**Key Concept:** The closure constraint formula $F_{shared} = F_1 + F_2 - 6$ shows that rigidly connecting two mechanisms removes 6 DoF (the 3 translations + 3 rotations that would allow independent motion). This is critical for coordinated multi-robot systems.
+
+**Practical Impact:** While the cell has 14 motors, only **8 can move independently** during welding operations - the other 6 are constrained by the rigid gripper connection between Robot 1 and the workpiece.
+:::
+
+</details>
+
+## 🏭 Application 2: Minimally Invasive Surgical Robot Tool Design (Medical Robotics)
+
+A laparoscopic surgical instrument must provide full 6-DoF manipulation inside the patient while constrained by a 10mm trocar port.
+
+:::note[System Problem Statement]
+- **Configuration:** Surgical tool passing through fixed trocar port
+- **Task:** Design joint configuration for maximum dexterity in confined space
+<div style="text-align: center;">
+  <img 
+    src="https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/laparoscopic-surgical-device-with-modular-end-tools.webp"
+    alt="Minimally Invasive Surgical Robot"
+    style="max-width: 100%; height: auto;"
+  />
+  <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+    <strong>Ref:</strong> Wang & Zuo (2021). <em>Laparoscopic surgical device with modular end tools…</em>  
+    <a href="https://link.springer.com/article/10.1007/s11517-021-02341-x">
+      https://link.springer.com/article/10.1007/s11517-021-02341-x
+    </a>
+  </p>
+</div>
+**What we need to calculate:**
+1. **DoF analysis** for different wrist joint configurations
+2. **Constraint effects** of the trocar port (Remote Center of Motion)
+3. **Actuator requirements** for each design alternative
+4. **Design selection** based on workspace and force requirements
+
+**Key Question:** Which joint configuration provides 6-DoF inside the patient with minimum instrument diameter?
+:::
+
+<Card title="🔧 Equivalent System Model" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Surgical Tool Joint Configurations](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/surgical-tool-configurations.png)
+  </TailwindWrapper>
+</div>
+**Given:**
+- **Trocar port diameter:** 10 mm (fixed constraint point)
+- **Required workspace:** 150 mm diameter sphere inside patient
+- **Force requirement:** 20 N grip force, 5 N precision manipulation
+- **Design alternatives:**
+  - **Option A:** Spherical wrist (1S) + shaft rotation (1R) + insertion (1P)
+  - **Option B:** Universal wrist (1U) + 2 revolute (2R) + insertion (1P)
+  - **Option C:** Three revolute wrist (3R) + shaft rotation (1R) + insertion (1P)
+</Card>
+
+### Step 1: Analyze Option A - Spherical Wrist Configuration
+
+<details>
+<summary>**Click to reveal Option A DoF calculations**</summary>
+
+<Steps>
+
+1. **System configuration:**
+
+   - **Proximal (outside patient):** Insertion depth (1P) + shaft rotation (1R)
+   - **Distal (inside patient):** Spherical wrist joint (1S at tool tip)
+   - Links: n = 4 (insertion shaft + rotating shaft + wrist housing + end-effector + ground)
+   - Joints: 1 prismatic + 1 revolute + 1 spherical
+
+2. **Apply Grübler's equation:**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(4-1) - [1(5) + 1(5) + 1(3)]$$
+
+   $$F = 18 - [5 + 5 + 3] = 18 - 13 = 5 \text{ DoF}$$ ✅
+
+3. **Motion capability breakdown:**
+
+   - **Insertion (P):** 1 translational DoF (depth control)
+   - **Shaft rotation (R):** 1 rotational DoF (about insertion axis)
+   - **Spherical wrist (S):** 3 rotational DoF (pitch, yaw, roll at tip)
+   - **Total:** 2 translation + 3 rotation = 5 DoF ✅
+
+   **Missing:** 1 translational DoF (cannot move laterally inside patient without pivoting about trocar)
+
+4. **Trocar constraint analysis:**
+
+   **Remote Center of Motion (RCM) constraint:**
+   - Tool shaft MUST pivot through trocar point
+   - This removes 2 translational DoF (X, Y perpendicular to shaft)
+   - Effective internal DoF: 5 - 2 = **3 DoF usable inside patient** ✅
+
+   **Note:** Lateral motion achieved by pivoting entire instrument through trocar, not internal joints.
+
+5. **Actuator count:**
+
+   **Motors required:** 5 (1 linear for insertion + 4 rotary: 1 shaft + 3 in spherical joint) ✅
+
+6. **Advantages/Disadvantages:**
+
+   **Advantages:**
+   - Compact spherical wrist design
+   - All 3 rotational DoF at single point (simplified kinematics)
+   - Minimum instrument diameter
+
+   **Disadvantages:**
+   - Spherical joint mechanically complex
+   - Difficult to seal for sterilization
+   - Higher friction in compact design
+
+</Steps>
+
+</details>
+
+### Step 2: Analyze Option B - Universal Wrist Configuration
+
+<details>
+<summary>**Click to reveal Option B DoF calculations**</summary>
+
+<Steps>
+
+1. **System configuration:**
+
+   - **Proximal:** Insertion (1P) + 2 revolute joints (2R for pitch/yaw angles)
+   - **Distal:** Universal joint wrist (1U at tool tip)
+   - Links: n = 5 (insertion + link 1 + link 2 + wrist + end-effector + ground)
+   - Joints: 1P + 2R + 1U
+
+2. **Apply Grübler's equation:**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(5-1) - [1(5) + 2(5) + 1(4)]$$
+
+   $$F = 24 - [5 + 10 + 4] = 24 - 19 = 5 \text{ DoF}$$ ✅
+
+   **Note:** Universal joint has 4 constraints (allows 2 rotational DoF).
+
+3. **Motion capability breakdown:**
+
+   - **Insertion (P):** 1 translational DoF
+   - **Proximal revolutes (2R):** 2 rotational DoF (instrument pitch/yaw)
+   - **Universal wrist (U):** 2 rotational DoF (end-effector orientation)
+   - **Total:** 1 translation + 4 rotation = 5 DoF ✅
+
+4. **Trocar constraint effect:**
+
+   Same RCM constraint as Option A:
+   - Effective internal DoF: **3 DoF** (1 insertion + 2 wrist rotations) ✅
+   - Proximal 2R joints used for positioning through trocar pivot
+
+5. **Actuator count:**
+
+   **Motors required:** 5 (1 linear + 4 rotary) ✅
+
+6. **Advantages/Disadvantages:**
+
+   **Advantages:**
+   - Universal joint mechanically simpler than spherical
+   - Easier to seal and sterilize
+   - Better force transmission
+
+   **Disadvantages:**
+   - Slightly larger diameter than spherical design
+   - 4 rotational DoF instead of 3 (one redundant)
+
+</Steps>
+
+</details>
+
+### Step 3: Analyze Option C - Three Revolute Wrist Configuration
+
+<details>
+<summary>**Click to reveal Option C DoF calculations**</summary>
+
+<Steps>
+
+1. **System configuration:**
+
+   - **Proximal:** Insertion (1P) + shaft rotation (1R)
+   - **Distal:** Three revolute wrist (3R - pitch, yaw, roll)
+   - Links: n = 6 (insertion + shaft + wrist link 1 + link 2 + link 3 + end-effector + ground)
+   - Joints: 1P + 4R total
+
+2. **Apply Grübler's equation:**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(6-1) - [1(5) + 4(5)]$$
+
+   $$F = 30 - [5 + 20] = 30 - 25 = 5 \text{ DoF}$$ ✅
+
+3. **Motion capability breakdown:**
+
+   - **Insertion (P):** 1 translational DoF
+   - **Shaft rotation (R):** 1 rotational DoF
+   - **Wrist (3R):** 3 rotational DoF (Euler angles: pitch-yaw-roll)
+   - **Total:** 1 translation + 4 rotation = 5 DoF ✅
+
+4. **Trocar constraint effect:**
+
+   Effective internal DoF: **3 DoF** (1 insertion + 2 wrist orientations, shaft rotation external) ✅
+
+5. **Actuator count:**
+
+   **Motors required:** 5 (1 linear + 4 rotary) ✅
+
+6. **Advantages/Disadvantages:**
+
+   **Advantages:**
+   - All revolute joints (simplest mechanism)
+   - Proven reliability in industrial robots
+   - Easy maintenance and sterilization
+
+   **Disadvantages:**
+   - Largest diameter (three separate revolute joints)
+   - Wrist singularity when axes align
+   - Longer distal segment
+
+</Steps>
+
+</details>
+
+### Step 4: Design Comparison and Selection
+
+<details>
+<summary>**Click to reveal comparison analysis**</summary>
+
+<Steps>
+
+1. **Comparative summary table:**
+
+   | Design | Config | DoF | Actuators | Diameter | Wrist Complexity | Force Trans. | Singularities |
+   |--------|--------|-----|-----------|----------|------------------|--------------|---------------|
+   | Option A | 1P+1R+1S | 5 | 5 | 8 mm | High | Medium | Few |
+   | Option B | 1P+2R+1U | 5 | 5 | 9 mm | Medium | High | Medium |
+   | Option C | 1P+4R | 5 | 5 | 10 mm | Low | High | Many |
+
+   ✅
+
+2. **Workspace analysis:**
+
+   All three options provide equivalent **effective DoF = 5** (before trocar constraint).
+
+   After RCM constraint:
+   - Insertion depth: 0-200 mm
+   - Wrist rotation: ±90° pitch, ±90° yaw
+   - Workspace volume: ~150 mm diameter sphere ✅
+
+3. **Force transmission comparison:**
+
+   **Option A (Spherical):**
+   - Force through compact ball joint
+   - Mechanical advantage: ~0.7 (friction losses)
+   - Achievable grip force: 20N × 0.7 = 14N ⚠️ (below requirement)
+
+   **Option B (Universal):**
+   - Force through two perpendicular axes
+   - Mechanical advantage: ~0.85
+   - Achievable grip force: 20N × 0.85 = 17N ✅ (meets requirement)
+
+   **Option C (3R Wrist):**
+   - Force through series of revolute joints
+   - Mechanical advantage: ~0.9
+   - Achievable grip force: 20N × 0.9 = 18N ✅ (exceeds requirement)
+
+4. **Sterilization and reliability:**
+
+   - **Option A:** Difficult to seal spherical joint → infection risk ⚠️
+   - **Option B:** Universal joint can be sealed → good ✅
+   - **Option C:** All revolute joints easily sealed → excellent ✅
+
+5. **Final recommendation:**
+
+   **Selected: Option B (1P + 2R + 1U)**
+
+   **Justification:**
+   - Meets all DoF requirements (5 total, 3 effective inside patient) ✅
+   - Acceptable diameter (9mm < 10mm trocar) ✅
+   - Good force transmission (17N grip force) ✅
+   - Medium complexity (balance of performance and reliability) ✅
+   - Superior sealing for sterilization ✅
+
+   **Trade-off:** Slightly larger than Option A, but significantly better force transmission and easier to sterilize than spherical joint. Simpler than Option C with fewer singularities.
+
+6. **Actuator implementation:**
+
+   **5 motors total:**
+   - 1 linear actuator (insertion, external)
+   - 2 rotary motors (pitch/yaw, external for trocar pivoting)
+   - 2 rotary motors (universal wrist, cable-driven to distal end)
+
+   **Cable transmission ratio:** 3:1 to achieve 20N output force ✅
+
+</Steps>
+
+:::note[Engineering Insight]
+The **trocar port creates a Remote Center of Motion (RCM) constraint** that removes 2 translational DoF, reducing the effective internal workspace DoF from 5 to 3. This is a critical example of **external constraints** affecting mechanism mobility.
+
+**Design Principle:** In constrained environments (surgical ports, confined spaces), the **effective DoF** differs from the **calculated DoF**. Engineers must account for workspace constraints, not just kinematic DoF, when selecting joint configurations.
+
+**Surgical Robot Specifics:** All three options have 5 kinematic DoF, but the universal joint (Option B) provides the best **balance of compactness, force transmission, and sterility** - demonstrating that DoF analysis alone is insufficient for real-world design decisions.
+:::
+
+</details>
+
+## 🏭 Application 3: Agricultural Fruit Harvesting Gripper Design (Agricultural Automation)
+
+An underactuated robotic gripper for tomatoe harvesting must adapt to varying fruit sizes (40-120mm) using a single motor controlling 4 fingers.
+
+:::note[System Problem Statement]
+- **Configuration:** 4-finger underactuated gripper with passive joints
+- **Task:** Calculate DoF and verify self-adaptive grasping capability
+<div style="text-align: center;">
+  <img 
+    src="https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/Model-of-Four-Finger-Gripper-with-a-Built-in-Vacuum-Suction-Nozzle.png"
+    alt="An Underactuated Robotic Gripper"
+    style="max-width: 100%; height: auto;"
+  />
+  <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+    <strong>Ref:</strong> Vu, Q., Ronzhin, A. (2020). <em>A Model of Four-Finger Gripper…</em>  
+    <a href="https://link.springer.com/chapter/10.1007/978-981-13-9267-2_13">
+      https://link.springer.com/chapter/10.1007/978-981-13-9267-2_13
+    </a>
+  </p>
+</div>
+**What we need to calculate:**
+1. **DoF analysis** including passive joints
+2. **Actuator count** for synchronized motion
+3. **Mechanical advantage** for force requirements
+4. **Size adaptability range** verification
+
+**Key Question:** How can 1 motor control 12 finger joints (4 fingers × 3 joints each) and still adapt to different fruit sizes?
+:::
+
+<Card title="🔧 Equivalent System Model" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Underactuated Gripper Mechanism](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/underactuated-gripper-diagram.png)
+  </TailwindWrapper>
+</div>
+**Given:**
+- **Each finger:** 3 phalanges (proximal, medial, distal) connected by revolute joints
+- **Actuation:** 1 motor + tendon-pulley system driving all fingers
+- **Fruit size range:** 40-120 mm diameter
+- **Force requirement:** 2-5 N gentle grip (no bruising)
+- **Constraint:** Fingers mechanically coupled through differential mechanism
+</Card>
+
+### Step 1: Calculate Individual Finger DoF
+
+<details>
+<summary>**Click to reveal single finger DoF analysis**</summary>
+
+<Steps>
+
+1. **Single finger configuration:**
+
+   - Links: n = 4 (proximal + medial + distal phalanges + palm/ground)
+   - Joints: j = 3 (all revolute: θ₁, θ₂, θ₃)
+   - Each revolute joint: c = 5 constraints
+
+2. **Apply Grübler's equation (spatial):**
+
+   $$F = 6(n-1) - \sum_{i=1}^{j} c_i$$
+
+   $$F = 6(4-1) - 3(5)$$
+
+   $$F = 18 - 15 = 3 \text{ DoF}$$ ✅
+
+   **Note:** This assumes **3 independent actuators** per finger (not our case).
+
+3. **Motion capability:**
+
+   - Joint 1 (proximal): Rotation θ₁
+   - Joint 2 (medial): Rotation θ₂
+   - Joint 3 (distal): Rotation θ₃
+   - **Total:** 3 rotational DoF per finger ✅
+
+4. **Underactuation constraint:**
+
+   **With tendon coupling:**
+   - All 3 joints driven by **single tendon**
+   - Joints move sequentially (not independently)
+   - **Effective actuated DoF per finger:** 1 ✅
+
+   **Passive joints:** Joints 2 and 3 become passive after contact with object.
+
+</Steps>
+
+</details>
+
+### Step 2: Calculate Complete 4-Finger Gripper DoF
+
+<details>
+<summary>**Click to reveal complete gripper DoF analysis**</summary>
+
+<Steps>
+
+1. **Total system without coupling:**
+
+   - Fingers: 4
+   - Joints per finger: 3
+   - Total joints: 4 × 3 = 12 revolute joints
+   - Total links: n = 4 fingers × 3 phalanges + 1 palm = 13 links
+
+   **If all joints independent:**
+
+   $$F = 6(13-1) - 12(5) = 72 - 60 = 12 \text{ DoF}$$ ✅
+
+2. **With tendon coupling constraints:**
+
+   **Coupling mechanism:**
+   - Single motor drives 1 main tendon
+   - Differential pulley distributes force to 4 finger tendons
+   - Each finger tendon drives 3 joints in sequence
+
+   **Additional constraints from coupling:**
+   - 4 fingers must close synchronously: 3 coupling constraints
+   - 3 joints per finger coupled by single tendon: 2 constraints × 4 = 8 constraints
+   - **Total coupling constraints:** 3 + 8 = 11 ✅
+
+3. **Modified Grübler's equation with coupling:**
+
+   $$F = 6(n-1) - \sum c_i - C_{coupling}$$
+
+   $$F = 72 - 60 - 11 = 1 \text{ DoF}$$ ✅
+
+   **Result:** The entire 12-joint gripper has **only 1 actuated DoF** (the motor input).
+
+4. **Passive DoF during grasping:**
+
+   When fingers contact fruit:
+   - Proximal joints stop when tendon tension balanced
+   - Medial and distal joints continue closing (passive motion)
+   - **Self-adaptive shape conformance** ✅
+
+5. **Actuator count:**
+
+   **Motors required:** 1 (single motor for entire gripper) ✅
+
+   **Mechanical advantage through pulleys:**
+   - Motor torque: 0.5 N·m
+   - Pulley ratio: 4:1
+   - Tendon force: (0.5 N·m) / (0.02 m radius) × 4 = 100 N
+   - Force per finger: 100 N / 4 = 25 N
+   - Fingertip force: 25 N / 5 (mechanical advantage) = 5 N ✅ (meets requirement)
+
+</Steps>
+
+</details>
+
+### Step 3: Size Adaptability Analysis
+
+<details>
+<summary>**Click to reveal adaptability calculations**</summary>
+
+<Steps>
+
+1. **Geometric parameters:**
+
+   - Proximal phalange length: L₁ = 40 mm
+   - Medial phalange length: L₂ = 30 mm
+   - Distal phalange length: L₃ = 25 mm
+   - Maximum finger span (fully open): 120 mm diameter ✅
+   - Minimum finger span (fully closed): 35 mm diameter
+
+2. **Joint angle ranges:**
+
+   - θ₁ (proximal): 0° to 90°
+   - θ₂ (medial): 0° to 110°
+   - θ₃ (distal): 0° to 120°
+
+3. **Grasping small fruit (40mm tomatoes):**
+
+   **Contact sequence:**
+   - All 4 fingers close simultaneously
+   - Proximal joints rotate to θ₁ ≈ 65°
+   - First contact at **proximal phalanges**
+   - Tendon tension stops proximal joints
+   - Medial and distal joints continue passively
+   - Final configuration: θ₁=65°, θ₂=25°, θ₃=10° ✅
+
+   **Grip diameter:** 40 mm ✅ (matches fruit size)
+
+4. **Grasping large fruit (120mm tomatoes):**
+
+   **Contact sequence:**
+   - Fingers open to maximum span
+   - Proximal joints rotate to θ₁ ≈ 15°
+   - First contact at **distal fingertips**
+   - Tendon tension distributed across all joints
+   - Final configuration: θ₁=15°, θ₂=5°, θ₃=5° ✅
+
+   **Grip diameter:** 120 mm ✅ (matches fruit size)
+
+5. **Force distribution verification:**
+
+   **For 40mm fruit (proximal contact):**
+   - Contact points: 4 (one per finger)
+   - Force per contact: 5N / 4 = 1.25 N
+   - **Status:** ✅ Within 2-5N requirement (no bruising)
+
+   **For 120mm fruit (distal contact):**
+   - Contact points: 4 (fingertips)
+   - Moment arm disadvantage: ×1.5
+   - Effective force: 5N / 1.5 = 3.3 N per contact
+   - **Status:** ✅ Within 2-5N requirement
+
+6. **Workspace envelope:**
+
+   **Achievable grip range:** 35-120 mm ✅
+   **Required range:** 40-120 mm ✅
+   **Margin:** 5 mm (acceptable) ✅
+
+</Steps>
+
+:::note[Engineering Insight]
+This underactuated gripper demonstrates how **coupling constraints** can reduce a 12-DoF mechanism to **1 actuated DoF** while maintaining **passive adaptability**. The key insight:
+
+$$F_{actuated} = F_{total} - C_{coupling} = 12 - 11 = 1 \text{ DoF}$$
+
+**Underactuation Principle:** By intentionally **removing independent actuation**, the gripper gains **passive compliance** - allowing automatic shape adaptation to varying fruit sizes without sensors or complex control. This is a powerful example of **constraint-based design** where limiting DoF actually **improves functionality**.
+
+**Practical Advantage:** 1 motor instead of 12 → 92% cost reduction + simpler control + inherent robustness.
+:::
+
+</details>
 
 ## 📋 Summary and Next Steps
 
 In this lesson, you learned to:
 
 1. **Classify** kinematic joints by their constraint characteristics and DoF
-2. **Calculate** mechanism mobility using Grübler's equation systematically  
+2. **Calculate** mechanism mobility using Grübler's equation systematically
 3. **Analyze** series, parallel, and hybrid joint configurations
-4. **Design** modular joint libraries for specific applications
+4. **Evaluate** multi-robot systems and closure constraint effects
+5. **Apply** constraint analysis to real-world design problems (surgical tools, agricultural grippers)
+6. **Understand** underactuation and passive joints in adaptive mechanisms
 
 **Key Design Insights:**
 - <Badge text="Each joint type provides specific motion capabilities" variant="tip" />
-- <Badge text="DoF analysis predicts mechanism mobility" variant="note" />  
+- <Badge text="DoF analysis predicts mechanism mobility" variant="note" />
 - <Badge text="Series joints add DoF, parallel joints add constraints" variant="caution" />
+- <Badge text="Shared workpieces create closure constraints reducing effective DoF" variant="caution" />
+- <Badge text="External constraints (trocar ports, coupling) reduce effective DoF" variant="caution" />
+- <Badge text="Underactuation enables passive adaptability through constraint design" variant="tip" />
 
-**Critical Formula:** $F = 6(n-1) - \sum c_i$ (Grübler's equation for spatial mechanisms)
+**Critical Formulas:**
+- **Spatial mechanisms:** $F = 6(n-1) - \sum c_i$
+- **With coupling constraints:** $F = 6(n-1) - \sum c_i - C_{coupling}$
+- **Closure constraints:** $F_{shared} = F_1 + F_2 - 6$
 
 **Coming Next**: In Lesson 2, we'll develop the mathematical foundations for spatial motion by studying planar transformations using complex analysis and homogeneous coordinates through SCARA robot programming.
 
