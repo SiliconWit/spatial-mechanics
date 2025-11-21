@@ -2,7 +2,7 @@
 title: "Lesson 3: 3D Rotation Matrices and Spatial Transformations"
 description: "3D rotation matrices, Euler angles, arbitrary axis rotations (decomposition and Rodrigues methods), and homogeneous transformations for robotics and aerospace applications"
 contributors: "sam-macharia,jack-kojiro"
-pubDate: 2025-09-13
+pubDate: 2025-11-21
 tags: ["spatial-mechanics", "3d-rotations", "euler-angles", "rodrigues-formula", "rotation-matrices", "homogeneous-transformations", "gimbal-lock"]
 excerpt: "Explore 3D rotation mathematics: coordinate axis rotations, Euler angle sequences with singularity management, arbitrary axis rotations using decomposition and Rodrigues methods, and 4×4 homogeneous transformations for unified spatial motion."
 ---
@@ -777,28 +777,26 @@ $$
 
 **General recommendation:** Use Rodrigues' formula for all computational work (robot control, graphics engines, simulation). Use decomposition approach for teaching, learning, and analytical derivations.
 
-## 🏭 Application 1: Robotic Welding of Pipe Joints (Oil & Gas Pipeline Construction)
+## 🏭 Application 1: Robotic Welding of Pipe Joints (Manufacturing)
 
-A 6-DOF welding robot must perform orbital welding around a pipe joint with the torch perpendicular to the pipe surface throughout the 360° weld path.
+A 3-axis welding robot must perform orbital welding around a horizontal pipe with the torch perpendicular to the pipe surface at key positions around the weld.
 
 :::note[System Problem Statement]
-- **Configuration:** 6-DOF welding robot with GTAW (Gas Tungsten Arc Welding) torch
-- **Workpiece:** 300mm diameter steel pipe inclined 35° from horizontal
-- **Task:** 360° continuous weld following pipe circumference with perpendicular torch orientation
+- **Configuration:** 3-axis welding robot with welding torch
+- **Workpiece:** 200mm diameter horizontal steel pipe (aligned with X-axis)
+- **Task:** Calculate torch orientation at 4 key waypoints (top, side, bottom, side) around pipe circumference
 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
   <TailwindWrapper>
-	![Robotic Pipe Welding Setup](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/pipe-welding-robot.png)
+	![Robotic Pipe Welding Setup](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/robotic-pipe-welding.jpg)
   </TailwindWrapper>
 </div>
 **What we need to calculate:**
-1. **Surface normal vectors** at 16 waypoints around pipe circumference
+1. **Surface normal vectors** at 4 waypoints around pipe circumference (0°, 90°, 180°, 270°)
 2. **Tool orientation matrices** ensuring torch perpendicularity to surface
 3. **Euler angle sequences** (ZYX convention) for robot controller
-4. **Singularity detection** during 360° traverse
-5. **SLERP interpolation** for smooth orientation transitions
-6. **Verification** that all orientations maintain ±2° tolerance
+4. **Verification** that torch remains perpendicular to pipe surface
 
-**Key Question:** How do we systematically calculate 3D rotation matrices to maintain torch perpendicularity while avoiding gimbal lock during orbital welding?
+**Key Question:** How do we systematically calculate 3D rotation matrices to maintain torch perpendicularity at different positions around a cylindrical surface?
 :::
 
 <Card title="🔧 Equivalent System Model" icon="document">
@@ -808,12 +806,12 @@ A 6-DOF welding robot must perform orbital welding around a pipe joint with the 
   </TailwindWrapper>
 </div>
 **Given:**
-- **Pipe parameters:** Radius R = 150 mm, centerline inclined 35° from horizontal
-- **Pipe centerline direction:** $\hat{p} = (\cos 35°, 0, \sin 35°) = (0.8192, 0, 0.5736)$
-- **Starting point:** θ = 0° at top of pipe in world frame
-- **Torch requirements:** Z-axis must align with surface normal (perpendicular to pipe)
-- **Waypoints:** 16 equally spaced points (every 22.5°)
-- **Tolerances:** Position ±1mm, orientation ±2°
+- **Pipe parameters:** Radius R = 100 mm, horizontal pipe aligned with X-axis
+- **Pipe centerline direction:** $\hat{p} = (1, 0, 0)$ (along X-axis)
+- **Starting point:** θ = 0° at top of pipe (pointing in +Z direction)
+- **Torch requirements:** Torch Z-axis must align with surface normal (pointing radially outward from pipe)
+- **Waypoints:** 4 cardinal points (θ = 0°, 90°, 180°, 270°)
+- **Coordinate system:** YZ-plane is perpendicular to pipe axis
 </Card>
 
 ### Step 1: Surface Normal Calculation at Waypoints
@@ -823,55 +821,98 @@ A 6-DOF welding robot must perform orbital welding around a pipe joint with the 
 
 <Steps>
 
-1. **Parametric pipe surface representation:**
+1. **Understanding the coordinate system and notation:**
 
-   Pipe centerline passes through origin, inclined 35° from horizontal.
+   **Coordinate system setup (RIGHT-HANDED):**
+   - The **X-axis** runs horizontally left-to-right (pipe direction)
+   - The **Y-axis** points upward vertically (toward the ceiling)
+   - The **Z-axis** points to the side (imagine lying along X-axis: legs at left, head at right, Z points to your left side)
+   - Alternative Z-axis description: when viewing the XY plane on paper, Z comes **out of the paper** toward you
+   - We look at the pipe's circular cross-section in the **YZ-plane** 
 
-   **Radial direction at angle θ around pipe:**
-   $$\hat{r}(\theta) = \cos\theta \cdot \hat{y} + \sin\theta \cdot \hat{n}$$
+   **Vector notation explained:**
+   - $\hat{x}$, $\hat{y}$, $\hat{z}$ are **unit vectors** (length = 1) pointing along each axis
+   - $\hat{x} = (1, 0, 0)$ means "1 unit in X-direction, 0 in Y, 0 in Z"
+   - $\hat{y} = (0, 1, 0)$ means "0 in X, 1 unit in Y-direction (upward), 0 in Z"
+   - $\hat{z} = (0, 0, 1)$ means "0 in X, 0 in Y, 1 unit in Z-direction (out toward you)"
+   - $\hat{n}$ means "unit normal vector" (perpendicular to the pipe surface, pointing radially outward)
 
-   Where $\hat{n}$ is perpendicular to pipe axis in XZ-plane:
-   $$\hat{n} = (-\sin 35°, 0, \cos 35°) = (-0.5736, 0, 0.8192)$$
+   **Angular position θ convention:**
+   - We define **θ = 0° at the TOP of the pipe** (highest point, where normal points straight up in +Y direction)
+   - θ increases as we rotate **clockwise** when viewing from the left (looking down the pipe in +X direction)
+   - This is a **choice of convention** - we could pick any starting point, but starting at the top is intuitive
 
-2. **Surface normal at θ = 0° (top of pipe):**
+2. **Geometric reasoning - where does the normal point?**
 
-   $$\hat{r}(0°) = \cos(0°) \cdot (0,1,0) + \sin(0°) \cdot (-0.5736, 0, 0.8192)$$
-   $$\hat{r}(0°) = (0, 1, 0)$$ ✅
+   Imagine standing at the left end of the pipe, looking at the circular cross-section in the YZ-plane:
 
-   **Physical meaning:** At top of pipe, normal points straight up (Y-direction)
+   - **At θ = 0° (top):** Normal points **straight up** → +Y-direction → $\hat{n} = \hat{y} = (0, 1, 0)$
+   - **At θ = 90° (toward you):** Normal points **out of paper** → +Z-direction → $\hat{n} = \hat{z} = (0, 0, 1)$
+   - **At θ = 180° (bottom):** Normal points **straight down** → -Y-direction → $\hat{n} = -\hat{y} = (0, -1, 0)$
+   - **At θ = 270° (away from you):** Normal points **into paper** → -Z-direction → $\hat{n} = -\hat{z} = (0, 0, -1)$
 
-3. **Surface normal at θ = 90°:**
+3. **Deriving the formula for surface normal:**
 
-   $$\hat{r}(90°) = \cos(90°) \cdot (0,1,0) + \sin(90°) \cdot (-0.5736, 0, 0.8192)$$
-   $$\hat{r}(90°) = (0, 0, 0) + (-0.5736, 0, 0.8192)$$
-   $$\hat{r}(90°) = (-0.5736, 0, 0.8192)$$ ✅
+   Looking at the circular cross-section in the YZ-plane, the normal vector rotates around the circle.
 
-   **Physical meaning:** Normal points perpendicular to pipe axis
+   **At angle θ measured clockwise from the top:**
+   - The **vertical component** (Y) starts at 1, decreases: this follows **cosine**
+   - The **Z component** (out of paper) starts at 0, increases: this follows **sine**
 
-4. **General formula for surface normal:**
+   **General formula:**
+   $$\hat{n}(\theta) = \cos\theta \cdot \hat{y} + \sin\theta \cdot \hat{z}$$
 
-   $$\hat{r}(\theta) = \begin{bmatrix} -0.5736\sin\theta \\ \cos\theta \\ 0.8192\sin\theta \end{bmatrix}$$ ✅
+   This means: "Mix the up-direction ($\hat{y}$) and out-of-paper direction ($\hat{z}$) using cosine and sine to get the correct angle."
 
-5. **16 waypoint normal vectors (every 22.5°):**
+4. **Calculating surface normal at θ = 0° (top of pipe):**
 
-   | Point | θ (°) | n_x | n_y | n_z | Verification: \|n\| |
-   |-------|-------|---------|---------|---------|---------------------|
-   | 0 | 0.0 | 0.0000 | 1.0000 | 0.0000 | 1.000 ✅ |
-   | 1 | 22.5 | -0.2195 | 0.9239 | 0.3133 | 1.000 ✅ |
-   | 2 | 45.0 | -0.4057 | 0.7071 | 0.5793 | 1.000 ✅ |
-   | 3 | 67.5 | -0.5299 | 0.3827 | 0.7566 | 1.000 ✅ |
-   | 4 | 90.0 | -0.5736 | 0.0000 | 0.8192 | 1.000 ✅ |
-   | 5 | 112.5 | -0.5299 | -0.3827 | 0.7566 | 1.000 ✅ |
-   | 6 | 135.0 | -0.4057 | -0.7071 | 0.5793 | 1.000 ✅ |
-   | 7 | 157.5 | -0.2195 | -0.9239 | 0.3133 | 1.000 ✅ |
-   | 8 | 180.0 | 0.0000 | -1.0000 | 0.0000 | 1.000 ✅ |
-   | 9 | 202.5 | 0.2195 | -0.9239 | -0.3133 | 1.000 ✅ |
-   | 10 | 225.0 | 0.4057 | -0.7071 | -0.5793 | 1.000 ✅ |
-   | 11 | 247.5 | 0.5299 | -0.3827 | -0.7566 | 1.000 ✅ |
-   | 12 | 270.0 | 0.5736 | 0.0000 | -0.8192 | 1.000 ✅ |
-   | 13 | 292.5 | 0.5299 | 0.3827 | -0.7566 | 1.000 ✅ |
-   | 14 | 315.0 | 0.4057 | 0.7071 | -0.5793 | 1.000 ✅ |
-   | 15 | 337.5 | 0.2195 | 0.9239 | -0.3133 | 1.000 ✅ |
+   $$\hat{n}(0°) = \cos(0°) \cdot \hat{y} + \sin(0°) \cdot \hat{z}$$
+
+   **Substitute values:** $\cos(0°) = 1$ and $\sin(0°) = 0$
+
+   $$\hat{n}(0°) = 1 \cdot \hat{y} + 0 \cdot \hat{z} = \hat{y}$$
+
+   **Convert to coordinates:** $\hat{y} = (0, 1, 0)$
+
+   $$\hat{n}(0°) = (0, 1, 0)$$ ✅
+
+   **Interpretation:**
+   - X-component = 0 (doesn't point along pipe)
+   - Y-component = 1 (points straight up!)
+   - Z-component = 0 (no out-of-paper component)
+
+5. **Calculating surface normal at θ = 90° (side toward you):**
+
+   $$\hat{n}(90°) = \cos(90°) \cdot \hat{y} + \sin(90°) \cdot \hat{z}$$
+
+   **Substitute values:** $\cos(90°) = 0$ and $\sin(90°) = 1$
+
+   $$\hat{n}(90°) = 0 \cdot \hat{y} + 1 \cdot \hat{z} = \hat{z}$$
+
+   **Convert to coordinates:** $\hat{z} = (0, 0, 1)$
+
+   $$\hat{n}(90°) = (0, 0, 1)$$ ✅
+
+   **Interpretation:**
+   - X-component = 0 (doesn't point along pipe)
+   - Y-component = 0 (no vertical component)
+   - Z-component = 1 (points out of paper toward you!)
+
+6. **General formula in coordinate form:**
+
+   $$\hat{n}(\theta) = \cos\theta \cdot (0,1,0) + \sin\theta \cdot (0,0,1) = (0, \cos\theta, \sin\theta)$$
+
+   Written as a column vector:
+   $$\hat{n}(\theta) = \begin{bmatrix} 0 \\ \cos\theta \\ \sin\theta \end{bmatrix}$$ ✅
+
+7. **All 4 waypoint normal vectors:**
+
+   | Point | θ (°) | Calculation | n_x | n_y | n_z | Physical Direction | \|n\| |
+   |-------|-------|-------------|---------|---------|---------|-------------------|-------|
+   | 0 | 0 | (0, cos 0°, sin 0°) | 0 | 1 | 0 | Top (+Y) | 1.000 ✅ |
+   | 1 | 90 | (0, cos 90°, sin 90°) | 0 | 0 | 1 | Side (+Z, toward you) | 1.000 ✅ |
+   | 2 | 180 | (0, cos 180°, sin 180°) | 0 | -1 | 0 | Bottom (-Y) | 1.000 ✅ |
+   | 3 | 270 | (0, cos 270°, sin 270°) | 0 | 0 | -1 | Side (-Z, away) | 1.000 ✅ |
 
 </Steps>
 
@@ -884,61 +925,140 @@ A 6-DOF welding robot must perform orbital welding around a pipe joint with the 
 
 <Steps>
 
-1. **Tool frame definition:**
+1. **What is a "tool frame" and why do we need it?**
 
-   - **Z-axis (torch direction):** Must align with surface normal $\hat{r}(\theta)$
-   - **X-axis (torch advance):** Tangent to weld path (circumferential direction)
-   - **Y-axis:** Completes right-handed frame
+   **The welding torch has its own coordinate system** attached to it:
+   - The torch must point perpendicular to the pipe surface (to make a good weld)
+   - We need to describe which way the torch is pointing in 3D space
+   - We do this by defining three perpendicular axes attached to the torch
 
-2. **Tangent vector (weld direction) at angle θ:**
+   **Tool frame axis definitions:**
+   - **Z-axis (torch tip direction):** Points where the torch is aimed - must align with surface normal $\hat{n}(\theta)$ to be perpendicular to pipe
+   - **X-axis (torch advance direction):** Points along the welding direction - we choose this to be along the pipe axis = $(1, 0, 0)$
+   - **Y-axis (torch side direction):** Points to the side of the torch - calculated automatically to complete a right-handed coordinate system
 
-   **Circumferential tangent:**
-   $$\hat{t}(\theta) = \frac{d\hat{r}}{d\theta} \text{ normalized}$$
+   **Why these choices?**
+   - Z-axis MUST be perpendicular to the pipe (required for welding)
+   - X-axis along the pipe makes sense because the torch moves along the pipe
+   - Y-axis is whatever's left to make the three axes perpendicular to each other
 
-   Since radial direction is $\hat{r}(\theta)$, tangent is perpendicular in the cylindrical coordinate system:
+2. **Tool orientation at θ = 0° (top of pipe):**
 
-   $$\hat{t}(\theta) = \hat{p} \times \hat{r}(\theta)$$ (pipe axis cross radial)
+   **What we know:**
+   - At the top, the surface normal points straight up: $\hat{n}(0°) = (0, 1, 0)$
+   - This means the torch must point upward too
 
-   $$\hat{t}(\theta) = \begin{bmatrix} 0.8192 \\ 0 \\ 0.5736 \end{bmatrix} \times \begin{bmatrix} -0.5736\sin\theta \\ \cos\theta \\ 0.8192\sin\theta \end{bmatrix}$$
+   **Building the tool frame step-by-step:**
 
-3. **Tangent calculation at θ = 0°:**
+   **Step 2a: Z-axis (where torch points):**
+   - Torch must be perpendicular to pipe surface
+   - At top of pipe, this means pointing upward (in +Y direction): $\mathbf{z}_{tool} = (0, 1, 0)$ ✅
 
-   $$\hat{t}(0°) = \begin{bmatrix} 0.8192 \\ 0 \\ 0.5736 \end{bmatrix} \times \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}$$
+   **Step 2b: X-axis (welding direction):**
+   - We choose this to be along the pipe: $\mathbf{x}_{tool} = (1, 0, 0)$ ✅
 
-   Using cross product formula:
-   $$\hat{t}(0°) = \begin{bmatrix} 0 \cdot 0 - 0.5736 \cdot 1 \\ 0.5736 \cdot 0 - 0.8192 \cdot 0 \\ 0.8192 \cdot 1 - 0 \cdot 0 \end{bmatrix} = \begin{bmatrix} -0.5736 \\ 0 \\ 0.8192 \end{bmatrix}$$ ✅
+   **Step 2c: Y-axis (complete the frame):**
+   - Must be perpendicular to both X and Z axes
+   - We use the **cross product**: $\mathbf{y}_{tool} = \mathbf{z}_{tool} \times \mathbf{x}_{tool}$
 
-   **Verification:** $\hat{t} \cdot \hat{r} = (-0.5736)(0) + (0)(1) + (0.8192)(0) = 0$ ✅ (perpendicular)
+   **Cross product calculation:**
+   $$\mathbf{y}_{tool} = (0, 1, 0) \times (1, 0, 0)$$
 
-4. **Tool orientation matrix at θ = 0°:**
+   Using cross product formula: $(a_1, a_2, a_3) \times (b_1, b_2, b_3) = (a_2 b_3 - a_3 b_2, a_3 b_1 - a_1 b_3, a_1 b_2 - a_2 b_1)$
 
-   $$\mathbf{x}_{tool} = \hat{t}(0°) = \begin{bmatrix} -0.5736 \\ 0 \\ 0.8192 \end{bmatrix}$$
+   $$= (1 \cdot 0 - 0 \cdot 0, 0 \cdot 1 - 0 \cdot 0, 0 \cdot 0 - 1 \cdot 1) = (0, 0, -1)$$ ✅
 
-   $$\mathbf{z}_{tool} = \hat{r}(0°) = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}$$
+   **Step 2d: Build the rotation matrix:**
+   - A rotation matrix has the tool frame axes as its **columns**
+   - Format: $R = [\mathbf{x}_{tool} | \mathbf{y}_{tool} | \mathbf{z}_{tool}]$ (three column vectors side-by-side)
 
-   $$\mathbf{y}_{tool} = \mathbf{z}_{tool} \times \mathbf{x}_{tool} = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} \times \begin{bmatrix} -0.5736 \\ 0 \\ 0.8192 \end{bmatrix}$$
+   $$
+   R_{tool}(0°) = \begin{bmatrix}
+   \text{x-axis} & \text{y-axis} & \text{z-axis} \\
+   1 & 0 & 0 \\
+   0 & 0 & 1 \\
+   0 & -1 & 0
+   \end{bmatrix}
+   $$ 
 
-   $$\mathbf{y}_{tool} = \begin{bmatrix} 1 \cdot 0.8192 - 0 \cdot 0 \\ 0 \cdot (-0.5736) - 0 \cdot 0.8192 \\ 0 \cdot 0 - 1 \cdot (-0.5736) \end{bmatrix} = \begin{bmatrix} 0.8192 \\ 0 \\ 0.5736 \end{bmatrix}$$ ✅
+   **Physical meaning:** At the top of the pipe, the torch points upward (+Y), moves along the pipe (+X), with Y-axis pointing away from you (-Z). ✅
+
+3. **Tool orientation at θ = 90° (side toward you):**
+
+   **What we know:**
+   - At the side, the surface normal points out toward you: $\hat{n}(90°) = (0, 0, 1)$
+   - This means the torch must point toward you
+
+   **Building the tool frame:**
+
+   **Step 3a: Z-axis (where torch points):**
+   - Must point toward you (in +Z direction): $\mathbf{z}_{tool} = (0, 0, 1)$ ✅
+
+   **Step 3b: X-axis (welding direction):**
+   - Still along the pipe: $\mathbf{x}_{tool} = (1, 0, 0)$ ✅
+
+   **Step 3c: Y-axis (cross product):**
+   $$\mathbf{y}_{tool} = \mathbf{z}_{tool} \times \mathbf{x}_{tool} = (0, 0, 1) \times (1, 0, 0)$$
+   $$= (0 \cdot 0 - 1 \cdot 0, 1 \cdot 1 - 0 \cdot 0, 0 \cdot 0 - 0 \cdot 1) = (0, 1, 0)$$ ✅
+
+   **Step 3d: Build the rotation matrix:**
+   $$
+   R_{tool}(90°) = \begin{bmatrix}
+   1 & 0 & 0 \\
+   0 & 1 & 0 \\
+   0 & 0 & 1
+   \end{bmatrix} = I
+   $$ 
+
+   **Physical meaning:** At θ = 90°, the tool frame aligns with the world frame! The torch points toward you (+Z), moves along pipe (+X), with Y-axis pointing up (+Y). ✅
+
+4. **Complete the other waypoints (θ = 180° and 270°):**
+
+   Following the same process for the bottom and other side:
+
+   **At θ = 180° (bottom):**
+   - Surface normal: $\hat{n}(180°) = (0, -1, 0)$ (points down)
+   - Z-axis: $(0, -1, 0)$, X-axis: $(1, 0, 0)$
+   - Y-axis: $(0, -1, 0) \times (1, 0, 0) = (0, 0, 1)$
 
    **Rotation matrix:**
-   $$R_{tool}(0°) = [\mathbf{x}_{tool} | \mathbf{y}_{tool} | \mathbf{z}_{tool}] = \begin{bmatrix} -0.5736 & 0.8192 & 0 \\ 0 & 0 & 1 \\ 0.8192 & 0.5736 & 0 \end{bmatrix}$$ ✅
+   $$R_{tool}(180°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix}$$
 
-5. **Verification - orthonormality check:**
+   **At θ = 270° (away from you):**
+   - Surface normal: $\hat{n}(270°) = (0, 0, -1)$ (points away)
+   - Z-axis: $(0, 0, -1)$, X-axis: $(1, 0, 0)$
+   - Y-axis: $(0, 0, -1) \times (1, 0, 0) = (0, -1, 0)$
 
-   $$R^T R = I?$$
+   **Rotation matrix:**
+   $$R_{tool}(270°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}$$
 
-   Column magnitudes: $|\mathbf{x}| = \sqrt{0.5736^2 + 0.8192^2} = 1.000$ ✅
+5. **Summary table of all 4 waypoints:**
 
-   Dot products: $\mathbf{x} \cdot \mathbf{y} = (-0.5736)(0.8192) + (0)(0) + (0.8192)(0.5736) = 0$ ✅
+   | θ (°) | Position | Torch Points | X-axis | Y-axis | Z-axis | R_tool (3×3 matrix) |
+   |-------|----------|--------------|--------|--------|--------|---------------------|
+   | 0 | Top | Up (+Y) | (1,0,0) | (0,0,-1) | (0,1,0) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}$ |
+   | 90 | Side | Toward you (+Z) | (1,0,0) | (0,1,0) | (0,0,1) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ |
+   | 180 | Bottom | Down (-Y) | (1,0,0) | (0,0,1) | (0,-1,0) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix}$ |
+   | 270 | Side | Away (-Z) | (1,0,0) | (0,-1,0) | (0,0,-1) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}$ |
 
-6. **Tool orientation matrices at key waypoints:**
+6. **Important pattern to recognize:**
 
-   | θ (°) | R_tool (3×3 matrix) |
-   |-------|---------------------|
-   | 0 | $\begin{bmatrix} -0.574 & 0.819 & 0 \\ 0 & 0 & 1 \\ 0.819 & 0.574 & 0 \end{bmatrix}$ |
-   | 90 | $\begin{bmatrix} -0.574 & 0.819 & -0.574 \\ 0 & 0 & 0 \\ 0.819 & 0.574 & 0.819 \end{bmatrix}$ |
-   | 180 | $\begin{bmatrix} -0.574 & 0.819 & 0 \\ 0 & 0 & -1 \\ 0.819 & 0.574 & 0 \end{bmatrix}$ |
-   | 270 | $\begin{bmatrix} -0.574 & 0.819 & 0.574 \\ 0 & 0 & 0 \\ 0.819 & 0.574 & -0.819 \end{bmatrix}$ |
+   **Look at the first column** of all the matrices - it's always $(1, 0, 0)$!
+   - This is the X-axis, which always points along the pipe
+   - This column never changes because the torch always moves along the pipe axis
+
+   **The key insight:**
+   - All these matrices represent **pure rotations about the X-axis** (the pipe)
+   - θ = 0°: Rotation by some angle about X-axis
+   - θ = 90°: Identity (world frame aligned)
+   - θ = 180°: Another rotation about X-axis
+   - θ = 270°: Another rotation about X-axis
+
+   **Physical interpretation:**
+   - Imagine holding the pipe with your right hand, thumb pointing along +X
+   - As you rotate around the pipe clockwise (when viewing from left), the torch rotates with you
+   - The torch always stays perpendicular to the pipe surface
+   - You're just doing a simple roll motion about the pipe axis!
 
 </Steps>
 
@@ -951,187 +1071,184 @@ A 6-DOF welding robot must perform orbital welding around a pipe joint with the 
 
 <Steps>
 
-1. **ZYX Euler angle extraction formulas:**
+1. **What are Euler angles and why do we need them?**
+
+   **The problem:**
+   - We have rotation matrices that describe the torch orientation
+   - But robot controllers don't understand matrices directly
+   - They need **three simple rotation angles**: roll, pitch, and yaw
+
+   **What are Euler angles?**
+   - **Roll (α):** Rotation about X-axis (like a plane banking left/right)
+   - **Pitch (β):** Rotation about Y-axis (like a plane nose up/down)
+   - **Yaw (γ):** Rotation about Z-axis (like a plane turning left/right)
+
+   **ZYX convention** means: apply rotations in order Z, then Y, then X (but we extract them in reverse!)
+
+2. **The extraction formulas (you don't need to memorize these!):**
 
    Given rotation matrix $R = \begin{bmatrix} r_{11} & r_{12} & r_{13} \\ r_{21} & r_{22} & r_{23} \\ r_{31} & r_{32} & r_{33} \end{bmatrix}$:
 
-   $$\beta = \arcsin(-r_{31})$$ (pitch - Y rotation)
-   $$\alpha = \arctan2(r_{32}, r_{33})$$ (roll - X rotation)
-   $$\gamma = \arctan2(r_{21}, r_{11})$$ (yaw - Z rotation)
+   These formulas extract the angles by looking at specific matrix elements:
+   - **Pitch (β):** $\beta = \arcsin(-r_{31})$ (looks at position row 3, column 1)
+   - **Roll (α):** $\alpha = \arctan2(r_{32}, r_{33})$ (looks at positions row 3, columns 2 & 3)
+   - **Yaw (γ):** $\gamma = \arctan2(r_{21}, r_{11})$ (looks at positions rows 2 & 1, column 1)
 
-2. **Euler angles at θ = 0°:**
+   **Don't worry about deriving these** - they come from the ZYX rotation sequence definition. Just know how to use them!
 
-   $$R_{tool}(0°) = \begin{bmatrix} -0.5736 & 0.8192 & 0 \\ 0 & 0 & 1 \\ 0.8192 & 0.5736 & 0 \end{bmatrix}$$
+3. **Extracting Euler angles at θ = 0° (top of pipe):**
 
-   $$\beta = \arcsin(-0.8192) = -55.0°$$ (pitch) ✅
-   $$\alpha = \arctan2(0.5736, 0) = 90.0°$$ (roll) ✅
-   $$\gamma = \arctan2(0, -0.5736) = 180.0°$$ (yaw) ✅
+   **Our rotation matrix:**
+   $$R_{tool}(0°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}$$
 
-3. **Singularity check:**
+   **Labeling the elements:**
+   $$R = \begin{bmatrix} r_{11}=1 & r_{12}=0 & r_{13}=0 \\ r_{21}=0 & r_{22}=0 & r_{23}=1 \\ r_{31}=0 & r_{32}=-1 & r_{33}=0 \end{bmatrix}$$
 
-   **Singular condition:** $|r_{31}| = 1$ (pitch = ±90°)
+   **Calculating pitch:**
+   $$\beta = \arcsin(-r_{31}) = \arcsin(-0) = \arcsin(0) = 0°$$ ✅
 
-   At θ = 0°: $|r_{31}| = |0.8192| = 0.8192 < 1$ ✅ (not singular)
+   **Calculating roll:**
+   $$\alpha = \arctan2(r_{32}, r_{33}) = \arctan2(-1, 0) = -90°$$ ✅
 
-   **Check all 16 waypoints for singularity:**
+   **Calculating yaw:**
+   $$\gamma = \arctan2(r_{21}, r_{11}) = \arctan2(0, 1) = 0°$$ ✅
 
-   Maximum $|r_{31}|$ occurs at θ = 90° and 270°:
-   $$|r_{31}|_{max} = 0.8192 < 1$$ ✅ (no singularities encountered)
+   **Result:** (roll, pitch, yaw) = (-90°, 0°, 0°)
 
-4. **Euler angle table for all waypoints:**
+   **Physical meaning:** A -90° roll about X-axis - torch points upward.
 
-   | Point | θ (°) | Roll α (°) | Pitch β (°) | Yaw γ (°) | Singular? |
-   |-------|-------|------------|-------------|-----------|-----------|
-   | 0 | 0.0 | 90.0 | -55.0 | 180.0 | No ✅ |
-   | 1 | 22.5 | 74.8 | -49.3 | 159.3 | No ✅ |
-   | 2 | 45.0 | 54.7 | -35.3 | 144.7 | No ✅ |
-   | 3 | 67.5 | 35.2 | -20.7 | 135.2 | No ✅ |
-   | 4 | 90.0 | 0.0 | -55.0 | 0.0 | No ✅ |
-   | 5 | 112.5 | -35.2 | -20.7 | -135.2 | No ✅ |
-   | 6 | 135.0 | -54.7 | -35.3 | -144.7 | No ✅ |
-   | 7 | 157.5 | -74.8 | -49.3 | -159.3 | No ✅ |
-   | 8 | 180.0 | -90.0 | -55.0 | 180.0 | No ✅ |
-   | 9 | 202.5 | -74.8 | -49.3 | 159.3 | No ✅ |
-   | 10 | 225.0 | -54.7 | -35.3 | 144.7 | No ✅ |
-   | 11 | 247.5 | -35.2 | -20.7 | 135.2 | No ✅ |
-   | 12 | 270.0 | 0.0 | -55.0 | 0.0 | No ✅ |
-   | 13 | 292.5 | 35.2 | -20.7 | -135.2 | No ✅ |
-   | 14 | 315.0 | 54.7 | -35.3 | -144.7 | No ✅ |
-   | 15 | 337.5 | 74.8 | -49.3 | -159.3 | No ✅ |
+4. **Extracting Euler angles at θ = 90° (side toward you):**
 
-5. **Orientation tolerance verification:**
+   **Our rotation matrix:**
+   $$R_{tool}(90°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
 
-   Maximum orientation change between adjacent waypoints:
-   $$\Delta\alpha_{max} = |90.0° - 74.8°| = 15.2°$$
+   **Labeling the elements:**
+   $$R = \begin{bmatrix} r_{11}=1 & r_{12}=0 & r_{13}=0 \\ r_{21}=0 & r_{22}=1 & r_{23}=0 \\ r_{31}=0 & r_{32}=0 & r_{33}=1 \end{bmatrix}$$
 
-   For SLERP interpolation with 200Hz update rate at 50mm/s travel speed:
-   - Arc length per segment: $\frac{2\pi \cdot 150}{16} = 58.9$ mm
-   - Travel time per segment: $\frac{58.9}{50} = 1.18$ s
-   - Number of interpolation steps: $1.18 \times 200 = 236$ steps
-   - Orientation change per step: $\frac{15.2°}{236} = 0.064°$ ✅ (well below ±2° tolerance)
+   **Calculating pitch:**
+   $$\beta = \arcsin(-r_{31}) = \arcsin(-0) = 0°$$ ✅
+
+   **Calculating roll:**
+   $$\alpha = \arctan2(r_{32}, r_{33}) = \arctan2(0, 1) = 0°$$ ✅
+
+   **Calculating yaw:**
+   $$\gamma = \arctan2(r_{21}, r_{11}) = \arctan2(0, 1) = 0°$$ ✅
+
+   **Result:** (roll, pitch, yaw) = (0°, 0°, 0°)
+
+   **Physical meaning:** This is the "home" position - torch points toward you at the side of the pipe.
+
+5. **What about gimbal lock (singularities)?**
+
+   **The danger zone:** If pitch β = ±90°, the formulas break down (gimbal lock!)
+
+   **Checking for gimbal lock:**
+   - Singularity happens when $|r_{31}| = 1$
+   - For all our waypoints: $r_{31} = 0$
+   - Therefore: $|r_{31}| = 0 < 1$ ✅ (safe!)
+
+   **Why are we safe?**
+   - Our torch never pitches up or down (pitch always = 0°)
+   - We only roll around the pipe
+   - The horizontal pipe geometry prevents gimbal lock!
+
+6. **Summary: Euler angles for all 4 waypoints:**
+
+   Calculating for the remaining two waypoints (θ = 180° and 270°) using the same formulas:
+
+   | Point | θ (°) | Position | Roll α (°) | Pitch β (°) | Yaw γ (°) | Robot Command | Singular? |
+   |-------|-------|----------|------------|-------------|-----------|---------------|-----------|
+   | 0 | 0 | Top | -90 | 0 | 0 | "Roll -90°" | No ✅ |
+   | 1 | 90 | Side (+Z) | 0 | 0 | 0 | "Home position" | No ✅ |
+   | 2 | 180 | Bottom | +90 | 0 | 0 | "Roll +90°" | No ✅ |
+   | 3 | 270 | Side (-Z) | ±180 | 0 | 0 | "Roll ±180°" | No ✅ |
+
+   **The beautiful insight:**
+   - **Only roll (α) changes** - pitch and yaw stay zero!
+   - This confirms our physical intuition: we're just rotating around the pipe (X-axis)
+   - θ = 90° is our "home/reference" position (identity matrix)
+   - Moving clockwise from θ = 90°: roll angle = -(θ - 90°)
+   - No complex 3D orientation calculations needed during welding!
 
 </Steps>
 
 </details>
 
-### Step 4: SLERP Orientation Interpolation
+### Step 4: Verification - Torch Perpendicularity Check
 
 <details>
-<summary>**Click to reveal SLERP interpolation calculations**</summary>
+<summary>**Click to reveal verification calculations**</summary>
 
 <Steps>
 
-1. **SLERP (Spherical Linear Interpolation) formula:**
+1. **Verification method:**
 
-   Interpolate between rotation matrices $R_1$ and $R_2$ at parameter $t \in [0,1]$:
+   For each waypoint, verify that the torch Z-axis (third column of rotation matrix) equals the surface normal.
 
-   $$R(t) = R_1 (R_1^T R_2)^t$$
+2. **Waypoint θ = 0° (top of pipe):**
 
-   Where matrix exponentiation $(R_1^T R_2)^t$ represents fractional rotation
+   **Expected:** Surface normal $\hat{n}(0°) = (0, 1, 0)$ (pointing up)
 
-2. **Alternative: Quaternion SLERP (more computationally efficient):**
+   **From rotation matrix:** $R_{tool}(0°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}$, third column $= (0, 1, 0)$ ✅
 
-   **Convert rotation matrices to quaternions:**
+   **Torch perpendicularity:** $\hat{n}(0°) \cdot \mathbf{z}_{tool} = (0,1,0) \cdot (0,1,0) = 1.0$ ✅ (perfect alignment)
 
-   For rotation matrix $R$, quaternion components:
-   $$q_w = \frac{1}{2}\sqrt{1 + r_{11} + r_{22} + r_{33}}$$
-   $$q_x = \frac{r_{32} - r_{23}}{4q_w}$$
-   $$q_y = \frac{r_{13} - r_{31}}{4q_w}$$
-   $$q_z = \frac{r_{21} - r_{12}}{4q_w}$$
+3. **Waypoint θ = 90° (side toward you):**
 
-3. **Quaternion at θ = 0°:**
+   **Expected:** Surface normal $\hat{n}(90°) = (0, 0, 1)$ (pointing toward you)
 
-   $$R(0°) = \begin{bmatrix} -0.5736 & 0.8192 & 0 \\ 0 & 0 & 1 \\ 0.8192 & 0.5736 & 0 \end{bmatrix}$$
+   **From rotation matrix:** $R_{tool}(90°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$, third column $= (0, 0, 1)$ ✅
 
-   $$q_w = \frac{1}{2}\sqrt{1 + (-0.5736) + 0 + 0} = \frac{1}{2}\sqrt{0.4264} = 0.3268$$
+   **Torch perpendicularity:** $\hat{n}(90°) \cdot \mathbf{z}_{tool} = (0,0,1) \cdot (0,0,1) = 1.0$ ✅ (perfect alignment)
 
-   $$q_x = \frac{0.5736 - 0.8192}{4(0.3268)} = \frac{-0.2456}{1.3072} = -0.1878$$
+4. **All waypoints verification summary:**
 
-   $$q_y = \frac{0 - 0.8192}{4(0.3268)} = -0.6250$$
-
-   $$q_z = \frac{0 - 0}{4(0.3268)} = 0$$
-
-   $$q(0°) = (0.3268, -0.1878, -0.6250, 0)$$ ✅
-
-4. **Quaternion at θ = 22.5°:**
-
-   Following same process:
-   $$q(22.5°) = (0.4181, -0.2195, -0.5547, -0.6830)$$ ✅
-
-5. **SLERP interpolation formula:**
-
-   $$q(t) = \frac{\sin((1-t)\Omega)}{\sin\Omega} q_1 + \frac{\sin(t\Omega)}{\sin\Omega} q_2$$
-
-   Where $\Omega = \arccos(q_1 \cdot q_2)$ is angle between quaternions
-
-6. **Angle between waypoints 0 and 1:**
-
-   $$\Omega = \arccos(q(0°) \cdot q(22.5°))$$
-   $$= \arccos(0.3268 \cdot 0.4181 + (-0.1878)(-0.2195) + (-0.6250)(-0.5547) + 0 \cdot (-0.6830))$$
-   $$= \arccos(0.1367 + 0.0412 + 0.3467) = \arccos(0.5246) = 58.36°$$ ✅
-
-7. **Interpolation example at t = 0.5 (midpoint):**
-
-   $$q(0.5) = \frac{\sin(29.18°)}{\ sin(58.36°)} q(0°) + \frac{\sin(29.18°)}{\sin(58.36°)} q(22.5°)$$
-
-   $$q(0.5) = 0.5736 \cdot q(0°) + 0.5736 \cdot q(22.5°)$$
-
-   Wait, that's not right. Let me recalculate:
-
-   $$q(0.5) = \frac{\sin(58.36° \cdot 0.5)}{\sin(58.36°)} q(0°) + \frac{\sin(58.36° \cdot 0.5)}{\sin(58.36°)} q(22.5°)$$
-
-   Actually, correct formula:
-   $$q(0.5) = \frac{\sin((1-0.5) \cdot 58.36°)}{\sin(58.36°)} q(0°) + \frac{\sin(0.5 \cdot 58.36°)}{\sin(58.36°)} q(22.5°)$$
-
-   $$q(0.5) = \frac{\sin(29.18°)}{\sin(58.36°)} q(0°) + \frac{\sin(29.18°)}{\sin(58.36°)} q(22.5°)$$
-
-   $$= \frac{0.4877}{0.8526} [q(0°) + q(22.5°)] = 0.5720 [q(0°) + q(22.5°)]$$
-
-   This is still wrong - the two coefficients should be different. Correct:
-
-   $$q(0.5) = \frac{\sin(29.18°)}{\sin(58.36°)} q(0°) + \frac{\sin(29.18°)}{\sin(58.36°)} q(22.5°)$$
-
-   Both are the same because we're at t=0.5 (symmetric). For general t:
-   $$\text{coeff}_1 = \frac{\sin((1-t)\Omega)}{\sin\Omega}, \quad \text{coeff}_2 = \frac{\sin(t\Omega)}{\sin\Omega}$$
+   | θ (°) | Surface Normal | Torch Z-axis | Dot Product | Perpendicular? |
+   |-------|----------------|--------------|-------------|----------------|
+   | 0 | (0, 1, 0) | (0, 1, 0) | 1.0 | ✅ Yes |
+   | 90 | (0, 0, 1) | (0, 0, 1) | 1.0 | ✅ Yes |
+   | 180 | (0, -1, 0) | (0, -1, 0) | 1.0 | ✅ Yes |
+   | 270 | (0, 0, -1) | (0, 0, -1) | 1.0 | ✅ Yes |
 
 </Steps>
 
 :::note[Engineering Insight]
-This application demonstrates **systematic 3D orientation control** for industrial welding. Key concepts:
+This simplified application demonstrates **systematic 3D orientation control** for welding robotics:
 
-1. **Surface normal calculation** requires understanding 3D geometry and cross products
-2. **Rotation matrix construction** from orthonormal basis vectors (tool frame axes)
-3. **Euler angle extraction** provides controller-ready commands but requires singularity checking
-4. **SLERP interpolation** ensures smooth, constant angular velocity orientation changes
-5. **No singularities encountered** because pipe inclination (35°) keeps pitch away from ±90°
+1. **Horizontal pipe geometry** makes calculations straightforward - surface normals lie in the YZ-plane
+2. **Rotation matrices** are simple X-axis rotations, making them easy to construct and interpret
+3. **Euler angle extraction** yields pure roll rotations - no gimbal lock possible (β = γ = 0)
+4. **No singularities** because pitch remains zero throughout the entire weld path
+5. **Pattern recognition** helps understand the geometry: rolling the torch about the pipe axis
 
-**Practical Advantage:** Pre-calculating all waypoint orientations enables **feedforward control** with predictable torch angles, critical for weld quality in pipeline construction where defects can cause catastrophic failures.
+**Practical Advantage:** This simplified geometry serves as an excellent introduction to robot welding path planning. Real industrial applications build on these concepts with inclined pipes, complex joint geometries, and optimized weld speed profiles.
+
+**Next step:** Students can extend this to inclined pipes or elliptical cross-sections to see how complexity increases!
 :::
 
 </details>
 
-## 🏭 Application 2: Drone Camera Gimbal Stabilization (Aerial Cinematography)
+## 🏭 Application 2: Drone Camera Gimbal Stabilization (Aerial Photography)
 
-A 3-axis camera gimbal must compensate for drone attitude disturbances to maintain level camera orientation pointed at a target.
+A 2-axis camera gimbal must compensate for drone tilting to keep the camera pointing straight down at the ground.
 
 :::note[System Problem Statement]
-- **Configuration:** 3-DOF gimbal (roll, pitch, yaw) mounted on quadcopter drone
-- **Disturbances:** Drone experiencing pitch = 15°, roll = -8°, yaw = 22° from wind gusts
-- **Task:** Calculate gimbal compensation angles to keep camera level and pointed at ground target
+- **Configuration:** 2-axis gimbal (roll, pitch) mounted on quadcopter drone
+- **Drone tilt:** Drone is tilted with roll = 10° and pitch = 20° (from wind or forward flight)
+- **Task:** Calculate gimbal compensation angles to keep camera pointing straight down
 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
   <TailwindWrapper>
-	![Drone Gimbal Stabilization](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/drone-gimbal-system.png)
+	![Drone Gimbal Stabilization](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/Wiris-drone-camera-gimbal.webp)
   </TailwindWrapper>
 </div>
 **What we need to calculate:**
-1. **Drone orientation matrix** from Euler angles (pitch, roll, yaw)
-2. **Desired camera orientation** (level, pointing downward at 30° angle toward target)
-3. **Compensation rotation** $R_{gimbal} = R_{drone}^{-1} \cdot R_{desired}$
-4. **Gimbal Euler angles** extracted from compensation matrix
-5. **Singularity check** for gimbal lock conditions
-6. **Verification** that camera achieves desired orientation
+1. **Drone orientation matrix** from Euler angles (roll and pitch only, no yaw)
+2. **Desired camera orientation** (pointing straight down in -Y direction)
+3. **Gimbal compensation matrix** $R_{gimbal} = R_{drone}^{-1} \cdot R_{desired}$
+4. **Gimbal Euler angles** (roll and pitch) extracted from compensation matrix
+5. **Verification** that camera points straight down after compensation
 
-**Key Question:** How do we use 3D rotation matrix composition and inversion to calculate real-time gimbal stabilization commands?
+**Key Question:** How do we use rotation matrix inversion to calculate gimbal stabilization commands that cancel out drone motion?
 :::
 
 <Card title="🔧 Equivalent System Model" icon="document">
@@ -1141,11 +1258,10 @@ A 3-axis camera gimbal must compensate for drone attitude disturbances to mainta
   </TailwindWrapper>
 </div>
 **Given:**
-- **Drone attitude (ZYX Euler):** Roll φ = -8°, Pitch θ = 15°, Yaw ψ = 22°
-- **Camera desired orientation:** Level (roll = 0°, pitch = 0°), pointed 30° forward/down toward target
-- **Gimbal limits:** Roll ±90°, Pitch -120° to +40°, Yaw ±180°
-- **Update rate:** 200Hz (5ms cycle time)
-- **Gimbal convention:** ZYX Euler angles
+- **Drone attitude:** Roll φ = 10°, Pitch θ = 20°, Yaw ψ = 0° (ignore yaw for simplicity)
+- **Camera desired orientation:** Pointing straight down (-Y direction)
+- **Coordinate system:** X = forward, Y = up, Z = right
+- **Gimbal convention:** Roll about X-axis, then Pitch about Y-axis
 </Card>
 
 ### Step 1: Drone Orientation Matrix from Euler Angles
@@ -1155,43 +1271,91 @@ A 3-axis camera gimbal must compensate for drone attitude disturbances to mainta
 
 <Steps>
 
-1. **ZYX Euler angle rotation sequence:**
+1. **Understanding the problem:**
 
-   $$R_{drone} = R_z(\psi) \cdot R_y(\theta) \cdot R_x(\phi)$$
+   **The situation:**
+   - The drone body is tilted from level flight
+   - Roll φ = 10° (drone is banking to the right)
+   - Pitch θ = 20° (drone nose is pitched up)
+   - We need to describe this tilt using a rotation matrix
 
-   Where we apply rotations in order: Roll (X), Pitch (Y), Yaw (Z)
+   **What we're calculating:**
+   - A 3×3 matrix that describes how the drone is oriented relative to the ground
+   - This matrix will help us figure out how to compensate with the gimbal
 
-   **Given:** φ = -8°, θ = 15°, ψ = 22°
+2. **Rotation sequence explanation:**
 
-2. **Individual rotation matrices:**
+   We apply rotations in this order:
+   1. **First: Roll** about X-axis by φ = 10°
+   2. **Second: Pitch** about Y-axis by θ = 20°
+   3. (Yaw is 0° so we skip it)
 
-   $$R_x(-8°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos(-8°) & -\sin(-8°) \\ 0 & \sin(-8°) & \cos(-8°) \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.9903 & 0.1392 \\ 0 & -0.1392 & 0.9903 \end{bmatrix}$$
+   **Combined formula:**
+   $$R_{drone} = R_y(\theta) \cdot R_x(\phi) = R_y(20°) \cdot R_x(10°)$$
 
-   $$R_y(15°) = \begin{bmatrix} \cos(15°) & 0 & \sin(15°) \\ 0 & 1 & 0 \\ -\sin(15°) & 0 & \cos(15°) \end{bmatrix} = \begin{bmatrix} 0.9659 & 0 & 0.2588 \\ 0 & 1 & 0 \\ -0.2588 & 0 & 0.9659 \end{bmatrix}$$
+3. **Step-by-step: Roll rotation matrix (X-axis, φ = 10°):**
 
-   $$R_z(22°) = \begin{bmatrix} \cos(22°) & -\sin(22°) & 0 \\ \sin(22°) & \cos(22°) & 0 \\ 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 0.9272 & -0.3746 & 0 \\ 0.3746 & 0.9272 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+   **Formula for X-axis rotation:**
+   $$R_x(\phi) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\phi & -\sin\phi \\ 0 & \sin\phi & \cos\phi \end{bmatrix}$$
 
-3. **Compose drone orientation (right-to-left multiplication):**
+   **Substitute φ = 10°:**
+   - $\cos(10°) = 0.9848$
+   - $\sin(10°) = 0.1736$
 
-   $$R_{drone} = R_z(22°) \cdot R_y(15°) \cdot R_x(-8°)$$
+   $$R_x(10°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.9848 & -0.1736 \\ 0 & 0.1736 & 0.9848 \end{bmatrix}$$ ✅
 
-   **First:** $R_y(15°) \cdot R_x(-8°)$:
+   **Physical meaning:** Rotating 10° about X-axis (banking right) - like tilting your head to the right.
 
-   $$= \begin{bmatrix} 0.9659 & 0 & 0.2588 \\ 0 & 1 & 0 \\ -0.2588 & 0 & 0.9659 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.9903 & 0.1392 \\ 0 & -0.1392 & 0.9903 \end{bmatrix}$$
+4. **Step-by-step: Pitch rotation matrix (Y-axis, θ = 20°):**
 
-   $$= \begin{bmatrix} 0.9659 & -0.0360 & 0.2563 \\ 0 & 0.9903 & 0.1392 \\ -0.2588 & -0.1345 & 0.9566 \end{bmatrix}$$
+   **Formula for Y-axis rotation:**
+   $$R_y(\theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{bmatrix}$$
 
-   **Second:** $R_z(22°) \cdot [R_y R_x]$:
+   **Substitute θ = 20°:**
+   - $\cos(20°) = 0.9397$
+   - $\sin(20°) = 0.3420$
 
-   $$R_{drone} = \begin{bmatrix} 0.9272 & -0.3746 & 0 \\ 0.3746 & 0.9272 & 0 \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0.9659 & -0.0360 & 0.2563 \\ 0 & 0.9903 & 0.1392 \\ -0.2588 & -0.1345 & 0.9566 \end{bmatrix}$$
+   $$R_y(20°) = \begin{bmatrix} 0.9397 & 0 & 0.3420 \\ 0 & 1 & 0 \\ -0.3420 & 0 & 0.9397 \end{bmatrix}$$ ✅
 
-   $$R_{drone} = \begin{bmatrix} 0.8957 & -0.4043 & 0.1854 \\ 0.3619 & 0.9146 & 0.1818 \\ -0.2588 & -0.1345 & 0.9566 \end{bmatrix}$$ ✅
+   **Physical meaning:** Rotating 20° about Y-axis (pitching up) - like nodding your head upward.
 
-4. **Verification - orthogonality check:**
+5. **Combining the rotations (matrix multiplication):**
 
-   **Column 1 magnitude:** $\sqrt{0.8957^2 + 0.3619^2 + (-0.2588)^2} = \sqrt{0.8023 + 0.1310 + 0.0670} = 1.000$ ✅
+   $$R_{drone} = R_y(20°) \cdot R_x(10°)$$
 
-   **Columns 1 and 2 orthogonal:** $0.8957(-0.4043) + 0.3619(0.9146) + (-0.2588)(-0.1345) = -0.3621 + 0.3310 + 0.0348 = 0.0037 \approx 0$ ✅
+   $$= \begin{bmatrix} 0.9397 & 0 & 0.3420 \\ 0 & 1 & 0 \\ -0.3420 & 0 & 0.9397 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.9848 & -0.1736 \\ 0 & 0.1736 & 0.9848 \end{bmatrix}$$
+
+   **Matrix multiplication (showing key elements):**
+
+   **Element (1,1):** $0.9397(1) + 0(0) + 0.3420(0) = 0.9397$
+
+   **Element (1,2):** $0.9397(0) + 0(0.9848) + 0.3420(0.1736) = 0.0594$
+
+   **Element (1,3):** $0.9397(0) + 0(-0.1736) + 0.3420(0.9848) = 0.3368$
+
+   **Element (2,1):** $0(1) + 1(0) + 0(0) = 0$
+
+   **Element (2,2):** $0(0) + 1(0.9848) + 0(0.1736) = 0.9848$
+
+   **Element (2,3):** $0(0) + 1(-0.1736) + 0(0.9848) = -0.1736$
+
+   **Element (3,1):** $-0.3420(1) + 0(0) + 0.9397(0) = -0.3420$
+
+   **Element (3,2):** $-0.3420(0) + 0(0.9848) + 0.9397(0.1736) = 0.1631$
+
+   **Element (3,3):** $-0.3420(0) + 0(-0.1736) + 0.9397(0.9848) = 0.9254$
+
+   **Result:**
+   $$R_{drone} = \begin{bmatrix} 0.9397 & 0.0594 & 0.3368 \\ 0 & 0.9848 & -0.1736 \\ -0.3420 & 0.1631 & 0.9254 \end{bmatrix}$$ ✅
+
+6. **What does this matrix tell us?**
+
+   Each **column** of the matrix tells us where the drone's axes point:
+   - **Column 1 (X-axis):** Where the drone's "forward" direction points
+   - **Column 2 (Y-axis):** Where the drone's "up" direction points
+   - **Column 3 (Z-axis):** Where the drone's "right" direction points
+
+   The drone's "up" direction (column 2) is (0.0594, 0.9848, 0.1631) - mostly still pointing up (Y=0.9848), but tilted slightly forward and to the side.
 
 </Steps>
 
@@ -1204,32 +1368,44 @@ A 3-axis camera gimbal must compensate for drone attitude disturbances to mainta
 
 <Steps>
 
-1. **Camera pointing requirement:**
+1. **What do we want the camera to do?**
 
-   Camera must be:
-   - **Level:** No roll relative to horizon
-   - **Pointing 30° forward/down** toward ground target
+   **The goal:**
+   - Camera should point **straight down** toward the ground
+   - This means the camera's "down" direction should align with the world's "down" direction (-Y)
+   - The camera should be **level** (not tilted/rolled)
 
-   This is equivalent to:
-   - Start with camera pointing straight down (Z-axis down)
-   - Pitch forward by 30° (rotate about Y-axis)
+   **In our coordinate system:**
+   - World "down" = -Y direction = (0, -1, 0)
+   - Camera optical axis points along its own Z-axis
+   - So we want camera Z-axis = (0, -1, 0)
 
-2. **Desired camera orientation:**
+2. **What is the desired orientation matrix?**
 
-   $$R_{desired} = R_y(-30°)$$
+   When the camera points straight down with no rotation:
+   - Camera X-axis (forward) points along world X-axis: (1, 0, 0)
+   - Camera Y-axis (up on camera) points along world Z-axis: (0, 0, 1)
+   - Camera Z-axis (optical axis) points down: (0, -1, 0)
 
-   (Negative because pitching "down" is negative pitch in standard convention)
+   **Building the matrix from these column vectors:**
+   $$R_{desired} = [\mathbf{x}_{cam} | \mathbf{y}_{cam} | \mathbf{z}_{cam}] = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix}$$ ✅
 
-   $$R_{desired} = \begin{bmatrix} \cos(-30°) & 0 & \sin(-30°) \\ 0 & 1 & 0 \\ -\sin(-30°) & 0 & \cos(-30°) \end{bmatrix}$$
+3. **Verification - does the camera point down?**
 
-   $$R_{desired} = \begin{bmatrix} 0.8660 & 0 & -0.5000 \\ 0 & 1 & 0 \\ 0.5000 & 0 & 0.8660 \end{bmatrix}$$ ✅
+   Apply the rotation to the camera's Z-axis unit vector (0, 0, 1):
 
-3. **Physical interpretation:**
+   $$
+   \mathbf{z}_{world} = R_{desired} \cdot \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix} \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ -1 \\ 0 \end{bmatrix}
+   $$ 
 
-   Camera Z-axis (optical axis) points:
-   $$\mathbf{z}_{camera} = R_{desired} \cdot \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} -0.5000 \\ 0 \\ 0.8660 \end{bmatrix}$$
+   **Result:** (0, -1, 0) means the camera points straight down in the -Y direction! ✅
 
-   This is 30° below horizontal (forward and down) ✅
+4. **Physical meaning:**
+
+   This matrix represents a **90° rotation about the X-axis**:
+   - Imagine starting with the camera pointing forward
+   - Rotate it 90° down (nose down) about the X-axis
+   - Now it points straight at the ground
 
 </Steps>
 
@@ -1242,177 +1418,206 @@ A 3-axis camera gimbal must compensate for drone attitude disturbances to mainta
 
 <Steps>
 
-1. **Coordinate frame relationship:**
+1. **Understanding the problem:**
 
-   $$R_{camera}^{world} = R_{drone}^{world} \cdot R_{gimbal}^{drone}$$
+   **The relationship:**
+   - The camera is mounted on the gimbal
+   - The gimbal is mounted on the drone
+   - Camera orientation in world = (Drone orientation) × (Gimbal orientation)
 
-   We want: $R_{camera}^{world} = R_{desired}$
+   **Mathematically:**
+   $$R_{camera} = R_{drone} \cdot R_{gimbal}$$
 
-   Therefore:
-   $$R_{gimbal}^{drone} = (R_{drone}^{world})^{-1} \cdot R_{desired}$$
+   **What we know:**
+   - $R_{drone}$ = how the drone is tilted (calculated in Step 1)
+   - $R_{camera} = R_{desired}$ = we want camera pointing straight down (from Step 2)
+   - $R_{gimbal}$ = **this is what we need to find!**
 
-2. **Drone rotation matrix inverse:**
+2. **Solving for the gimbal orientation:**
 
-   Since rotation matrices are orthogonal: $R^{-1} = R^T$
+   From: $R_{camera} = R_{drone} \cdot R_{gimbal}$
 
-   $$R_{drone}^{-1} = R_{drone}^T = \begin{bmatrix} 0.8957 & 0.3619 & -0.2588 \\ -0.4043 & 0.9146 & -0.1345 \\ 0.1854 & 0.1818 & 0.9566 \end{bmatrix}$$ ✅
+   We can solve for $R_{gimbal}$ by multiplying both sides by $R_{drone}^{-1}$ (the inverse):
 
-3. **Gimbal compensation matrix:**
+   $$R_{gimbal} = R_{drone}^{-1} \cdot R_{camera}$$
 
    $$R_{gimbal} = R_{drone}^{-1} \cdot R_{desired}$$
 
-   $$= \begin{bmatrix} 0.8957 & 0.3619 & -0.2588 \\ -0.4043 & 0.9146 & -0.1345 \\ 0.1854 & 0.1818 & 0.9566 \end{bmatrix} \begin{bmatrix} 0.8660 & 0 & -0.5000 \\ 0 & 1 & 0 \\ 0.5000 & 0 & 0.8660 \end{bmatrix}$$
+   **Key trick:** For rotation matrices, the inverse equals the transpose!
+   $$R_{drone}^{-1} = R_{drone}^T$$
 
-   **Matrix multiplication:**
+3. **Calculate the drone's inverse (transpose):**
 
-   Element (1,1): $0.8957(0.8660) + 0.3619(0) + (-0.2588)(0.5000) = 0.7755 - 0.1294 = 0.6461$
+   From Step 1, we had:
+   $$R_{drone} = \begin{bmatrix} 0.9397 & 0.0594 & 0.3368 \\ 0 & 0.9848 & -0.1736 \\ -0.3420 & 0.1631 & 0.9254 \end{bmatrix}$$
 
-   Element (1,2): $0.8957(0) + 0.3619(1) + (-0.2588)(0) = 0.3619$
+   **Transpose (swap rows and columns):**
+   $$R_{drone}^{-1} = R_{drone}^T = \begin{bmatrix} 0.9397 & 0 & -0.3420 \\ 0.0594 & 0.9848 & 0.1631 \\ 0.3368 & -0.1736 & 0.9254 \end{bmatrix}$$ ✅
 
-   Element (1,3): $0.8957(-0.5000) + 0.3619(0) + (-0.2588)(0.8660) = -0.4479 - 0.2241 = -0.6720$
+4. **Calculate gimbal compensation matrix:**
 
-   Element (2,1): $-0.4043(0.8660) + 0.9146(0) + (-0.1345)(0.5000) = -0.3501 - 0.0673 = -0.4174$
+   $$R_{gimbal} = R_{drone}^{-1} \cdot R_{desired}$$
 
-   Element (2,2): $-0.4043(0) + 0.9146(1) + (-0.1345)(0) = 0.9146$
+   $$= \begin{bmatrix} 0.9397 & 0 & -0.3420 \\ 0.0594 & 0.9848 & 0.1631 \\ 0.3368 & -0.1736 & 0.9254 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix}$$
 
-   Element (2,3): $-0.4043(-0.5000) + 0.9146(0) + (-0.1345)(0.8660) = 0.2022 - 0.1165 = 0.0857$
+   **Matrix multiplication (showing all 9 elements):**
 
-   Element (3,1): $0.1854(0.8660) + 0.1818(0) + 0.9566(0.5000) = 0.1606 + 0.4783 = 0.6389$
+   **Row 1:**
+   - (1,1): $0.9397(1) + 0(0) + (-0.3420)(0) = 0.9397$
+   - (1,2): $0.9397(0) + 0(0) + (-0.3420)(1) = -0.3420$
+   - (1,3): $0.9397(0) + 0(-1) + (-0.3420)(0) = 0$
 
-   Element (3,2): $0.1854(0) + 0.1818(1) + 0.9566(0) = 0.1818$
+   **Row 2:**
+   - (2,1): $0.0594(1) + 0.9848(0) + 0.1631(0) = 0.0594$
+   - (2,2): $0.0594(0) + 0.9848(0) + 0.1631(1) = 0.1631$
+   - (2,3): $0.0594(0) + 0.9848(-1) + 0.1631(0) = -0.9848$
 
-   Element (3,3): $0.1854(-0.5000) + 0.1818(0) + 0.9566(0.8660) = -0.0927 + 0.8284 = 0.7357$
+   **Row 3:**
+   - (3,1): $0.3368(1) + (-0.1736)(0) + 0.9254(0) = 0.3368$
+   - (3,2): $0.3368(0) + (-0.1736)(0) + 0.9254(1) = 0.9254$
+   - (3,3): $0.3368(0) + (-0.1736)(-1) + 0.9254(0) = 0.1736$
 
-   $$R_{gimbal} = \begin{bmatrix} 0.6461 & 0.3619 & -0.6720 \\ -0.4174 & 0.9146 & 0.0857 \\ 0.6389 & 0.1818 & 0.7357 \end{bmatrix}$$ ✅
+   **Result:**
+   $$R_{gimbal} = \begin{bmatrix} 0.9397 & -0.3420 & 0 \\ 0.0594 & 0.1631 & -0.9848 \\ 0.3368 & 0.9254 & 0.1736 \end{bmatrix}$$ ✅
+
+5. **What does this mean?**
+
+   This matrix tells the gimbal: "To cancel out the drone's tilt and point the camera straight down, you need to rotate in the opposite direction of the drone's tilt."
 
 </Steps>
 
 </details>
 
-### Step 4: Gimbal Euler Angle Extraction and Singularity Check
+### Step 4: Extract Gimbal Euler Angles (Roll and Pitch)
 
 <details>
 <summary>**Click to reveal Euler angle extraction**</summary>
 
 <Steps>
 
-1. **ZYX Euler extraction from gimbal matrix:**
+1. **Why extract Euler angles?**
 
-   $$R_{gimbal} = \begin{bmatrix} r_{11} & r_{12} & r_{13} \\ r_{21} & r_{22} & r_{23} \\ r_{31} & r_{32} & r_{33} \end{bmatrix} = \begin{bmatrix} 0.6461 & 0.3619 & -0.6720 \\ -0.4174 & 0.9146 & 0.0857 \\ 0.6389 & 0.1818 & 0.7357 \end{bmatrix}$$
+   - The gimbal motors need simple angle commands: "rotate roll by X°, pitch by Y°"
+   - We have a 3×3 matrix, but need to extract the roll and pitch angles from it
+   - This is the reverse of what we did in Step 1
 
-   **Formulas:**
-   $$\theta_{pitch} = \arcsin(-r_{31}) = \arcsin(-0.6389) = -39.70°$$ ✅
+2. **Euler angle extraction formulas:**
 
-   $$\phi_{roll} = \arctan2(r_{32}, r_{33}) = \arctan2(0.1818, 0.7357) = 13.88°$$ ✅
+   Given rotation matrix $R = \begin{bmatrix} r_{11} & r_{12} & r_{13} \\ r_{21} & r_{22} & r_{23} \\ r_{31} & r_{32} & r_{33} \end{bmatrix}$:
 
-   $$\psi_{yaw} = \arctan2(r_{21}, r_{11}) = \arctan2(-0.4174, 0.6461) = -32.86°$$ ✅
+   - **Pitch (θ):** $\theta = \arcsin(-r_{31})$
+   - **Roll (φ):** $\phi = \arctan2(r_{32}, r_{33})$
 
-2. **Singularity check:**
+   **Our gimbal matrix:**
+   $$R_{gimbal} = \begin{bmatrix} 0.9397 & -0.3420 & 0 \\ 0.0594 & 0.1631 & -0.9848 \\ 0.3368 & 0.9254 & 0.1736 \end{bmatrix}$$
 
-   **Singular condition:** $|r_{31}| = 1$ (pitch = ±90°)
+3. **Calculate pitch:**
 
-   $$|r_{31}| = |0.6389| = 0.6389 < 1$$ ✅ (not singular)
+   $$\theta_{pitch} = \arcsin(-r_{31}) = \arcsin(-0.3368)$$
 
-   **Gimbal limit check:**
-   - Roll: 13.88° within ±90° ✅
-   - Pitch: -39.70° within -120° to +40° ✅
-   - Yaw: -32.86° within ±180° ✅
+   $$= -19.68° \approx -20°$$ ✅
 
-3. **Gimbal command summary:**
+   **Physical meaning:** Gimbal needs to pitch down by 20° to compensate for drone pitching up by 20°!
 
-   | Axis | Compensation Angle | Within Limits? |
-   |------|-------------------|----------------|
-   | Roll | +13.88° | ✅ Yes |
-   | Pitch | -39.70° | ✅ Yes |
-   | Yaw | -32.86° | ✅ Yes |
+4. **Why Euler angle extraction is tricky here:**
+
+   Extracting Euler angles from the gimbal compensation matrix is more complex than it might seem for a 2-axis gimbal. The matrix we calculated represents the combined compensation needed, but extracting meaningful roll and pitch angles depends on the specific rotation sequence the gimbal hardware uses.
+
+   **The key insight:**
+   - The gimbal needs to rotate opposite to the drone's motion
+   - Drone rolled 10° right → gimbal should roll ~10° left
+   - Drone pitched 20° up → gimbal should pitch ~20° down
+
+5. **Better approach: Direct verification**
+
+   Instead of extracting Euler angles, let's verify directly that the camera points down after compensation (Step 5).
 
 </Steps>
 
 </details>
 
-### Step 5: Verification - Camera Achieves Desired Orientation
+### Step 5: Verification - Does the Camera Point Straight Down?
 
 <details>
 <summary>**Click to reveal verification calculations**</summary>
 
 <Steps>
 
-1. **Reconstruct camera orientation:**
+1. **The test: Does the final camera point straight down?**
+
+   We need to verify: $R_{camera} = R_{drone} \cdot R_{gimbal} = R_{desired}$
+
+   **What we'll check:**
+   - Apply the gimbal compensation to the tilted drone
+   - See where the camera's Z-axis (optical axis) ends up pointing
+   - It should point straight down: (0, -1, 0)
+
+2. **Calculate final camera orientation:**
 
    $$R_{camera} = R_{drone} \cdot R_{gimbal}$$
 
-   Should equal $R_{desired} = \begin{bmatrix} 0.8660 & 0 & -0.5000 \\ 0 & 1 & 0 \\ 0.5000 & 0 & 0.8660 \end{bmatrix}$
+   $$= \begin{bmatrix} 0.9397 & 0.0594 & 0.3368 \\ 0 & 0.9848 & -0.1736 \\ -0.3420 & 0.1631 & 0.9254 \end{bmatrix} \begin{bmatrix} 0.9397 & -0.3420 & 0 \\ 0.0594 & 0.1631 & -0.9848 \\ 0.3368 & 0.9254 & 0.1736 \end{bmatrix}$$
 
-2. **Matrix multiplication:**
+   **We only need to check where the camera Z-axis points (third column of result):**
 
-   $$R_{camera} = \begin{bmatrix} 0.8957 & -0.4043 & 0.1854 \\ 0.3619 & 0.9146 & 0.1818 \\ -0.2588 & -0.1345 & 0.9566 \end{bmatrix} \begin{bmatrix} 0.6461 & 0.3619 & -0.6720 \\ -0.4174 & 0.9146 & 0.0857 \\ 0.6389 & 0.1818 & 0.7357 \end{bmatrix}$$
+   Camera Z-axis = $R_{camera} \cdot \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$ = (third column of $R_{camera}$)
 
-   Element (1,1): $0.8957(0.6461) + (-0.4043)(-0.4174) + 0.1854(0.6389)$
-   $$= 0.5787 + 0.1687 + 0.1185 = 0.8659 \approx 0.8660$ ✅
+   **Element (1,3):** $0.9397(0) + 0.0594(-0.9848) + 0.3368(0.1736)$
+   $$= 0 - 0.0585 + 0.0585 = 0.0000 \approx 0$$ ✅
 
-   Element (1,2): $0.8957(0.3619) + (-0.4043)(0.9146) + 0.1854(0.1818)$
-   $$= 0.3242 - 0.3698 + 0.0337 = -0.0119 \approx 0$ ✅
+   **Element (2,3):** $0(0) + 0.9848(-0.9848) + (-0.1736)(0.1736)$
+   $$= 0 - 0.9698 - 0.0301 = -1.0000 \approx -1$$ ✅
 
-   Element (1,3): $0.8957(-0.6720) + (-0.4043)(0.0857) + 0.1854(0.7357)$
-   $$= -0.6019 - 0.0347 + 0.1364 = -0.5002 \approx -0.5000$ ✅
+   **Element (3,3):** $-0.3420(0) + 0.1631(-0.9848) + 0.9254(0.1736)$
+   $$= 0 - 0.1607 + 0.1607 = 0.0000 \approx 0$$ ✅
 
-   Element (2,2): $0.3619(0.3619) + 0.9146(0.9146) + 0.1818(0.1818)$
-   $$= 0.1310 + 0.8365 + 0.0330 = 1.0005 \approx 1$ ✅
+   **Result:** Camera Z-axis points to $(0, -1, 0)$ = straight down! ✅
 
-   Element (3,3): $(-0.2588)(-0.6720) + (-0.1345)(0.0857) + 0.9566(0.7357)$
-   $$= 0.1739 - 0.0115 + 0.7038 = 0.8662 \approx 0.8660$ ✅
+3. **Success!**
 
-3. **Camera optical axis verification:**
-
-   Camera Z-axis in world frame:
-   $$\mathbf{z}_{camera} = R_{camera} \cdot \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} -0.5002 \\ 0 \\ 0.8662 \end{bmatrix}$$
-
-   **Angle from horizontal:**
-   $$\theta = \arctan2(-0.5002, 0.8662) = -30.0°$$ ✅ (pointing 30° downward as required)
-
-   **Levelness check (no roll):**
-   Camera Y-axis should be horizontal: $\mathbf{y}_{camera} = [0, 1, 0]^T$ ✅
+   The gimbal compensation works perfectly:
+   - Drone is tilted (roll = 10°, pitch = 20°)
+   - Gimbal compensates with opposite rotations
+   - Camera ends up pointing straight down at the ground
 
 </Steps>
 
 :::note[Engineering Insight]
-This application demonstrates **real-time 3D orientation compensation** through matrix operations:
+This simplified application demonstrates **gimbal stabilization** fundamentals:
 
-1. **Euler angle composition** builds drone orientation from attitude sensors (IMU)
-2. **Matrix inversion** ($R^{-1} = R^T$) efficiently calculates compensation using orthogonality property
-3. **No singularities** encountered because pitch remains far from ±90°
-4. **Closed-form solution** enables 200Hz update rate on embedded gimbal controller
+1. **Matrix composition:** $R_{camera} = R_{drone} \cdot R_{gimbal}$ represents how orientations combine
+2. **Matrix inversion:** $R_{gimbal} = R_{drone}^{-1} \cdot R_{desired}$ solves for compensation
+3. **Transpose trick:** For rotation matrices, $R^{-1} = R^T$ (just swap rows/columns!)
+4. **Simpler problem:** Using roll = 10° and pitch = 20° with camera pointing straight down makes calculations more intuitive
 
-**Practical Advantage:** Pre-computing $R_{drone}^{-1}$ at each timestep and matrix-multiplying by fixed $R_{desired}$ requires only **27 multiplications + 18 additions** - achievable in < 1ms on ARM Cortex-M4 processors used in commercial gimbals.
+**Practical Application:** Real drone gimbals update at 200-400Hz using microcontrollers. The matrix operations (9 multiplications + 6 additions for transpose, plus ~27 more for multiplication) can execute in less than 1ms on modern ARM processors.
 
-**Gimbal Lock Consideration:** If drone pitch approached ±90° (rare in normal flight), we would switch to **quaternion representation** to avoid singularity, then convert back to Euler angles for gimbal commands.
+**Next step:** Students can extend this to 3-axis gimbals with yaw control, or add constraints like "keep horizon level in frame" for cinematography applications!
 :::
 
 </details>
 
 ## 🏭 Application 3: Satellite Attitude Control for Solar Tracking (Space Systems)
 
-A satellite must continuously reorient to point solar panels at the sun while simultaneously pointing a camera at Earth using reaction wheel actuation.
+A satellite needs to reorient its solar panels to point toward the sun using reaction wheel actuation.
 
 :::note[System Problem Statement]
 - **Configuration:** Spacecraft with 3-axis attitude control using reaction wheels
-- **Dual pointing requirement:** Solar panel normal toward sun, camera toward Earth
-- **Task:** Calculate required spacecraft rotation using arbitrary axis rotation formulas
+- **Objective:** Rotate solar panel normal from current orientation to point at sun
+- **Task:** Calculate required spacecraft rotation using arbitrary axis rotation (Rodrigues formula)
 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
   <TailwindWrapper>
 	![Satellite Attitude Control](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/satellite-attitude.png)
   </TailwindWrapper>
 </div>
 **What we need to calculate:**
-1. **Sun vector** in spacecraft body frame at 6 orbit positions
-2. **Required rotation axis and angle** to align solar panel with sun (arbitrary axis rotation)
-3. **Rotation matrix** using Rodrigues formula
-4. **Verification** that panel normal aligns with sun vector
-5. **Camera pointing constraint** check (Earth must remain in FOV)
-6. **Power output** calculation using cosine law
-7. **Reaction wheel torque commands** from angular momentum requirements
+1. **Sun vector** in spacecraft body frame
+2. **Rotation axis** (perpendicular to current and desired panel orientations)
+3. **Rotation angle** (how much to rotate)
+4. **Rotation matrix** using Rodrigues formula
+5. **Verification** that panel normal aligns with sun vector
 
-**Key Question:** How do we use arbitrary axis rotation mathematics to calculate optimal spacecraft orientation that satisfies dual pointing constraints?
+**Key Question:** How do we use arbitrary axis rotation to reorient the spacecraft solar panels toward the sun?
 :::
 
 <Card title="🔧 Equivalent System Model" icon="document">
@@ -1422,267 +1627,277 @@ A satellite must continuously reorient to point solar panels at the sun while si
   </TailwindWrapper>
 </div>
 **Given:**
-- **Orbit:** Circular, altitude 500 km, period 94.6 minutes
-- **Initial body frame:** X = velocity direction, Y = radial (toward Earth center), Z = normal to orbit plane
-- **Solar panel:** Normal along +Z body axis (initially)
-- **Camera:** Points along -Y body axis (toward Earth)
-- **Sun vector positions:** 6 equally-spaced points around orbit (initial sun at [0.5, -0.3, 0.8] in body frame)
+- **Spacecraft body frame:** X = velocity direction, Y = radial (toward Earth), Z = orbit normal
+- **Solar panel normal (current):** Along +Z body axis = [0, 0, 1]
+- **Sun direction (in body frame):** [0.6, 0, 0.8] (normalized)
 - **Solar panel area:** 2.5 m², efficiency 30%
-- **Power requirement:** Minimum 500W continuous
+- **Task:** Find rotation matrix R that aligns panel normal with sun direction
+
+**What makes this interesting:**
+- We cannot decompose this into simple X, Y, Z rotations easily
+- Instead, we use **Rodrigues formula** for arbitrary axis rotation
+- This is how real spacecraft attitude control systems work
 </Card>
 
-### Step 1: Sun Vector Calculation in Body Frame
+### Step 1: Identify Current and Desired Panel Orientations
 
 <details>
-<summary>**Click to reveal sun vector calculations**</summary>
+<summary>**Click to reveal vector setup**</summary>
 
 <Steps>
 
-1. **Orbit geometry:**
+1. **Current solar panel normal (before rotation):**
 
-   Satellite in sun-synchronous orbit, orbit plane at 98° inclination.
+   The solar panel is mounted on the spacecraft with its normal vector pointing along the +Z body axis.
 
-   **Sun direction in inertial frame (fixed):**
-   Assume sun along +X inertial direction: $\mathbf{s}_{inertial} = [1, 0, 0]^T$
+   $$\mathbf{n}_{current} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$$
 
-2. **Body frame rotation around orbit:**
+   **Physical interpretation:** Panel faces "up" relative to orbit plane.
 
-   As satellite orbits, body frame rotates about Z-axis (orbit normal).
+2. **Sun direction in body frame:**
 
-   **Orbital angle at 6 positions** (every 60°):
-   $$\theta_{orbit} = [0°, 60°, 120°, 180°, 240°, 300°]$$
+   At this moment in the orbit, sensors measure the sun direction in the spacecraft body frame:
 
-3. **Sun vector in body frame at each position:**
+   $$\mathbf{s}_{sun} = \begin{bmatrix} 0.6 \\ 0 \\ 0.8 \end{bmatrix}$$
 
-   $$\mathbf{s}_{body}(\theta) = R_z(-\theta) \cdot \mathbf{s}_{inertial}$$
+   **Verify this is a unit vector:**
+   $$|\mathbf{s}_{sun}| = \sqrt{0.6^2 + 0^2 + 0.8^2} = \sqrt{0.36 + 0 + 0.64} = \sqrt{1.0} = 1.0$$ ✅
 
-   At θ = 0°:
-   $$\mathbf{s}_{body}(0°) = \begin{bmatrix} \cos 0° & \sin 0° & 0 \\ -\sin 0° & \cos 0° & 0 \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} = \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}$$ ✅
+   **Physical interpretation:** Sun is in the XZ-plane (no Y-component), pointing mostly forward (+X) and somewhat "up" (+Z).
 
-   Actually, let me use the given sun vector: $\mathbf{s}_{body}(0°) = [0.5, -0.3, 0.8]^T$ (normalized)
+3. **Desired panel normal (after rotation):**
 
-   **Verify normalization:**
-   $$|\mathbf{s}| = \sqrt{0.5^2 + (-0.3)^2 + 0.8^2} = \sqrt{0.25 + 0.09 + 0.64} = \sqrt{0.98} = 0.9899 \approx 1$$ ✅
+   To maximize solar power, we want the panel normal to point directly at the sun:
 
-4. **Sun vectors at 6 orbit positions** (rotating around orbit):
+   $$\mathbf{n}_{desired} = \mathbf{s}_{sun} = \begin{bmatrix} 0.6 \\ 0 \\ 0.8 \end{bmatrix}$$
 
-   Using rotation about orbit normal (Z-axis in inertial frame):
+4. **Visualization of the rotation problem:**
 
-   | Position | θ_orbit | s_x | s_y | s_z |
-   |----------|---------|-----|-----|-----|
-   | 1 | 0° | 0.5000 | -0.3000 | 0.8000 |
-   | 2 | 60° | 0.4000 | 0.4062 | 0.8000 |
-   | 3 | 120° | -0.4000 | 0.4062 | 0.8000 |
-   | 4 | 180° | -0.5000 | -0.3000 | 0.8000 |
-   | 5 | 240° | -0.4000 | -0.7062 | 0.8000 |
-   | 6 | 300° | 0.4000 | -0.7062 | 0.8000 |
+   | Vector | Direction | Coordinates |
+   |--------|-----------|-------------|
+   | Current normal | Along +Z axis | [0, 0, 1] |
+   | Sun direction | In XZ-plane | [0.6, 0, 0.8] |
+   | Need to rotate | From current to sun | ? |
 
-   (Z-component remains constant because sun stays in same plane relative to orbit)
+   **Key observation:** Both vectors lie in the XZ-plane (Y-component is zero for both), so the rotation axis must be perpendicular to the XZ-plane (i.e., along Y-axis or close to it).
 
 </Steps>
 
 </details>
 
-### Step 2: Rotation Axis and Angle for Solar Panel Alignment
+### Step 2: Calculate Rotation Axis and Angle
 
 <details>
-<summary>**Click to reveal rotation axis/angle calculations**</summary>
+<summary>**Click to reveal rotation axis and angle calculations**</summary>
 
 <Steps>
 
-1. **Current panel normal (initial orientation):**
+1. **Find the rotation axis using cross product:**
 
-   Solar panel normal along +Z body axis:
-   $$\mathbf{n}_{current} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$$
-
-2. **Desired panel normal (align with sun):**
-
-   $$\mathbf{n}_{desired} = \mathbf{s}_{body} = \begin{bmatrix} 0.5 \\ -0.3 \\ 0.8 \end{bmatrix}$$
-
-3. **Rotation axis (perpendicular to both vectors):**
+   The rotation axis must be perpendicular to both the current panel normal and the desired (sun) direction. We use the cross product:
 
    $$\mathbf{v} = \mathbf{n}_{current} \times \mathbf{n}_{desired}$$
 
-   $$= \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \times \begin{bmatrix} 0.5 \\ -0.3 \\ 0.8 \end{bmatrix}$$
+   $$= \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \times \begin{bmatrix} 0.6 \\ 0 \\ 0.8 \end{bmatrix}$$
 
-   $$= \begin{bmatrix} 0 \cdot 0.8 - 1 \cdot (-0.3) \\ 1 \cdot 0.5 - 0 \cdot 0.8 \\ 0 \cdot (-0.3) - 0 \cdot 0.5 \end{bmatrix} = \begin{bmatrix} 0.3 \\ 0.5 \\ 0 \end{bmatrix}$$
+   **Cross product formula reminder:**
+   $$\mathbf{a} \times \mathbf{b} = \begin{bmatrix} a_y b_z - a_z b_y \\ a_z b_x - a_x b_z \\ a_x b_y - a_y b_x \end{bmatrix}$$
 
-   **Unit rotation axis:**
-   $$\hat{\mathbf{v}} = \frac{\mathbf{v}}{|\mathbf{v}|} = \frac{1}{\sqrt{0.3^2 + 0.5^2}} \begin{bmatrix} 0.3 \\ 0.5 \\ 0 \end{bmatrix} = \frac{1}{0.5831} \begin{bmatrix} 0.3 \\ 0.5 \\ 0 \end{bmatrix}$$
+   **Apply the formula:**
+   - X-component: $(0)(0.8) - (1)(0) = 0$
+   - Y-component: $(1)(0.6) - (0)(0.8) = 0.6$
+   - Z-component: $(0)(0) - (0)(0.6) = 0$
 
-   $$\hat{\mathbf{v}} = \begin{bmatrix} 0.5145 \\ 0.8575 \\ 0 \end{bmatrix}$$ ✅
+   $$\mathbf{v} = \begin{bmatrix} 0 \\ 0.6 \\ 0 \end{bmatrix}$$
 
-4. **Rotation angle:**
+   **Physical interpretation:** Rotation axis points along +Y (toward Earth). This makes sense since both the current normal and sun direction are in the XZ-plane.
 
-   $$\cos\phi = \mathbf{n}_{current} \cdot \mathbf{n}_{desired} = 0 \cdot 0.5 + 0 \cdot (-0.3) + 1 \cdot 0.8 = 0.8$$
+2. **Normalize to get unit rotation axis:**
 
-   $$\phi = \arccos(0.8) = 36.87°$$ ✅
+   $$|\mathbf{v}| = \sqrt{0^2 + 0.6^2 + 0^2} = 0.6$$
 
-   **Verification using sin:**
-   $$\sin\phi = |\mathbf{v}| = 0.5831$$
-   $$\phi = \arcsin(0.5831) = 35.66°$$
+   $$\hat{\mathbf{v}} = \frac{\mathbf{v}}{|\mathbf{v}|} = \frac{1}{0.6} \begin{bmatrix} 0 \\ 0.6 \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix}$$
 
-   Wait, these don't match. Let me recalculate:
+   **Result:** Unit rotation axis is exactly the +Y body axis.
 
-   Actually, $|\mathbf{n}_{current} \times \mathbf{n}_{desired}| = |\mathbf{n}_{current}||\mathbf{n}_{desired}|\sin\phi$
+3. **Calculate rotation angle using dot product:**
 
-   Since both are unit vectors: $|\mathbf{v}| = \sin\phi = 0.5831$
-   $$\phi = \arcsin(0.5831) = 35.66°$$
+   $$\cos\phi = \mathbf{n}_{current} \cdot \mathbf{n}_{desired}$$
 
-   But from dot product: $\cos\phi = 0.8 \Rightarrow \phi = 36.87°$
+   $$= (0)(0.6) + (0)(0) + (1)(0.8) = 0.8$$
 
-   Check: $\sin(36.87°) = 0.6, \cos(36.87°) = 0.8$
+   $$\phi = \arccos(0.8) = 36.87°$$
 
-   But $|\mathbf{v}| = 0.5831 \neq 0.6$
+4. **Verify using cross product magnitude:**
 
-   The issue is that $\mathbf{n}_{desired}$ is not quite unit length. Let me normalize:
-   $$|\mathbf{n}_{desired}| = \sqrt{0.5^2 + 0.3^2 + 0.8^2} = 0.9899$$
+   For unit vectors: $|\mathbf{a} \times \mathbf{b}| = |\mathbf{a}| |\mathbf{b}| \sin\phi$
 
-   For unit vectors:
-   $$\hat{\mathbf{n}}_{desired} = \frac{1}{0.9899}\begin{bmatrix} 0.5 \\ -0.3 \\ 0.8 \end{bmatrix} = \begin{bmatrix} 0.5051 \\ -0.3031 \\ 0.8081 \end{bmatrix}$$
+   $$|\mathbf{v}| = (1)(1) \sin\phi = \sin\phi$$
 
-   $$\cos\phi = \hat{\mathbf{n}}_{current} \cdot \hat{\mathbf{n}}_{desired} = 0.8081$$
-   $$\phi = \arccos(0.8081) = 36.08°$$ ✅
+   $$\sin\phi = 0.6$$
 
-</Steps>
+   $$\phi = \arcsin(0.6) = 36.87°$$ ✅
 
-</details>
+   **Check trigonometric identity:** $\sin^2\phi + \cos^2\phi = 0.6^2 + 0.8^2 = 0.36 + 0.64 = 1.0$ ✅
 
-### Step 3: Rotation Matrix Using Rodrigues Formula
+5. **Summary of rotation parameters:**
 
-<details>
-<summary>**Click to reveal Rodrigues rotation matrix**</summary>
-
-<Steps>
-
-1. **Rodrigues' rotation formula:**
-
-   $$R(\mathbf{v}, \phi) = I + (\sin\phi) W + (1 - \cos\phi) W^2$$
-
-   Where $W$ is the skew-symmetric matrix of unit vector $\hat{\mathbf{v}}$:
-
-   $$W = \begin{bmatrix} 0 & -v_z & v_y \\ v_z & 0 & -v_x \\ -v_y & v_x & 0 \end{bmatrix}$$
-
-2. **Skew-symmetric matrix for $\hat{\mathbf{v}} = [0.5145, 0.8575, 0]^T$:**
-
-   $$W = \begin{bmatrix} 0 & 0 & 0.8575 \\ 0 & 0 & -0.5145 \\ -0.8575 & 0.5145 & 0 \end{bmatrix}$$
-
-3. **$W^2$ calculation:**
-
-   $$W^2 = W \cdot W = \begin{bmatrix} 0 & 0 & 0.8575 \\ 0 & 0 & -0.5145 \\ -0.8575 & 0.5145 & 0 \end{bmatrix}^2$$
-
-   Element (1,1): $0 \cdot 0 + 0 \cdot 0 + 0.8575 \cdot (-0.8575) = -0.7353$
-
-   Element (1,2): $0 \cdot 0 + 0 \cdot 0 + 0.8575 \cdot 0.5145 = 0.4412$
-
-   Element (1,3): $0 \cdot 0.8575 + 0 \cdot (-0.5145) + 0.8575 \cdot 0 = 0$
-
-   Element (2,1): $0 \cdot 0 + 0 \cdot 0 + (-0.5145)(-0.8575) = 0.4412$
-
-   Element (2,2): $0 \cdot 0 + 0 \cdot 0 + (-0.5145)(0.5145) = -0.2647$
-
-   Element (2,3): $0 \cdot 0.8575 + 0 \cdot (-0.5145) + (-0.5145) \cdot 0 = 0$
-
-   Element (3,1): $(-0.8575) \cdot 0 + 0.5145 \cdot 0 + 0 \cdot (-0.8575) = 0$
-
-   Element (3,2): $(-0.8575) \cdot 0 + 0.5145 \cdot 0 + 0 \cdot 0.5145 = 0$
-
-   Element (3,3): $(-0.8575) \cdot 0.8575 + 0.5145 \cdot (-0.5145) + 0 \cdot 0 = -0.7353 - 0.2647 = -1.0000$
-
-   $$W^2 = \begin{bmatrix} -0.7353 & 0.4412 & 0 \\ 0.4412 & -0.2647 & 0 \\ 0 & 0 & -1.0000 \end{bmatrix}$$ ✅
-
-4. **Rodrigues formula application:**
-
-   $$R = I + \sin(36.08°) W + (1 - \cos(36.08°)) W^2$$
-
-   $$\sin(36.08°) = 0.5886, \quad \cos(36.08°) = 0.8081$$
-   $$1 - \cos(36.08°) = 0.1919$$
-
-   $$R = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} + 0.5886 \begin{bmatrix} 0 & 0 & 0.8575 \\ 0 & 0 & -0.5145 \\ -0.8575 & 0.5145 & 0 \end{bmatrix}$$
-   $$+ 0.1919 \begin{bmatrix} -0.7353 & 0.4412 & 0 \\ 0.4412 & -0.2647 & 0 \\ 0 & 0 & -1.0000 \end{bmatrix}$$
-
-   $$R = \begin{bmatrix} 1 - 0.1411 & 0.0847 & 0.5047 \\ 0.0847 & 1 - 0.0508 & -0.3028 \\ -0.5047 & 0.3028 & 1 - 0.1919 \end{bmatrix}$$
-
-   $$R = \begin{bmatrix} 0.8589 & 0.0847 & 0.5047 \\ 0.0847 & 0.9492 & -0.3028 \\ -0.5047 & 0.3028 & 0.8081 \end{bmatrix}$$ ✅
+   | Parameter | Value | Physical Meaning |
+   |-----------|-------|------------------|
+   | Rotation axis | [0, 1, 0] | Along +Y (toward Earth) |
+   | Rotation angle | 36.87° | Tilt panel forward toward sun |
+   | Rotation direction | Right-hand rule | Thumb along +Y, fingers curl from +Z toward +X |
 
 </Steps>
 
 </details>
 
-### Step 4: Verification and Power Calculation
+### Step 3: Build Rotation Matrix Using Rodrigues Formula
 
 <details>
-<summary>**Click to reveal verification and power calculations**</summary>
+<summary>**Click to reveal Rodrigues rotation matrix construction**</summary>
 
 <Steps>
 
-1. **Verify panel normal after rotation:**
+1. **Rodrigues rotation formula:**
 
-   $$\mathbf{n}_{final} = R \cdot \mathbf{n}_{current} = \begin{bmatrix} 0.8589 & 0.0847 & 0.5047 \\ 0.0847 & 0.9492 & -0.3028 \\ -0.5047 & 0.3028 & 0.8081 \end{bmatrix} \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$$
+   For a rotation by angle φ about unit axis $\hat{\mathbf{v}}$:
 
-   $$= \begin{bmatrix} 0.5047 \\ -0.3028 \\ 0.8081 \end{bmatrix}$$
+   $$R(\hat{\mathbf{v}}, \phi) = I + (\sin\phi) W + (1 - \cos\phi) W^2$$
 
-   **Compare to desired:** $\hat{\mathbf{n}}_{desired} = [0.5051, -0.3031, 0.8081]^T$
+   Where:
+   - $I$ = 3×3 identity matrix
+   - $W$ = skew-symmetric matrix of $\hat{\mathbf{v}}$
+   - $\phi$ = rotation angle
 
-   **Error:** $\Delta n = [0.0004, 0.0003, 0.0000]$ → **Perfect alignment!** ✅
+   **Why this works:** Rodrigues formula gives the same result as rotating a vector around an arbitrary axis, derived from exponential map of rotation.
 
-2. **Solar panel power output:**
+2. **Construct skew-symmetric matrix W:**
 
-   **Cosine law:** $P = P_{max} \cdot \cos\theta$
+   For rotation axis $\hat{\mathbf{v}} = [0, 1, 0]^T$:
 
-   Where θ is angle between panel normal and sun vector.
+   $$W = \begin{bmatrix} 0 & -v_z & v_y \\ v_z & 0 & -v_x \\ -v_y & v_x & 0 \end{bmatrix} = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{bmatrix}$$
 
-   Since we aligned them perfectly: $\cos\theta = \mathbf{n}_{final} \cdot \hat{\mathbf{s}} = 1$
+   **Physical meaning:** The skew-symmetric matrix $W$ represents the cross product operation with $\hat{\mathbf{v}}$.
 
-   **Maximum power:**
+3. **Calculate $W^2$:**
+
+   $$W^2 = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{bmatrix} \cdot \begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{bmatrix}$$
+
+   **Element-by-element multiplication:**
+   - Row 1, Col 1: $(0)(0) + (0)(0) + (1)(-1) = -1$
+   - Row 1, Col 2: $(0)(0) + (0)(0) + (1)(0) = 0$
+   - Row 1, Col 3: $(0)(1) + (0)(0) + (1)(0) = 0$
+   - Row 2, Col 1: $(0)(0) + (0)(0) + (0)(-1) = 0$
+   - Row 2, Col 2: $(0)(0) + (0)(0) + (0)(0) = 0$
+   - Row 2, Col 3: $(0)(1) + (0)(0) + (0)(0) = 0$
+   - Row 3, Col 1: $(-1)(0) + (0)(0) + (0)(-1) = 0$
+   - Row 3, Col 2: $(-1)(0) + (0)(0) + (0)(0) = 0$
+   - Row 3, Col 3: $(-1)(1) + (0)(0) + (0)(0) = -1$
+
+   $$W^2 = \begin{bmatrix} -1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix}$$
+
+4. **Apply Rodrigues formula with φ = 36.87°:**
+
+   $$\sin(36.87°) = 0.6, \quad \cos(36.87°) = 0.8$$
+   $$1 - \cos(36.87°) = 1 - 0.8 = 0.2$$
+
+   $$R = I + 0.6 \cdot W + 0.2 \cdot W^2$$
+
+   $$= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} + 0.6 \begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{bmatrix} + 0.2 \begin{bmatrix} -1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix}$$
+
+   $$= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} + \begin{bmatrix} 0 & 0 & 0.6 \\ 0 & 0 & 0 \\ -0.6 & 0 & 0 \end{bmatrix} + \begin{bmatrix} -0.2 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -0.2 \end{bmatrix}$$
+
+   **Add element-by-element:**
+   $$R = \begin{bmatrix} 1 + 0 - 0.2 & 0 + 0 + 0 & 0 + 0.6 + 0 \\ 0 + 0 + 0 & 1 + 0 + 0 & 0 + 0 + 0 \\ 0 - 0.6 + 0 & 0 + 0 + 0 & 1 + 0 - 0.2 \end{bmatrix}$$
+
+   $$R = \begin{bmatrix} 0.8 & 0 & 0.6 \\ 0 & 1 & 0 \\ -0.6 & 0 & 0.8 \end{bmatrix}$$ ✅
+
+5. **Physical interpretation of the rotation matrix:**
+
+   This is a rotation about the Y-axis by 36.87°. Notice:
+   - Middle row/column unchanged: [0, 1, 0] (Y-axis is rotation axis)
+   - X and Z components mix according to rotation angle
+   - This is exactly $R_y(36.87°)$ from standard rotation matrix formulas
+
+   **Comparison to standard Y-axis rotation:**
+   $$R_y(\theta) = \begin{bmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{bmatrix} = \begin{bmatrix} 0.8 & 0 & 0.6 \\ 0 & 1 & 0 \\ -0.6 & 0 & 0.8 \end{bmatrix}$$ ✅
+
+   **Key insight:** For this problem, Rodrigues formula gives us the same result as a simple Y-axis rotation. But Rodrigues formula works for ANY arbitrary axis, not just X, Y, or Z!
+
+</Steps>
+
+</details>
+
+### Step 4: Verify the Rotation Works
+
+<details>
+<summary>**Click to reveal verification**</summary>
+
+<Steps>
+
+1. **Apply rotation to current panel normal:**
+
+   $$\mathbf{n}_{final} = R \cdot \mathbf{n}_{current}$$
+
+   $$= \begin{bmatrix} 0.8 & 0 & 0.6 \\ 0 & 1 & 0 \\ -0.6 & 0 & 0.8 \end{bmatrix} \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$$
+
+   **Matrix-vector multiplication:**
+   - X-component: $(0.8)(0) + (0)(0) + (0.6)(1) = 0.6$
+   - Y-component: $(0)(0) + (1)(0) + (0)(1) = 0$
+   - Z-component: $(-0.6)(0) + (0)(0) + (0.8)(1) = 0.8$
+
+   $$\mathbf{n}_{final} = \begin{bmatrix} 0.6 \\ 0 \\ 0.8 \end{bmatrix}$$
+
+2. **Compare to desired (sun direction):**
+
+   **Desired:** $\mathbf{n}_{desired} = [0.6, 0, 0.8]^T$
+
+   **Actual:** $\mathbf{n}_{final} = [0.6, 0, 0.8]^T$
+
+   **Perfect match!** ✅
+
+3. **Calculate solar power output:**
+
+   Solar panels generate maximum power when perpendicular to sunlight. Power follows cosine law:
+
+   $$P = P_{max} \cdot (\mathbf{n}_{final} \cdot \mathbf{s}_{sun})$$
+
+   **Dot product (alignment factor):**
+   $$\mathbf{n}_{final} \cdot \mathbf{s}_{sun} = (0.6)(0.6) + (0)(0) + (0.8)(0.8) = 0.36 + 0 + 0.64 = 1.0$$
+
+   **Maximum possible power:**
    $$P_{max} = \text{Area} \times \text{Solar constant} \times \text{Efficiency}$$
-   $$= 2.5 \, \text{m}^2 \times 1367 \, \text{W/m}^2 \times 0.30 = 1025 \, \text{W}$$ ✅
+   $$= 2.5 \, \text{m}^2 \times 1367 \, \text{W/m}^2 \times 0.30 = 1025.25 \, \text{W}$$
 
    **Actual power (perfect alignment):**
-   $$P = 1025 \times 1.0 = 1025 \, \text{W}$$ ✅ (exceeds 500W requirement)
+   $$P = 1025.25 \times 1.0 = 1025.25 \, \text{W}$$ ✅
 
-3. **Camera pointing verification:**
+   This is maximum possible power from these solar panels!
 
-   Camera points along -Y body axis: $\mathbf{c}_{current} = [0, -1, 0]^T$
+4. **Summary:**
 
-   After rotation:
-   $$\mathbf{c}_{final} = R \cdot \mathbf{c}_{current} = \begin{bmatrix} 0.8589 & 0.0847 & 0.5047 \\ 0.0847 & 0.9492 & -0.3028 \\ -0.5047 & 0.3028 & 0.8081 \end{bmatrix} \begin{bmatrix} 0 \\ -1 \\ 0 \end{bmatrix}$$
-
-   $$= \begin{bmatrix} -0.0847 \\ -0.9492 \\ -0.3028 \end{bmatrix}$$
-
-   **Earth direction (radial inward):** $\mathbf{e} = [0, -1, 0]^T$ (in initial frame)
-
-   **Angle from Earth:**
-   $$\cos\theta_E = \mathbf{c}_{final} \cdot \mathbf{e} = (-0.0847)(0) + (-0.9492)(-1) + (-0.3028)(0) = 0.9492$$
-
-   $$\theta_E = \arccos(0.9492) = 18.43°$$ ✅
-
-   **Camera FOV:** Typically ±20° to ±30° → Earth remains in view ✅
-
-4. **Rotation summary table:**
-
-   | Parameter | Value |
-   |-----------|-------|
-   | Rotation axis | [0.5145, 0.8575, 0]^T |
-   | Rotation angle | 36.08° |
-   | Panel alignment error | < 0.1° |
-   | Solar power | 1025 W |
-   | Earth offset angle | 18.43° |
-   | Constraint satisfied? | ✅ Yes |
+   | Parameter | Value | Status |
+   |-----------|-------|--------|
+   | Rotation axis | [0, 1, 0] (Y-axis) | ✅ |
+   | Rotation angle | 36.87° | ✅ |
+   | Panel alignment | Perfect (error = 0) | ✅ |
+   | Solar power | 1025 W | ✅ Maximum |
+   | Method | Rodrigues formula | ✅ |
 
 </Steps>
 
 :::note[Engineering Insight]
 This application demonstrates **arbitrary axis rotation** for spacecraft attitude control:
 
-1. **Cross product** determines rotation axis perpendicular to both current and desired orientations
-2. **Rodrigues formula** provides elegant rotation matrix without Euler angle decomposition
-3. **Dual pointing constraints** (solar panel + camera) require optimization - this solution prioritizes solar (survival-critical)
-4. **No gimbal lock** possible with arbitrary axis rotation (valid for all orientations)
+1. **Cross product** determines the rotation axis perpendicular to both current and desired orientations
+2. **Rodrigues formula** provides an elegant rotation matrix without needing Euler angle decomposition
+3. **No gimbal lock** is possible with arbitrary axis rotation (works for all orientations)
+4. **Clean mathematics** when rotation axis aligns with a coordinate axis (as in this example)
 
-**Practical Advantage:** Satellite attitude determination & control systems (ADCS) use **quaternions** for onboard computation (more efficient than matrices), but ground station analysis uses rotation matrices for human interpretability. Rodrigues formula bridges both representations.
+**Practical implementation:** Real satellite attitude determination and control systems (ADCS) use **quaternions** for onboard computation (more efficient than matrices and no gimbal lock), but ground station analysis uses rotation matrices for human interpretability. Rodrigues formula bridges both representations.
 
-**Real-world consideration:** Continuous sun tracking creates **cyclic angular momentum** in reaction wheels. Periodic **momentum dumping** using magnetic torquers is required every few orbits to prevent wheel saturation.
+**Real-world consideration:** Continuous sun tracking creates **cyclic angular momentum** in reaction wheels. Periodic **momentum dumping** using magnetic torquers or thrusters is required every few orbits to prevent wheel saturation. This is why satellites need both reaction wheels (for precision) and magnetic torquers (for momentum management).
 :::
 
 </details>
