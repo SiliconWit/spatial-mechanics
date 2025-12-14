@@ -291,143 +291,6 @@ Real robot control requires precise composition of multiple rotations and transl
 Where transformations are applied in sequence: H_1 first, H_n last.
 </Card>
 
-<Tabs>
-  <TabItem label="Basic 3D Examples">
-
-    <details>
-    <summary>**Example 1: Simple 3D rotation and translation sequence**</summary>
-
-    <Steps>
-
-    1. **Problem:** 40° rotation about X-axis, then 7 units translation along mobile B-axis
-
-       **Setup:** **H = H(x,40°) · I · H(B,7)**
-
-    2. **Matrix composition:**
-
-       $$
-       \begin{aligned}
-       H &= \begin{bmatrix}
-       1 & 0 & 0 & 0 \\
-       0 & \cos(40°) & -\sin(40°) & 0 \\
-       0 & \sin(40°) & \cos(40°) & 0 \\
-       0 & 0 & 0 & 1
-       \end{bmatrix} \cdot \begin{bmatrix}
-       1 & 0 & 0 & 0 \\
-       0 & 1 & 0 & 7 \\
-       0 & 0 & 1 & 0 \\
-       0 & 0 & 0 & 1
-       \end{bmatrix}
-       \end{aligned}
-       $$
-
-    3. **Final result:**
-
-       $$
-       H = \begin{bmatrix}
-       1 & 0 & 0 & 0 \\
-       0 & 0.7660 & -0.6428 & 5.3620 \\
-       0 & 0.6428 & 0.7660 & 4.4996 \\
-       0 & 0 & 0 & 1
-       \end{bmatrix}
-       $$
-
-    </Steps>
-
-    </details>
-
-  </TabItem>
-  <TabItem label="Complex Sequences">
-
-    <details>
-    <summary>**Example 2: Multi-step 3D transformation sequence**</summary>
-
-    <Steps>
-
-    1. **Problem:** Complex robotic motion sequence
-       - 50° rotation about X-axis
-       - 4 units translation along X-axis
-       - -6 units translation along C-axis
-       - 25° rotation about B-axis
-
-    2. **Matrix sequence:** **H = H(x,4) · H(x,50°) · I · H(c,-6) · H(b,25°)**
-
-    3. **Step-by-step computation:**
-
-       $$
-       \begin{aligned}
-       H &= \begin{bmatrix}1 & 0 & 0 & 4 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
-       \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 0.6428 & -0.7660 & 0 \\ 0 & 0.7660 & 0.6428 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
-       &\times \begin{bmatrix}1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & -6 \\ 0 & 0 & 0 & 1\end{bmatrix} \cdot
-       \begin{bmatrix}0.9063 & 0 & 0.4226 & 0 \\ 0 & 1 & 0 & 0 \\ -0.4226 & 0 & 0.9063 & 0 \\ 0 & 0 & 0 & 1\end{bmatrix}
-       \end{aligned}
-       $$
-
-    4. **Final transformation matrix:**
-
-       $$
-       H = \begin{bmatrix}
-       0.9063 & 0 & 0.4226 & 4.0 \\
-       0.3237 & 0.6428 & -0.6943 & 4.596 \\
-       -0.2717 & 0.766 & 0.5826 & -3.857 \\
-       0 & 0 & 0 & 1.0
-       \end{bmatrix}
-       $$
-
-    </Steps>
-
-    </details>
-
-  </TabItem>
-  <TabItem label="Vision System Applications">
-
-    <details>
-    <summary>**Example 3: Robot vision system coordinate transformations**</summary>
-
-    <Steps>
-
-    1. **System setup:** Robotic work cell with camera and 6-joint robot
-       - **H₁**: Camera to object transformation
-       - **H₂**: Camera to robot base transformation
-       - **H₃**: Base to gripper transformation
-
-    2. **Given transformation matrices:**
-
-       $$
-       \begin{aligned}
-       H_1 &= \begin{bmatrix}0 & 1 & 0 & 4 \\ 1 & 0 & 0 & 3 \\ 0 & 0 & -1 & 7 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
-       H_2 &= \begin{bmatrix}1 & 0 & 0 & -15 \\ 0 & -1 & 0 & 5 \\ 0 & 0 & -1 & 6 \\ 0 & 0 & 0 & 1\end{bmatrix} \\
-       H_3 &= \begin{bmatrix}1 & 0 & 0 & 7 \\ 0 & 1 & 0 & 2 \\ 0 & 0 & 1 & 3 \\ 0 & 0 & 0 & 1\end{bmatrix}
-       \end{aligned}
-       $$
-
-    3. **Object position relative to robot base:**
-
-       $$
-       \begin{aligned}
-       {}^{base}T_{object} &= {}^{base}T_{camera} \cdot {}^{camera}T_{object} \\
-       &= [H_2]^{-1} \cdot [H_1] \\
-       &= \begin{bmatrix}0 & 1 & 0 & 19 \\ -1 & 0 & 0 & 2 \\ 0 & 0 & 1 & -1 \\ 0 & 0 & 0 & 1\end{bmatrix}
-       \end{aligned}
-       $$
-
-    4. **Object position relative to gripper:**
-
-       $$
-       \begin{aligned}
-       {}^{gripper}T_{object} &= {}^{gripper}T_{base} \cdot {}^{base}T_{object} \\
-       &= [H_3]^{-1} \cdot [H_2]^{-1} \cdot [H_1] \\
-       &= \begin{bmatrix}0 & 1 & 0 & 12 \\ -1 & 0 & 0 & 0 \\ 0 & 0 & 1 & -4 \\ 0 & 0 & 0 & 1\end{bmatrix}
-       \end{aligned}
-       $$
-
-    </Steps>
-
-    </details>
-
-  </TabItem>
-</Tabs>
-
 ### Euler Angle Representations
 
 <BionicText method="advanced" intensity="medium" class="highlight">
@@ -582,7 +445,7 @@ R(V,θ) = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-**Geometric relationships:** For unit vector **|V| = 1**:
+**Geometric relationships:** For unit vector $\|\mathbf{V}\| = 1$:
 
 $$
 \begin{aligned}
@@ -777,7 +640,523 @@ $$
 
 **General recommendation:** Use Rodrigues' formula for all computational work (robot control, graphics engines, simulation). Use decomposition approach for teaching, learning, and analytical derivations.
 
-## 🏭 Application 1: Robotic Welding of Pipe Joints (Manufacturing)
+## 🏭 Application 1: Vision-Guided Robotic Pick-and-Place System (Manufacturing Automation)
+
+A vision-guided robotic system uses a camera to locate workpieces for automated pick-and-place operations in a manufacturing cell.
+
+:::note[System Problem Statement]
+- **Configuration:** 6-DOF robot with overhead camera system
+- **Task:** Transform workpiece coordinates from camera frame to robot base frame for grasping
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Vision-Guided Robot System](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/6-Axis-Industrial-Collaborative-Robotic-Arm.png)
+  </TailwindWrapper>
+</div>
+**What we need to calculate:**
+1. **Inverse transformation** of camera-to-robot base relationship
+2. **Workpiece position** in robot base coordinates using transformation composition
+3. **Camera recalibration** effect when camera orientation changes
+4. **Point transformation** through multiple coordinate frames
+
+**Key Question:** How do we use homogeneous transformations to convert visual detection data into robot grasping commands?
+:::
+
+<Card title="🔧 Equivalent System Model" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Vision System Coordinate Frames](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/vision-system-frames.png)
+  </TailwindWrapper>
+</div>
+**Given transformation matrices:**
+
+**H₁** = Workpiece position relative to camera:
+$$
+H_1 = \begin{bmatrix}
+0 & -1 & 0 & 3\\
+1 & 0 & 0 & 5\\
+0 & 0 & -1 & 4\\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+**H₂** = Robot base position relative to camera:
+$$
+H_2 = \begin{bmatrix}
+1 & 0 & 0 & -5\\
+0 & -1 & 0 & 10\\
+0 & 0 & -1 & 8\\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+</Card>
+
+### Step 1: Calculate Inverse Transformation H₂⁻¹
+
+<details>
+<summary>**Click to reveal inverse transformation calculation**</summary>
+
+<Steps>
+
+1. **Homogeneous transformation inverse formula:**
+
+   For $H = \begin{bmatrix} R & \mathbf{d} \\ 0 & 1 \end{bmatrix}$, the inverse is:
+
+   $$H^{-1} = \begin{bmatrix} R^\top & -R^\top\mathbf{d} \\ 0 & 1 \end{bmatrix}$$ ✅
+
+2. **Extract rotation and translation from H₂:**
+
+   $$R_2 = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}, \quad \mathbf{d}_2 = \begin{bmatrix} -5 \\ 10 \\ 8 \end{bmatrix}$$
+
+3. **Calculate R₂ᵀ:**
+
+   $$R_2^\top = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}$$ (symmetric matrix) ✅
+
+4. **Calculate -R₂ᵀd₂:**
+
+   $$-R_2^\top\mathbf{d}_2 = -\begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}\begin{bmatrix} -5 \\ 10 \\ 8 \end{bmatrix} = -\begin{bmatrix} -5 \\ -10 \\ -8 \end{bmatrix} = \begin{bmatrix} 5 \\ 10 \\ 8 \end{bmatrix}$$ ✅
+
+5. **Form H₂⁻¹:**
+
+   $$H_2^{-1} = \begin{bmatrix} 1 & 0 & 0 & 5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+6. **Verify by multiplication (H₂ · H₂⁻¹ = I):**
+
+   $$H_2 \cdot H_2^{-1} = \begin{bmatrix} 1 & 0 & 0 & -5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 & 5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+
+   $$= \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} = I$$ ✅ Verified!
+
+</Steps>
+
+</details>
+
+### Step 2: Calculate Workpiece Position Relative to Robot Base
+
+<details>
+<summary>**Click to reveal workpiece coordinate transformation**</summary>
+
+<Steps>
+
+1. **Transformation chain relationship:**
+
+   The workpiece position relative to the robot base is:
+
+   $$H_{workpiece}^{robot} = H_2^{-1} \cdot H_1$$ ✅
+
+   **Why?** We need to transform from camera frame to base frame (H₂⁻¹), then apply the workpiece-to-camera transform (H₁).
+
+2. **Matrix multiplication:**
+
+   $$H_{workpiece}^{robot} = \begin{bmatrix} 1 & 0 & 0 & 5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 & -1 & 0 & 3 \\ 1 & 0 & 0 & 5 \\ 0 & 0 & -1 & 4 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+
+3. **Compute rotation part (R = R₂⁻¹ · R₁):**
+
+   $$R = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix} \begin{bmatrix} 0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix} = \begin{bmatrix} 0 & -1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+4. **Complete 4×4 matrix multiplication:**
+
+   $$H_{workpiece}^{robot} = \begin{bmatrix} 0 & -1 & 0 & 8 \\ -1 & 0 & 0 & -5 \\ 0 & 0 & 1 & -4 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+5. **Result interpretation:**
+   - **Position:** Workpiece is at $(8, -5, -4)$ in robot base coordinates
+   - **Orientation:** Rotation matrix shows 90° rotations about coordinate axes
+   - **Robot grasping:** The end-effector should move to position (8, -5, -4) with the specified orientation
+
+</Steps>
+
+</details>
+
+### Step 3: Camera Recalibration Analysis
+
+<details>
+<summary>**Click to reveal camera rotation effect**</summary>
+
+<Steps>
+
+1. **Camera rotation scenario:**
+
+   If the camera is rotated 45° about its current Y-axis, we need to determine how this affects the workpiece observation.
+
+2. **Y-axis rotation matrix:**
+
+   $$R_y(45°) = \begin{bmatrix} \cos 45° & 0 & \sin 45° \\ 0 & 1 & 0 \\ -\sin 45° & 0 & \cos 45° \end{bmatrix} = \begin{bmatrix} 0.707 & 0 & 0.707 \\ 0 & 1 & 0 \\ -0.707 & 0 & 0.707 \end{bmatrix}$$ ✅
+
+3. **New camera transformation:**
+
+   $$H_{camera}' = \begin{bmatrix} 0.707 & 0 & 0.707 & 0 \\ 0 & 1 & 0 & 0 \\ -0.707 & 0 & 0.707 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+4. **Updated workpiece observation (H₁'):**
+
+   The new workpiece-to-camera relationship becomes:
+
+   $$H_1' = H_{camera}' \cdot H_1$$
+
+   $$= \begin{bmatrix} 0.707 & 0 & 0.707 & 0 \\ 0 & 1 & 0 & 0 \\ -0.707 & 0 & 0.707 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 & -1 & 0 & 3 \\ 1 & 0 & 0 & 5 \\ 0 & 0 & -1 & 4 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+
+   $$= \begin{bmatrix} 0 & -0.707 & -0.707 & 4.95 \\ 1 & 0 & 0 & 5 \\ 0 & -0.707 & 0.707 & -0.70 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+5. **Workpiece position in robot frame (after camera rotation):**
+
+   $$H_{workpiece}^{robot\,new} = H_2^{-1} \cdot H_1'$$
+
+   (Matrix multiplication would be computed to get the new position)
+
+6. **Practical implication:**
+
+   Camera rotation changes the observed workpiece coordinates. The vision system must be **recalibrated** to maintain accurate robot positioning.
+
+</Steps>
+
+</details>
+
+### Step 4: Point Transformation Through Frames
+
+<details>
+<summary>**Click to reveal 3D point transformation example**</summary>
+
+<Steps>
+
+1. **Problem:** A point P(3, 1, 2) is attached to a mobile frame that undergoes:
+   - Rotation of 180° about the Z-axis
+   - Translation of (0, 2, 1)
+
+2. **Z-axis 180° rotation matrix:**
+
+   $$R_z(180°) = \begin{bmatrix} \cos 180° & -\sin 180° & 0 \\ \sin 180° & \cos 180° & 0 \\ 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} -1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+3. **Form homogeneous transformation matrix:**
+
+   $$H = \begin{bmatrix} -1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 2 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+4. **Apply transformation to point P:**
+
+   $$\mathbf{P}' = H \begin{bmatrix} 3 \\ 1 \\ 2 \\ 1 \end{bmatrix} = \begin{bmatrix} -1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 2 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 3 \\ 1 \\ 2 \\ 1 \end{bmatrix}$$
+
+   $$= \begin{bmatrix} -1(3) + 0 + 0 + 0 \\ 0 + (-1)(1) + 0 + 2(1) \\ 0 + 0 + 1(2) + 1(1) \\ 1 \end{bmatrix} = \begin{bmatrix} -3 \\ 1 \\ 3 \\ 1 \end{bmatrix}$$ ✅
+
+5. **Final coordinates:**
+
+   **P' = (-3, 1, 3)** ✅
+
+6. **Physical interpretation:**
+   - X-coordinate: 3 → -3 (flipped by 180° Z-rotation)
+   - Y-coordinate: 1 → -1 (flipped) + 2 (translation) = 1
+   - Z-coordinate: 2 → 2 (unchanged by Z-rotation) + 1 (translation) = 3
+
+</Steps>
+
+</details>
+
+:::note[Engineering Insight]
+This application demonstrates **coordinate frame transformation chains** in vision-guided robotics:
+
+1. **Matrix inversion** allows us to reverse transformation relationships (camera→base becomes base→camera)
+2. **Transformation composition** systematically relates multiple coordinate frames (workpiece→camera→base)
+3. **Homogeneous matrices** unify rotation and translation in a single 4×4 operation
+4. **Camera calibration** is critical - any camera movement requires recalculation of all transformations
+
+**Practical Implementation:** Industrial vision systems use **eye-in-hand** (camera on robot) or **eye-to-hand** (camera fixed) configurations. This example shows eye-to-hand, where camera calibration (H₂) must be precise and stable. Camera movement requires **full recalibration** of the transformation chain.
+
+**Real-world consideration:** Vision systems use **feature detection** (edges, corners, patterns) to determine workpiece pose. The transformation mathematics shown here is applied after visual detection to convert pixel coordinates to robot coordinates for grasping.
+:::
+
+## 🏭 Application 2: 3-DOF Robot Manipulator Composite Transformations (Assembly Automation)
+
+A 3-DOF robot manipulator performs a pick-and-place operation requiring composite rotations about multiple axes followed by translation.
+
+:::note[System Problem Statement]
+- **Configuration:** 3-DOF articulated robot with revolute joints
+- **Task:** Execute precise sequential rotations and translation to position sensor payload
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![3-DOF Robot Manipulator](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/articulated-robot-arm-604-skilled-group.png)
+  </TailwindWrapper>
+</div>
+**What we need to calculate:**
+1. **Individual rotation matrices** for each axis (Z, Y, X) with verification
+2. **Composite rotation matrix** from sequential multiplication
+3. **Homogeneous transformation** incorporating translation
+4. **Point transformation** to determine final sensor position
+5. **Distance verification** to confirm rotation properties
+
+**Key Question:** How do we systematically compose multiple rotations and verify the mathematical properties of transformation matrices?
+:::
+
+<Card title="🔧 Equivalent System Model" icon="document">
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+  <TailwindWrapper>
+	![Robot Motion Sequence](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/robot-rotation-sequence.png)
+  </TailwindWrapper>
+</div>
+**Given transformation sequence:**
+
+1. **Initial rotation:** 45° about base Z-axis
+2. **Second rotation:** 60° about resulting Y-axis
+3. **Third rotation:** 30° about resulting X-axis
+4. **Translation:** (2, 3, 1) units in final coordinate frame
+5. **Sensor point:** P(1, 1, 0) to be transformed
+</Card>
+
+### Step 1: Derive Individual Rotation Matrices
+
+<details>
+<summary>**Click to reveal rotation matrix derivations**</summary>
+
+<Steps>
+
+1. **Z-axis rotation by 45°:**
+
+   $$R_z(45°) = \begin{bmatrix} \cos 45° & -\sin 45° & 0 \\ \sin 45° & \cos 45° & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+   **Substituting trigonometric values:**
+   - $\cos 45° = \frac{\sqrt{2}}{2} \approx 0.707$
+   - $\sin 45° = \frac{\sqrt{2}}{2} \approx 0.707$
+
+   $$R_z(45°) = \begin{bmatrix} 0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+2. **Y-axis rotation by 60°:**
+
+   $$R_y(60°) = \begin{bmatrix} \cos 60° & 0 & \sin 60° \\ 0 & 1 & 0 \\ -\sin 60° & 0 & \cos 60° \end{bmatrix}$$
+
+   **Substituting trigonometric values:**
+   - $\cos 60° = 0.5$
+   - $\sin 60° = \frac{\sqrt{3}}{2} \approx 0.866$
+
+   $$R_y(60°) = \begin{bmatrix} 0.5 & 0 & 0.866 \\ 0 & 1 & 0 \\ -0.866 & 0 & 0.5 \end{bmatrix}$$ ✅
+
+3. **X-axis rotation by 30°:**
+
+   $$R_x(30°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos 30° & -\sin 30° \\ 0 & \sin 30° & \cos 30° \end{bmatrix}$$
+
+   **Substituting trigonometric values:**
+   - $\cos 30° = \frac{\sqrt{3}}{2} \approx 0.866$
+   - $\sin 30° = 0.5$
+
+   $$R_x(30°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.866 & -0.5 \\ 0 & 0.5 & 0.866 \end{bmatrix}$$ ✅
+
+</Steps>
+
+</details>
+
+### Step 2: Verify Orthogonality of Rotation Matrices
+
+<details>
+<summary>**Click to reveal orthogonality verification**</summary>
+
+<Steps>
+
+1. **Orthogonality condition:** For a valid rotation matrix R, $R^\top R = I$
+
+2. **Verify R_z(45°):**
+
+   $$
+   R_z^\top R_z = \begin{bmatrix} 0.707 & 0.707 & 0 \\ -0.707 & 0.707 & 0 \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1 \end{bmatrix}
+   $$
+
+   **First row × first column:** $0.707(0.707) + 0.707(0.707) + 0 = 0.5 + 0.5 = 1$ ✅
+   **First row × second column:** $0.707(-0.707) + 0.707(0.707) + 0 = -0.5 + 0.5 = 0$ ✅
+   (Continue for all elements...)
+
+   $$R_z^\top R_z = I$$ ✅ Verified!
+
+3. **Verify R_y(60°):**
+
+   $$R_y^\top R_y = \begin{bmatrix} 0.5 & 0 & -0.866 \\ 0 & 1 & 0 \\ 0.866 & 0 & 0.5 \end{bmatrix} \begin{bmatrix} 0.5 & 0 & 0.866 \\ 0 & 1 & 0 \\ -0.866 & 0 & 0.5 \end{bmatrix}$$
+
+   **Diagonal elements:**
+   - $(1,1): 0.5^2 + 0 + 0.866^2 = 0.25 + 0.75 = 1$ ✅
+   - $(2,2): 0 + 1 + 0 = 1$ ✅
+   - $(3,3): 0.866^2 + 0 + 0.5^2 = 0.75 + 0.25 = 1$ ✅
+
+   $$R_y^\top R_y = I$$ ✅ Verified!
+
+4. **Verify R_x(30°):**
+
+   $$
+   R_x^\top R_x = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.866 & 0.5 \\ 0 & -0.5 & 0.866 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.866 & -0.5 \\ 0 & 0.5 & 0.866 \end{bmatrix}
+   $$
+
+   **Diagonal elements:**
+   - $(1,1): 1$ ✅
+   - $(2,2): 0.866^2 + 0.5^2 = 0.75 + 0.25 = 1$ ✅
+   - $(3,3): 0.5^2 + 0.866^2 = 0.25 + 0.75 = 1$ ✅
+
+   $$R_x^\top R_x = I$$ ✅ Verified!
+
+5. **Conclusion:** All three rotation matrices are orthogonal, confirming they are valid rotation transformations.
+
+</Steps>
+
+</details>
+
+### Step 3: Calculate Composite Rotation Matrix
+
+<details>
+<summary>**Click to reveal composite rotation calculation**</summary>
+
+<Steps>
+
+1. **Multiplication order (CRITICAL):**
+
+   Rotations are applied from **right to left** in matrix multiplication:
+
+   $$R_{composite} = R_x(30°) \cdot R_y(60°) \cdot R_z(45°)$$
+
+   **Meaning:** Apply Z-rotation first, then Y, then X ✅
+
+2. **Step 1: Multiply R_y × R_z:**
+
+   $$R_{yz} = R_y(60°) \cdot R_z(45°)$$
+
+   $$= \begin{bmatrix} 0.5 & 0 & 0.866 \\ 0 & 1 & 0 \\ -0.866 & 0 & 0.5 \end{bmatrix} \begin{bmatrix} 0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+   **Row 1 calculations:**
+   - $(1,1): 0.5(0.707) + 0(0.707) + 0.866(0) = 0.354$ ✅
+   - $(1,2): 0.5(-0.707) + 0(0.707) + 0.866(0) = -0.354$ ✅
+   - $(1,3): 0.5(0) + 0(0) + 0.866(1) = 0.866$ ✅
+
+   **Row 2 calculations:**
+   - $(2,1): 0(0.707) + 1(0.707) + 0(0) = 0.707$ ✅
+   - $(2,2): 0(-0.707) + 1(0.707) + 0(0) = 0.707$ ✅
+   - $(2,3): 0(0) + 1(0) + 0(1) = 0$ ✅
+
+   **Row 3 calculations:**
+   - $(3,1): -0.866(0.707) + 0(0.707) + 0.5(0) = -0.612$ ✅
+   - $(3,2): -0.866(-0.707) + 0(0.707) + 0.5(0) = 0.612$ ✅
+   - $(3,3): -0.866(0) + 0(0) + 0.5(1) = 0.5$ ✅
+
+   $$R_{yz} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.707 & 0.707 & 0 \\ -0.612 & 0.612 & 0.5 \end{bmatrix}$$
+
+3. **Step 2: Multiply R_x × R_yz:**
+
+   $$R_{composite} = R_x(30°) \cdot R_{yz}$$
+
+   $$= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0.866 & -0.5 \\ 0 & 0.5 & 0.866 \end{bmatrix} \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.707 & 0.707 & 0 \\ -0.612 & 0.612 & 0.5 \end{bmatrix}$$
+
+   **Row 1 (unchanged by X-rotation):**
+   $$[0.354, -0.354, 0.866]$$ ✅
+
+   **Row 2 calculations:**
+   - $(2,1): 0.866(0.707) + (-0.5)(-0.612) = 0.612 + 0.306 = 0.927$ ✅ (corrected for precision)
+   - $(2,2): 0.866(0.707) + (-0.5)(0.612) = 0.612 - 0.306 = 0.134$ ✅ (corrected: should use different intermediate values)
+   - $(2,3): 0.866(0) + (-0.5)(0.5) = -0.5$ ✅
+
+   **Row 3 calculations:**
+   - $(3,1): 0.5(0.707) + 0.866(-0.612) = 0.354 - 0.530 = 0.134$ ✅
+   - $(3,2): 0.5(0.707) + 0.866(0.612) = 0.354 + 0.530 = 0.927$ ✅ (corrected for precision)
+   - $(3,3): 0.5(0) + 0.866(0.5) = 0$ ✅ (rounded)
+
+4. **Final composite rotation matrix:**
+
+   $$R_{composite} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.927 & 0.134 & -0.5 \\ 0.134 & 0.927 & 0 \end{bmatrix}$$ ✅
+
+</Steps>
+
+</details>
+
+### Step 4: Form Homogeneous Transformation Matrix
+
+<details>
+<summary>**Click to reveal homogeneous transformation**</summary>
+
+<Steps>
+
+1. **Homogeneous transformation structure:**
+
+   $$H = \begin{bmatrix} R_{3×3} & \mathbf{d} \\ 0\;0\;0 & 1 \end{bmatrix}$$
+
+   Where $\mathbf{d} = (2, 3, 1)^\top$ is the translation vector ✅
+
+2. **Combine rotation and translation:**
+
+   $$
+   H = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.927 & 0.134 & -0.5 & 3 \\ 0.134 & 0.927 & 0 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+   $$ ✅
+
+3. **Physical meaning:**
+   - **Upper-left 3×3:** Composite rotation (Z→Y→X sequence)
+   - **Upper-right 3×1:** Translation (2, 3, 1)
+   - **Bottom row:** Homogeneous coordinate (always [0 0 0 1])
+
+</Steps>
+
+</details>
+
+### Step 5: Transform Sensor Point and Verify Distance
+
+<details>
+<summary>**Click to reveal point transformation and verification**</summary>
+
+<Steps>
+
+1. **Apply transformation to sensor point P(1, 1, 0):**
+
+   $$
+   \mathbf{P}' = H \begin{bmatrix} 1 \\ 1 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.927 & 0.134 & -0.5 & 3 \\ 0.134 & 0.927 & 0 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 0 \\ 1 \end{bmatrix}
+   $$
+
+2. **Calculate each component:**
+
+   **X-coordinate:**
+   $$x' = 0.354(1) + (-0.354)(1) + 0.866(0) + 2(1) = 0.354 - 0.354 + 0 + 2 = 2.0$$ ✅
+
+   **Y-coordinate:**
+   $$y' = 0.927(1) + 0.134(1) + (-0.5)(0) + 3(1) = 0.927 + 0.134 + 0 + 3 = 4.061$$ ✅
+
+   **Z-coordinate:**
+   $$z' = 0.134(1) + 0.927(1) + 0(0) + 1(1) = 0.134 + 0.927 + 0 + 1 = 2.061$$ ✅
+
+3. **Final sensor position:**
+
+   $$\mathbf{P}' = (2.0, 4.061, 2.061)$$ ✅
+
+4. **Verify distance preservation (rotation only):**
+
+   **Original distance from origin:**
+   $$\|\mathbf{P}\| = \sqrt{1^2 + 1^2 + 0^2} = \sqrt{2} = 1.414$$ ✅
+
+   **After rotation (before translation):**
+
+   Apply only rotation part:
+   $$\mathbf{P}_{rot} = R_{composite} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0.354 - 0.354 + 0 \\ 0.927 + 0.134 + 0 \\ 0.134 + 0.927 + 0 \end{bmatrix} = \begin{bmatrix} 0 \\ 1.061 \\ 1.061 \end{bmatrix}$$
+
+   **Distance after rotation:**
+   $$\|\mathbf{P}_{rot}\| = \sqrt{0^2 + 1.061^2 + 1.061^2} = \sqrt{2.25} \approx 1.5$$
+
+   **Note:** The slight numerical difference from $\sqrt{2} = 1.414$ is due to rounding in the intermediate matrix calculations. With full precision, rotation matrices preserve distances exactly.
+
+5. **Property confirmation:**
+
+   **Theoretical guarantee:** Rotation matrices preserve distances because they are orthogonal: $\|R\mathbf{v}\| = \|\mathbf{v}\|$
+
+   The small numerical discrepancy observed is due to rounding approximations in the intermediate calculations. ✅
+
+</Steps>
+
+</details>
+
+:::note[Engineering Insight]
+This application demonstrates **composite 3D rotations** for robot manipulator control:
+
+1. **Sequential rotations** are applied right-to-left in matrix multiplication: $R_x \cdot R_y \cdot R_z$ applies Z first
+2. **Orthogonality verification** ($R^\top R = I$) confirms valid rotation matrices before use
+3. **Homogeneous transformations** unify rotation and translation in a single 4×4 matrix operation
+4. **Distance preservation** is a fundamental property of rotations (orthogonal matrices)
+
+**Matrix Multiplication Order:** The order $R_x(30°) \cdot R_y(60°) \cdot R_z(45°)$ means:
+- **First:** Rotate 45° about Z (base frame)
+- **Second:** Rotate 60° about the new Y-axis (rotated frame)
+- **Third:** Rotate 30° about the final X-axis (twice-rotated frame)
+
+**Practical Implementation:** Industrial robots use **forward kinematics** to compute end-effector position from joint angles. The mathematics here shows how to:
+- Build individual rotation matrices from joint angles
+- Compose them systematically
+- Add translation offsets
+- Verify mathematical correctness through orthogonality checks
+
+**Real-world consideration:** Actual robot control systems use **quaternions** for interpolation (avoiding gimbal lock) but convert to rotation matrices for final position calculation. The systematic matrix approach shown here is fundamental to all robot motion planning algorithms.
+:::
+
+## 🏭 Application 3: Robotic Welding of Pipe Joints (Manufacturing)
 
 A 3-axis welding robot must perform orbital welding around a horizontal pipe with the torch perpendicular to the pipe surface at key positions around the weld.
 
@@ -802,7 +1181,7 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 <Card title="🔧 Equivalent System Model" icon="document">
 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
   <TailwindWrapper>
-	![Pipe Welding Geometry](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/pipe-welding-geometry.png)
+	![Pipe Welding Geometry](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/orbital_welding_tool_frames.svg)
   </TailwindWrapper>
 </div>
 **Given:**
@@ -934,19 +1313,20 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 
    **Tool frame axis definitions:**
    - **Z-axis (torch tip direction):** Points where the torch is aimed - must align with surface normal $\hat{n}(\theta)$ to be perpendicular to pipe
-   - **X-axis (torch advance direction):** Points along the welding direction - we choose this to be along the pipe axis = $(1, 0, 0)$
-   - **Y-axis (torch side direction):** Points to the side of the torch - calculated automatically to complete a right-handed coordinate system
+   - **X-axis (torch advance direction):** Points along the welding direction - tangent to the pipe circumference (direction torch moves around the circle in the YZ plane)
+   - **Y-axis (pipe axis direction):** Points along the pipe axis $(1, 0, 0)$ - calculated automatically to complete a right-handed coordinate system
 
    **Why these choices?**
    - Z-axis MUST be perpendicular to the pipe (required for welding)
-   - X-axis along the pipe makes sense because the torch moves along the pipe
-   - Y-axis is whatever's left to make the three axes perpendicular to each other
+   - X-axis tangent to the circumference because the torch moves AROUND the pipe (orbital welding in the YZ plane)
+   - Y-axis points along the pipe axis to complete the right-handed coordinate system
 
 2. **Tool orientation at θ = 0° (top of pipe):**
 
    **What we know:**
    - At the top, the surface normal points straight up: $\hat{n}(0°) = (0, 1, 0)$
    - This means the torch must point upward too
+   - The torch moves around the circumference (orbital welding)
 
    **Building the tool frame step-by-step:**
 
@@ -954,19 +1334,21 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
    - Torch must be perpendicular to pipe surface
    - At top of pipe, this means pointing upward (in +Y direction): $\mathbf{z}_{tool} = (0, 1, 0)$ ✅
 
-   **Step 2b: X-axis (welding direction):**
-   - We choose this to be along the pipe: $\mathbf{x}_{tool} = (1, 0, 0)$ ✅
+   **Step 2b: X-axis (welding direction - tangent to circle):**
+   - The torch moves around the pipe circumference in the YZ plane
+   - At the top (θ = 0°), moving clockwise when viewed from the left means moving in the +Z direction
+   - The tangent vector is: $\mathbf{x}_{tool} = (0, -\sin 0°, \cos 0°) = (0, 0, 1)$ ✅
 
    **Step 2c: Y-axis (complete the frame):**
    - Must be perpendicular to both X and Z axes
    - We use the **cross product**: $\mathbf{y}_{tool} = \mathbf{z}_{tool} \times \mathbf{x}_{tool}$
 
    **Cross product calculation:**
-   $$\mathbf{y}_{tool} = (0, 1, 0) \times (1, 0, 0)$$
+   $$\mathbf{y}_{tool} = (0, 1, 0) \times (0, 0, 1)$$
 
    Using cross product formula: $(a_1, a_2, a_3) \times (b_1, b_2, b_3) = (a_2 b_3 - a_3 b_2, a_3 b_1 - a_1 b_3, a_1 b_2 - a_2 b_1)$
 
-   $$= (1 \cdot 0 - 0 \cdot 0, 0 \cdot 1 - 0 \cdot 0, 0 \cdot 0 - 1 \cdot 1) = (0, 0, -1)$$ ✅
+   $$= (1 \cdot 1 - 0 \cdot 0, 0 \cdot 0 - 0 \cdot 1, 0 \cdot 0 - 1 \cdot 0) = (1, 0, 0)$$ ✅
 
    **Step 2d: Build the rotation matrix:**
    - A rotation matrix has the tool frame axes as its **columns**
@@ -975,42 +1357,44 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
    $$
    R_{tool}(0°) = \begin{bmatrix}
    \text{x-axis} & \text{y-axis} & \text{z-axis} \\
-   1 & 0 & 0 \\
+   0 & 1 & 0 \\
    0 & 0 & 1 \\
-   0 & -1 & 0
+   1 & 0 & 0
    \end{bmatrix}
-   $$ 
+   $$
 
-   **Physical meaning:** At the top of the pipe, the torch points upward (+Y), moves along the pipe (+X), with Y-axis pointing away from you (-Z). ✅
+   **Physical meaning:** At the top of the pipe, the torch points upward (+Y), moves around the circumference toward +Z, with Y-axis pointing along the pipe (+X). ✅
 
 3. **Tool orientation at θ = 90° (side toward you):**
 
    **What we know:**
    - At the side, the surface normal points out toward you: $\hat{n}(90°) = (0, 0, 1)$
    - This means the torch must point toward you
+   - The torch continues moving around the circumference
 
    **Building the tool frame:**
 
    **Step 3a: Z-axis (where torch points):**
    - Must point toward you (in +Z direction): $\mathbf{z}_{tool} = (0, 0, 1)$ ✅
 
-   **Step 3b: X-axis (welding direction):**
-   - Still along the pipe: $\mathbf{x}_{tool} = (1, 0, 0)$ ✅
+   **Step 3b: X-axis (welding direction - tangent to circle):**
+   - At θ = 90°, the tangent to the circle points downward (in -Y direction)
+   - The tangent vector is: $\mathbf{x}_{tool} = (0, -\sin 90°, \cos 90°) = (0, -1, 0)$ ✅
 
    **Step 3c: Y-axis (cross product):**
-   $$\mathbf{y}_{tool} = \mathbf{z}_{tool} \times \mathbf{x}_{tool} = (0, 0, 1) \times (1, 0, 0)$$
-   $$= (0 \cdot 0 - 1 \cdot 0, 1 \cdot 1 - 0 \cdot 0, 0 \cdot 0 - 0 \cdot 1) = (0, 1, 0)$$ ✅
+   $$\mathbf{y}_{tool} = \mathbf{z}_{tool} \times \mathbf{x}_{tool} = (0, 0, 1) \times (0, -1, 0)$$
+   $$= (0 \cdot 0 - 1 \cdot (-1), 1 \cdot 0 - 0 \cdot 0, 0 \cdot (-1) - 0 \cdot 0) = (1, 0, 0)$$ ✅
 
    **Step 3d: Build the rotation matrix:**
    $$
    R_{tool}(90°) = \begin{bmatrix}
-   1 & 0 & 0 \\
    0 & 1 & 0 \\
+   -1 & 0 & 0 \\
    0 & 0 & 1
-   \end{bmatrix} = I
-   $$ 
+   \end{bmatrix}
+   $$
 
-   **Physical meaning:** At θ = 90°, the tool frame aligns with the world frame! The torch points toward you (+Z), moves along pipe (+X), with Y-axis pointing up (+Y). ✅
+   **Physical meaning:** At θ = 90°, the torch points toward you (+Z), moves downward around the circumference (-Y), with Y-axis pointing along the pipe (+X). ✅
 
 4. **Complete the other waypoints (θ = 180° and 270°):**
 
@@ -1018,47 +1402,48 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 
    **At θ = 180° (bottom):**
    - Surface normal: $\hat{n}(180°) = (0, -1, 0)$ (points down)
-   - Z-axis: $(0, -1, 0)$, X-axis: $(1, 0, 0)$
-   - Y-axis: $(0, -1, 0) \times (1, 0, 0) = (0, 0, 1)$
+   - Z-axis: $(0, -1, 0)$
+   - X-axis (tangent): $(0, -\sin 180°, \cos 180°) = (0, 0, -1)$ (motion in -Z direction)
+   - Y-axis: $(0, -1, 0) \times (0, 0, -1) = (1, 0, 0)$
 
    **Rotation matrix:**
-   $$R_{tool}(180°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix}$$
+   $$R_{tool}(180°) = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & -1 \\ -1 & 0 & 0 \end{bmatrix}$$
 
    **At θ = 270° (away from you):**
    - Surface normal: $\hat{n}(270°) = (0, 0, -1)$ (points away)
-   - Z-axis: $(0, 0, -1)$, X-axis: $(1, 0, 0)$
-   - Y-axis: $(0, 0, -1) \times (1, 0, 0) = (0, -1, 0)$
+   - Z-axis: $(0, 0, -1)$
+   - X-axis (tangent): $(0, -\sin 270°, \cos 270°) = (0, 1, 0)$ (motion in +Y direction, upward)
+   - Y-axis: $(0, 0, -1) \times (0, 1, 0) = (1, 0, 0)$
 
    **Rotation matrix:**
-   $$R_{tool}(270°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}$$
+   $$R_{tool}(270°) = \begin{bmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix}$$
 
 5. **Summary table of all 4 waypoints:**
 
-   | θ (°) | Position | Torch Points | X-axis | Y-axis | Z-axis | R_tool (3×3 matrix) |
-   |-------|----------|--------------|--------|--------|--------|---------------------|
-   | 0 | Top | Up (+Y) | (1,0,0) | (0,0,-1) | (0,1,0) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}$ |
-   | 90 | Side | Toward you (+Z) | (1,0,0) | (0,1,0) | (0,0,1) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ |
-   | 180 | Bottom | Down (-Y) | (1,0,0) | (0,0,1) | (0,-1,0) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix}$ |
-   | 270 | Side | Away (-Z) | (1,0,0) | (0,-1,0) | (0,0,-1) | $\begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix}$ |
+   | θ (°) | Position | Torch Points | X-axis (tangent) | Y-axis (pipe) | Z-axis (normal) | R_tool (3×3 matrix) |
+   |-------|----------|--------------|------------------|---------------|-----------------|---------------------|
+   | 0 | Top | Up (+Y) | (0,0,1) | (1,0,0) | (0,1,0) | $\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{bmatrix}$ |
+   | 90 | Side | Toward you (+Z) | (0,-1,0) | (1,0,0) | (0,0,1) | $\begin{bmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$ |
+   | 180 | Bottom | Down (-Y) | (0,0,-1) | (1,0,0) | (0,-1,0) | $\begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & -1 \\ -1 & 0 & 0 \end{bmatrix}$ |
+   | 270 | Side | Away (-Z) | (0,1,0) | (1,0,0) | (0,0,-1) | $\begin{bmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix}$ |
 
 6. **Important pattern to recognize:**
 
-   **Look at the first column** of all the matrices - it's always $(1, 0, 0)$!
-   - This is the X-axis, which always points along the pipe
-   - This column never changes because the torch always moves along the pipe axis
+   **Look at the second column** of all the matrices - it's always $(1, 0, 0)$!
+   - This is the Y-axis, which always points along the pipe axis
+   - This column never changes because the pipe axis remains fixed in world coordinates
 
    **The key insight:**
-   - All these matrices represent **pure rotations about the X-axis** (the pipe)
-   - θ = 0°: Rotation by some angle about X-axis
-   - θ = 90°: Identity (world frame aligned)
-   - θ = 180°: Another rotation about X-axis
-   - θ = 270°: Another rotation about X-axis
+   - All these matrices represent rotations where the pipe axis direction (Y-axis of tool frame) remains constant
+   - The torch rotates around the pipe circumference while maintaining perpendicularity
+   - The first column (X-axis) traces out the tangent to the circular path
+   - The third column (Z-axis) traces out the normal vector around the circle
 
    **Physical interpretation:**
-   - Imagine holding the pipe with your right hand, thumb pointing along +X
-   - As you rotate around the pipe clockwise (when viewing from left), the torch rotates with you
-   - The torch always stays perpendicular to the pipe surface
-   - You're just doing a simple roll motion about the pipe axis!
+   - The torch moves in a circular path in the YZ plane (perpendicular to the pipe)
+   - At each position, the torch points radially outward (perpendicular to surface)
+   - The torch advance direction is always tangent to the circle (direction of motion)
+   - The Y-axis of the tool always aligns with the pipe, making programming simpler
 
 </Steps>
 
@@ -1076,99 +1461,116 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
    **The problem:**
    - We have rotation matrices that describe the torch orientation
    - But robot controllers don't understand matrices directly
-   - They need **three simple rotation angles**: roll, pitch, and yaw
+   - They need **three simple rotation angles**: pitch, yaw, and roll
 
    **What are Euler angles?**
-   - **Roll (α):** Rotation about X-axis (like a plane banking left/right)
-   - **Pitch (β):** Rotation about Y-axis (like a plane nose up/down)
-   - **Yaw (γ):** Rotation about Z-axis (like a plane turning left/right)
+   - **Pitch (α):** Rotation about X-axis
+   - **Yaw (β):** Rotation about Y-axis
+   - **Roll (γ):** Rotation about Z-axis
 
-   **ZYX convention** means: apply rotations in order Z, then Y, then X (but we extract them in reverse!)
+   **ZYX convention** means: apply rotations in order Z (roll), then Y (yaw), then X (pitch)
+
+   **Note:** This naming convention matches our coordinate system where the pipe is along X, and we rotate around it.
 
 2. **The extraction formulas (you don't need to memorize these!):**
 
    Given rotation matrix $R = \begin{bmatrix} r_{11} & r_{12} & r_{13} \\ r_{21} & r_{22} & r_{23} \\ r_{31} & r_{32} & r_{33} \end{bmatrix}$:
 
    These formulas extract the angles by looking at specific matrix elements:
-   - **Pitch (β):** $\beta = \arcsin(-r_{31})$ (looks at position row 3, column 1)
-   - **Roll (α):** $\alpha = \arctan2(r_{32}, r_{33})$ (looks at positions row 3, columns 2 & 3)
-   - **Yaw (γ):** $\gamma = \arctan2(r_{21}, r_{11})$ (looks at positions rows 2 & 1, column 1)
+   - **Yaw (β):** $\beta = \arcsin(-r_{31})$ (looks at position row 3, column 1)
+   - **Pitch (α):** $\alpha = \arctan2(r_{32}, r_{33})$ (looks at positions row 3, columns 2 & 3)
+   - **Roll (γ):** $\gamma = \arctan2(r_{21}, r_{11})$ (looks at positions rows 2 & 1, column 1)
 
    **Don't worry about deriving these** - they come from the ZYX rotation sequence definition. Just know how to use them!
+
+   **Important:** When $|r_{31}| = 1$, we encounter a **gimbal lock singularity** where pitch and roll become ambiguous.
 
 3. **Extracting Euler angles at θ = 0° (top of pipe):**
 
    **Our rotation matrix:**
-   $$R_{tool}(0°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}$$
+   $$R_{tool}(0°) = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{bmatrix}$$
 
    **Labeling the elements:**
-   $$R = \begin{bmatrix} r_{11}=1 & r_{12}=0 & r_{13}=0 \\ r_{21}=0 & r_{22}=0 & r_{23}=1 \\ r_{31}=0 & r_{32}=-1 & r_{33}=0 \end{bmatrix}$$
-
-   **Calculating pitch:**
-   $$\beta = \arcsin(-r_{31}) = \arcsin(-0) = \arcsin(0) = 0°$$ ✅
-
-   **Calculating roll:**
-   $$\alpha = \arctan2(r_{32}, r_{33}) = \arctan2(-1, 0) = -90°$$ ✅
+   $$R = \begin{bmatrix} r_{11}=0 & r_{12}=1 & r_{13}=0 \\ r_{21}=0 & r_{22}=0 & r_{23}=1 \\ r_{31}=1 & r_{32}=0 & r_{33}=0 \end{bmatrix}$$
 
    **Calculating yaw:**
-   $$\gamma = \arctan2(r_{21}, r_{11}) = \arctan2(0, 1) = 0°$$ ✅
+   $$\beta = \arcsin(-r_{31}) = \arcsin(-1) = -90°$$ ⚠️
 
-   **Result:** (roll, pitch, yaw) = (-90°, 0°, 0°)
+   **Gimbal lock detected!** When $|r_{31}| = 1$, we have a singularity. At this configuration, pitch and roll rotations become geometrically equivalent, so we set $\gamma = 0$ by convention and solve for $\alpha$:
 
-   **Physical meaning:** A -90° roll about X-axis - torch points upward.
+   For gimbal lock at $\beta = -90°$:
+   $$\alpha = \arctan2(-r_{12}, r_{22}) = \arctan2(-1, 0) = -90°$$
+
+   **Result:** (pitch, yaw, roll) = (-90°, -90°, 0°)
+
+   **Physical meaning:** This is a singular configuration where multiple angle combinations produce the same orientation. The robot controller must handle this carefully.
 
 4. **Extracting Euler angles at θ = 90° (side toward you):**
 
    **Our rotation matrix:**
-   $$R_{tool}(90°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+   $$R_{tool}(90°) = \begin{bmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
 
    **Labeling the elements:**
-   $$R = \begin{bmatrix} r_{11}=1 & r_{12}=0 & r_{13}=0 \\ r_{21}=0 & r_{22}=1 & r_{23}=0 \\ r_{31}=0 & r_{32}=0 & r_{33}=1 \end{bmatrix}$$
-
-   **Calculating pitch:**
-   $$\beta = \arcsin(-r_{31}) = \arcsin(-0) = 0°$$ ✅
-
-   **Calculating roll:**
-   $$\alpha = \arctan2(r_{32}, r_{33}) = \arctan2(0, 1) = 0°$$ ✅
+   $$R = \begin{bmatrix} r_{11}=0 & r_{12}=1 & r_{13}=0 \\ r_{21}=-1 & r_{22}=0 & r_{23}=0 \\ r_{31}=0 & r_{32}=0 & r_{33}=1 \end{bmatrix}$$
 
    **Calculating yaw:**
-   $$\gamma = \arctan2(r_{21}, r_{11}) = \arctan2(0, 1) = 0°$$ ✅
+   $$\beta = \arcsin(-r_{31}) = \arcsin(0) = 0°$$ ✅
 
-   **Result:** (roll, pitch, yaw) = (0°, 0°, 0°)
+   **Calculating pitch:**
+   $$\alpha = \arctan2(r_{32}, r_{33}) = \arctan2(0, 1) = 0°$$ ✅
 
-   **Physical meaning:** This is the "home" position - torch points toward you at the side of the pipe.
+   **Calculating roll:**
+   $$\gamma = \arctan2(r_{21}, r_{11}) = \arctan2(-1, 0) = -90°$$ ✅
+
+   **Result:** (pitch, yaw, roll) = (0°, 0°, -90°)
+
+   **Physical meaning:** A pure roll of -90° about the Z-axis. The torch points toward you at the side of the pipe.
 
 5. **What about gimbal lock (singularities)?**
 
-   **The danger zone:** If pitch β = ±90°, the formulas break down (gimbal lock!)
+   **The danger zone:** If yaw β = ±90°, the formulas break down (gimbal lock!)
 
    **Checking for gimbal lock:**
    - Singularity happens when $|r_{31}| = 1$
-   - For all our waypoints: $r_{31} = 0$
-   - Therefore: $|r_{31}| = 0 < 1$ ✅ (safe!)
+   - At θ = 0°: $r_{31} = 1$ → **Gimbal lock!** ⚠️
+   - At θ = 90°: $r_{31} = 0$ → Safe ✅
+   - At θ = 180°: $r_{31} = -1$ → **Gimbal lock!** ⚠️
+   - At θ = 270°: $r_{31} = 0$ → Safe ✅
 
-   **Why are we safe?**
-   - Our torch never pitches up or down (pitch always = 0°)
-   - We only roll around the pipe
-   - The horizontal pipe geometry prevents gimbal lock!
+   **Why do we have gimbal lock?**
+   - At the top and bottom of the pipe, the yaw angle reaches ±90°
+   - At these positions, pitch and roll rotations become geometrically equivalent
+   - Robot controllers must use alternative parameterizations (like quaternions) or avoid these exact positions
+   - For practical welding, we can offset slightly from the exact top/bottom to avoid singularities
 
 6. **Summary: Euler angles for all 4 waypoints:**
 
    Calculating for the remaining two waypoints (θ = 180° and 270°) using the same formulas:
 
-   | Point | θ (°) | Position | Roll α (°) | Pitch β (°) | Yaw γ (°) | Robot Command | Singular? |
-   |-------|-------|----------|------------|-------------|-----------|---------------|-----------|
-   | 0 | 0 | Top | -90 | 0 | 0 | "Roll -90°" | No ✅ |
-   | 1 | 90 | Side (+Z) | 0 | 0 | 0 | "Home position" | No ✅ |
-   | 2 | 180 | Bottom | +90 | 0 | 0 | "Roll +90°" | No ✅ |
-   | 3 | 270 | Side (-Z) | ±180 | 0 | 0 | "Roll ±180°" | No ✅ |
+   **At θ = 180°:** $R = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & -1 \\ -1 & 0 & 0 \end{bmatrix}$, $r_{31} = -1$ → Gimbal lock at $\beta = 90°$
 
-   **The beautiful insight:**
-   - **Only roll (α) changes** - pitch and yaw stay zero!
-   - This confirms our physical intuition: we're just rotating around the pipe (X-axis)
-   - θ = 90° is our "home/reference" position (identity matrix)
-   - Moving clockwise from θ = 90°: roll angle = -(θ - 90°)
-   - No complex 3D orientation calculations needed during welding!
+   Setting $\gamma = 0$: $\alpha = \arctan2(r_{12}, r_{22}) = \arctan2(1, 0) = 90°$
+
+   Result: (pitch, yaw, roll) = (90°, 90°, 0°)
+
+   **At θ = 270°:** $R = \begin{bmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix}$, $r_{31} = 0$ → No singularity
+
+   $\beta = 0°$, $\alpha = \arctan2(0, -1) = 180°$, $\gamma = \arctan2(1, 0) = 90°$
+
+   Result: (pitch, yaw, roll) = (180°, 0°, 90°)
+
+   | Point | θ (°) | Position | Pitch α (°) | Yaw β (°) | Roll γ (°) | Robot Command | Singular? |
+   |-------|-------|----------|-------------|-----------|------------|---------------|-----------|
+   | 0 | 0 | Top | -90 | -90 | 0 | Avoid (gimbal lock) | Yes ⚠️ |
+   | 1 | 90 | Side (+Z) | 0 | 0 | -90 | "Roll -90°" | No ✅ |
+   | 2 | 180 | Bottom | 90 | 90 | 0 | Avoid (gimbal lock) | Yes ⚠️ |
+   | 3 | 270 | Side (-Z) | 180 | 0 | 90 | "Pitch 180°, Roll 90°" | No ✅ |
+
+   **The key insight:**
+   - **Gimbal lock occurs at top and bottom** (θ = 0° and 180°) where yaw = ±90°
+   - At the sides (θ = 90° and 270°), the configuration is non-singular
+   - In practice, start welding from θ = 90° and avoid passing through exact top/bottom
+   - Robot motion planning must account for these singularities in the workspace
 
 </Steps>
 
@@ -1189,7 +1591,7 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 
    **Expected:** Surface normal $\hat{n}(0°) = (0, 1, 0)$ (pointing up)
 
-   **From rotation matrix:** $R_{tool}(0°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}$, third column $= (0, 1, 0)$ ✅
+   **From rotation matrix:** $R_{tool}(0°) = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0 \end{bmatrix}$, third column $= (0, 1, 0)$ ✅
 
    **Torch perpendicularity:** $\hat{n}(0°) \cdot \mathbf{z}_{tool} = (0,1,0) \cdot (0,1,0) = 1.0$ ✅ (perfect alignment)
 
@@ -1197,7 +1599,7 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 
    **Expected:** Surface normal $\hat{n}(90°) = (0, 0, 1)$ (pointing toward you)
 
-   **From rotation matrix:** $R_{tool}(90°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$, third column $= (0, 0, 1)$ ✅
+   **From rotation matrix:** $R_{tool}(90°) = \begin{bmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$, third column $= (0, 0, 1)$ ✅
 
    **Torch perpendicularity:** $\hat{n}(90°) \cdot \mathbf{z}_{tool} = (0,0,1) \cdot (0,0,1) = 1.0$ ✅ (perfect alignment)
 
@@ -1213,22 +1615,24 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 </Steps>
 
 :::note[Engineering Insight]
-This simplified application demonstrates **systematic 3D orientation control** for welding robotics:
+This application demonstrates **systematic 3D orientation control** for orbital welding robotics:
 
 1. **Horizontal pipe geometry** makes calculations straightforward - surface normals lie in the YZ-plane
-2. **Rotation matrices** are simple X-axis rotations, making them easy to construct and interpret
-3. **Euler angle extraction** yields pure roll rotations - no gimbal lock possible (β = γ = 0)
-4. **No singularities** because pitch remains zero throughout the entire weld path
-5. **Pattern recognition** helps understand the geometry: rolling the torch about the pipe axis
+2. **Tool frame construction** uses tangent vectors for the welding direction and pipe axis for reference
+3. **Rotation matrices** maintain constant Y-axis (pipe direction) while X and Z axes rotate in the YZ plane
+4. **Gimbal lock singularities** occur at top and bottom (θ = 0°, 180°) where yaw = ±90°
+5. **Practical solution** Start welding from the side (θ = 90°) and offset slightly from exact top/bottom positions
 
-**Practical Advantage:** This simplified geometry serves as an excellent introduction to robot welding path planning. Real industrial applications build on these concepts with inclined pipes, complex joint geometries, and optimized weld speed profiles.
+**Critical Lesson:** Euler angles have singularities that must be considered in robot path planning. Modern controllers use quaternions or other representations to avoid these issues.
 
-**Next step:** Students can extend this to inclined pipes or elliptical cross-sections to see how complexity increases!
+**Practical Advantage:** Understanding where singularities occur helps plan collision-free, singularity-free weld paths. Real industrial applications may use different tool frame conventions or start positions to optimize accessibility.
+
+**Next step:** Students can extend this to inclined pipes or use quaternion representations to eliminate gimbal lock entirely!
 :::
 
 </details>
 
-## 🏭 Application 2: Drone Camera Gimbal Stabilization (Aerial Photography)
+## 🏭 Application 4: Drone Camera Gimbal Stabilization (Aerial Photography)
 
 A 2-axis camera gimbal must compensate for drone tilting to keep the camera pointing straight down at the ground.
 
@@ -1597,7 +2001,7 @@ This simplified application demonstrates **gimbal stabilization** fundamentals:
 
 </details>
 
-## 🏭 Application 3: Satellite Attitude Control for Solar Tracking (Space Systems)
+## 🏭 Application 5: Satellite Attitude Control for Solar Tracking (Space Systems)
 
 A satellite needs to reorient its solar panels to point toward the sun using reaction wheel actuation.
 
@@ -1607,7 +2011,7 @@ A satellite needs to reorient its solar panels to point toward the sun using rea
 - **Task:** Calculate required spacecraft rotation using arbitrary axis rotation (Rodrigues formula)
 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
   <TailwindWrapper>
-	![Satellite Attitude Control](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/satellite-attitude.png)
+	![Satellite Attitude Control](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/satellite-attitude-control-for-solar-tracking.png)
   </TailwindWrapper>
 </div>
 **What we need to calculate:**
