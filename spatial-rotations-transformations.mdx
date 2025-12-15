@@ -10,6 +10,7 @@ excerpt: "Explore 3D rotation mathematics: coordinate axis rotations, Euler angl
 import SpatialMechanicsComments from '../../../../components/spatial-mechanics/SpatialMechanicsComments.astro';
 import TawkWidget from '../../../../components/TawkWidget.astro';
 import UniversalContentContributors from '../../../../components/UniversalContentContributors.astro';
+import InArticleAd from '../../../../components/InArticleAd.astro';
 import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
@@ -60,6 +61,9 @@ These systems require precise control of:
 :::
 
 > **Engineering Question:** How do we mathematically represent and compose complex 3D orientations in a systematic way that handles singularities and works across diverse applications?
+
+
+<InArticleAd />
 
 ### Why 3D Spatial Mathematics Matters
 
@@ -671,7 +675,7 @@ A vision-guided robotic system uses a camera to locate workpieces for automated 
 
 **H₁** = Workpiece position relative to camera:
 $$
-H_1 = \begin{bmatrix}
+H_1 = H_{workpiece}^{camera} = \begin{bmatrix}
 0 & -1 & 0 & 3\\
 1 & 0 & 0 & 5\\
 0 & 0 & -1 & 4\\
@@ -681,7 +685,7 @@ $$
 
 **H₂** = Robot base position relative to camera:
 $$
-H_2 = \begin{bmatrix}
+H_2 = H_{robot}^{camera} = \begin{bmatrix}
 1 & 0 & 0 & -5\\
 0 & -1 & 0 & 10\\
 0 & 0 & -1 & 8\\
@@ -739,10 +743,12 @@ $$
 1. **Transformation chain relationship:**
 
    The workpiece position relative to the robot base is:
+   
+   $$H_{workpiece}^{robot} = H_{camera}^{robot} \cdot H_{workpiece}^{camera}$$ (chain product rule) ✅
 
    $$H_{workpiece}^{robot} = H_2^{-1} \cdot H_1$$ ✅
 
-   **Why?** We need to transform from camera frame to base frame (H₂⁻¹), then apply the workpiece-to-camera transform (H₁).
+   **Why?** We need to transform from camera frame to robot base frame (H₂⁻¹), then apply the workpiece-to-camera transform (H₁).
 
 2. **Matrix multiplication:**
 
@@ -752,14 +758,46 @@ $$
 
    $$R = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix} \begin{bmatrix} 0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix} = \begin{bmatrix} 0 & -1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$ ✅
 
-4. **Complete 4×4 matrix multiplication:**
+4. **Compute position/translation part:**
 
-   $$H_{workpiece}^{robot} = \begin{bmatrix} 0 & -1 & 0 & 8 \\ -1 & 0 & 0 & -5 \\ 0 & 0 & 1 & -4 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+   For homogeneous matrix multiplication $H_A \cdot H_B$, the translation part is: $\mathbf{t}_{result} = R_A \cdot \mathbf{t}_B + \mathbf{t}_A$
 
-5. **Result interpretation:**
-   - **Position:** Workpiece is at $(8, -5, -4)$ in robot base coordinates
-   - **Orientation:** Rotation matrix shows 90° rotations about coordinate axes
-   - **Robot grasping:** The end-effector should move to position (8, -5, -4) with the specified orientation
+   **Extract translation vectors:**
+   - From $H_2^{-1}$: $\mathbf{t}_{2^{-1}} = \begin{bmatrix} 5 \\ 10 \\ 8 \end{bmatrix}$
+   - From $H_1$: $\mathbf{t}_1 = \begin{bmatrix} 3 \\ 5 \\ 4 \end{bmatrix}$
+
+   **Calculate $R_{2^{-1}} \cdot \mathbf{t}_1$:**
+
+   $$R_{2^{-1}} \cdot \mathbf{t}_1 = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & -1 \end{bmatrix} \begin{bmatrix} 3 \\ 5 \\ 4 \end{bmatrix} = \begin{bmatrix} 3 \\ -5 \\ -4 \end{bmatrix}$$
+
+   **Add $\mathbf{t}_{2^{-1}}$:**
+
+   $$\mathbf{t}_{result} = \begin{bmatrix} 3 \\ -5 \\ -4 \end{bmatrix} + \begin{bmatrix} 5 \\ 10 \\ 8 \end{bmatrix} = \begin{bmatrix} 8 \\ 5 \\ 4 \end{bmatrix}$$
+
+   **Therefore, the workpiece position is $(8, 5, 4)$ in robot base coordinates** ✅
+
+5. **Complete 4×4 matrix multiplication:**
+
+   $$H_{workpiece}^{robot} = \begin{bmatrix} 0 & -1 & 0 & 8 \\ -1 & 0 & 0 & 5 \\ 0 & 0 & 1 & 4 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+6. **Result interpretation:**
+   - **Position:** Workpiece is at $(8, 5, 4)$ in robot base coordinates
+
+   - **Orientation:** The rotation matrix columns show where each workpiece axis points in robot coordinates:
+
+   $$R = \begin{bmatrix} 0 & -1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+   Workpiece X-axis: $R \cdot \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ -1 \\ 0 \end{bmatrix}$ → Robot negative Y ✅
+
+   Workpiece Y-axis: $R \cdot \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} -1 \\ 0 \\ 0 \end{bmatrix}$ → Robot negative X ✅
+
+   Workpiece Z-axis: $R \cdot \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}$ → Robot positive Z (unchanged) ✅
+
+   **Understanding this rotation:**
+   - Since Z-axis is unchanged, the transformation acts only in the XY-plane
+   - Check determinant: $\det(R) = 0 \cdot (0 \cdot 1 - 0 \cdot 0) - (-1) \cdot ((-1) \cdot 1 - 0 \cdot 0) + 0 = 0 + 1(-1) = -1$ ⚠️
+   - **This is NOT a pure rotation** (Pure rotations have det = +1)
+   - **Robot grasping:** End-effector moves to (8, 5, 4) with the orientation specified by R
 
 </Steps>
 
@@ -2332,6 +2370,7 @@ In this lesson, you learned 3D rotation and transformation mathematics through t
 
 **Coming Next**: Lesson 4 develops systematic kinematic modeling using DH parameters for Stewart Platform analysis.
 
+<InArticleAd />
 <SpatialMechanicsComments />
 <TawkWidget />
 <Copyright />
