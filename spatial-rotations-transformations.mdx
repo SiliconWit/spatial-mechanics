@@ -836,7 +836,21 @@ $$
 
    $$H_{workpiece}^{robot\,new} = H_2^{-1} \cdot H_1'$$
 
-   (Matrix multiplication would be computed to get the new position)
+   $$= \begin{bmatrix} 1 & 0 & 0 & 5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 & -0.707 & -0.707 & 4.95 \\ 1 & 0 & 0 & 5 \\ 0 & -0.707 & 0.707 & -0.70 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+
+   **Computing the rotation part (R):**
+   - Row 1: $(1)(0) + (0)(1) + (0)(0) = 0$, $(1)(-0.707) + (0)(0) + (0)(-0.707) = -0.707$, $(1)(-0.707) + (0)(0) + (0)(0.707) = -0.707$
+   - Row 2: $(0)(0) + (-1)(1) + (0)(0) = -1$, $(0)(-0.707) + (-1)(0) + (0)(-0.707) = 0$, $(0)(-0.707) + (-1)(0) + (0)(0.707) = 0$
+   - Row 3: $(0)(0) + (0)(1) + (-1)(0) = 0$, $(0)(-0.707) + (0)(0) + (-1)(-0.707) = 0.707$, $(0)(-0.707) + (0)(0) + (-1)(0.707) = -0.707$
+
+   **Computing the translation part (t):**
+   - $t_x = (1)(4.95) + (0)(5) + (0)(-0.70) + (5)(1) = 4.95 + 5 = 9.95$
+   - $t_y = (0)(4.95) + (-1)(5) + (0)(-0.70) + (10)(1) = -5 + 10 = 5$
+   - $t_z = (0)(4.95) + (0)(5) + (-1)(-0.70) + (8)(1) = 0.70 + 8 = 8.70$
+
+   $$H_{workpiece}^{robot\,new} = \begin{bmatrix} 0 & -0.707 & -0.707 & 9.95 \\ -1 & 0 & 0 & 5 \\ 0 & 0.707 & -0.707 & 8.70 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+
+   **Interpretation:** After the 45° camera rotation, the workpiece appears at position **(9.95, 5, 8.70) mm** in robot base coordinates, with an altered orientation shown by the rotation matrix.
 
 6. **Practical implication:**
 
