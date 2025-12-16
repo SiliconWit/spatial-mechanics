@@ -62,9 +62,6 @@ These systems require precise control of:
 
 > **Engineering Question:** How do we mathematically represent and compose complex 3D orientations in a systematic way that handles singularities and works across diverse applications?
 
-
-<InArticleAd />
-
 ### Why 3D Spatial Mathematics Matters
 
 **Consequences of Poor Mathematical Foundation:**
@@ -82,6 +79,9 @@ These systems require precise control of:
 - **Foundation for advanced topics** (quaternions, screws, differential kinematics)
 
 ## 📚 Fundamental Theory: 3D Rotation Mathematics
+
+<InArticleAd />
+
 
 ### Basic Rotation Matrices About Coordinate Axes
 
@@ -533,6 +533,9 @@ $$V_x = \frac{x}{\sqrt{x^2+y^2+z^2}}, \quad V_y = \frac{y}{\sqrt{x^2+y^2+z^2}}, 
 
 ## Method 2: Rodrigues' Rotation Formula
 
+<InArticleAd />
+
+
 <BionicText method="advanced" intensity="medium" class="highlight">
 Rodrigues' formula provides a compact, elegant expression for arbitrary axis rotations using matrix exponentials and the skew-symmetric matrix form. This is the preferred method for computational implementations.
 </BionicText>
@@ -583,6 +586,7 @@ $$
 3. **Compute W²:**
 
    $$
+
    W^2 = W \cdot W = \begin{bmatrix}
    -0.667 & 0.333 & 0.333 \\
    0.333 & -0.667 & 0.333 \\
@@ -913,6 +917,9 @@ This application demonstrates **coordinate frame transformation chains** in visi
 
 ## 🏭 Application 2: 3-DOF Robot Manipulator Composite Transformations (Assembly Automation)
 
+<InArticleAd />
+
+
 A 3-DOF robot manipulator performs a pick-and-place operation requiring composite rotations about multiple axes followed by translation.
 
 :::note[System Problem Statement]
@@ -1122,7 +1129,8 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
 
    $$
    H = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.927 & 0.134 & -0.5 & 3 \\ 0.134 & 0.927 & 0 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix}
-   $$ ✅
+   $$ 
+   ✅
 
 3. **Physical meaning:**
    - **Upper-left 3×3:** Composite rotation (Z→Y→X sequence)
@@ -1169,7 +1177,14 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
    **After rotation (before translation):**
 
    Apply only rotation part:
-   $$\mathbf{P}_{rot} = R_{composite} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0.354 - 0.354 + 0 \\ 0.927 + 0.134 + 0 \\ 0.134 + 0.927 + 0 \end{bmatrix} = \begin{bmatrix} 0 \\ 1.061 \\ 1.061 \end{bmatrix}$$
+   $$\mathbf{P}_{rot} = R_{composite} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.927 & 0.134 & -0.5 \\ 0.134 & 0.927 & 0 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix}$$
+
+   **Computing each component:**
+   - Row 1: $0.354(1) + (-0.354)(1) + 0.866(0) = 0.354 - 0.354 + 0 = 0$
+   - Row 2: $0.927(1) + 0.134(1) + (-0.5)(0) = 0.927 + 0.134 + 0 = 1.061$
+   - Row 3: $0.134(1) + 0.927(1) + 0(0) = 0.134 + 0.927 + 0 = 1.061$
+
+   $$\mathbf{P}_{rot} = \begin{bmatrix} 0 \\ 1.061 \\ 1.061 \end{bmatrix}$$
 
    **Distance after rotation:**
    $$\|\mathbf{P}_{rot}\| = \sqrt{0^2 + 1.061^2 + 1.061^2} = \sqrt{2.25} \approx 1.5$$
@@ -1257,7 +1272,7 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
    **Coordinate system setup (RIGHT-HANDED):**
    - The **X-axis** runs horizontally left-to-right (pipe direction)
    - The **Y-axis** points upward vertically (toward the ceiling)
-   - The **Z-axis** points to the side (imagine lying along X-axis: legs at left, head at right, Z points to your left side)
+   - The **Z-axis** points to the side (imagine lying along X-axis: legs at left, head at right, Z points to your right side)
    - Alternative Z-axis description: when viewing the XY plane on paper, Z comes **out of the paper** toward you
    - We look at the pipe's circular cross-section in the **YZ-plane** 
 
@@ -1686,6 +1701,9 @@ This application demonstrates **systematic 3D orientation control** for orbital 
 
 ## 🏭 Application 4: Drone Camera Gimbal Stabilization (Aerial Photography)
 
+<InArticleAd />
+
+
 A 2-axis camera gimbal must compensate for drone tilting to keep the camera pointing straight down at the ground.
 
 :::note[System Problem Statement]
@@ -1929,6 +1947,7 @@ A 2-axis camera gimbal must compensate for drone tilting to keep the camera poin
    - (2,3): $0.0594(0) + 0.9848(-1) + 0.1631(0) = -0.9848$
 
    **Row 3:**
+
    - (3,1): $0.3368(1) + (-0.1736)(0) + 0.9254(0) = 0.3368$
    - (3,2): $0.3368(0) + (-0.1736)(0) + 0.9254(1) = 0.9254$
    - (3,3): $0.3368(0) + (-0.1736)(-1) + 0.9254(0) = 0.1736$
