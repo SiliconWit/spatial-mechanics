@@ -34,6 +34,9 @@ By the end of this lesson, you will be able to:
 
 ## 🔧 Real-World Engineering Challenge: 3D Spatial Orientation Control
 
+<InArticleAd />
+
+
 <BionicText method="advanced" intensity="medium" class="highlight">
 Spatial orientation control is fundamental across robotics, aerospace, computer graphics, and automation. From industrial robots manipulating parts with precise tool angles, to spacecraft maintaining attitude in orbit, to animation systems rotating 3D models - all require mathematical frameworks for representing and composing 3D rotations and transformations.
 </BionicText>
@@ -79,9 +82,6 @@ These systems require precise control of:
 - **Foundation for advanced topics** (quaternions, screws, differential kinematics)
 
 ## 📚 Fundamental Theory: 3D Rotation Mathematics
-
-<InArticleAd />
-
 
 ### Basic Rotation Matrices About Coordinate Axes
 
@@ -411,6 +411,9 @@ Rotation about an arbitrary axis is essential when the rotation cannot be decomp
 
 ## Method 1: Decomposition Approach (General Arbitrary Axis Formula)
 
+<InArticleAd />
+
+
 <Card title="🔄 Arbitrary Axis Rotation Strategy" icon="document">
 **Five-step decomposition process:**
 
@@ -649,6 +652,9 @@ $$
 **General recommendation:** Use Rodrigues' formula for all computational work (robot control, graphics engines, simulation). Use decomposition approach for teaching, learning, and analytical derivations.
 
 ## 🏭 Application 1: Vision-Guided Robotic Pick-and-Place System (Manufacturing Automation)
+
+<InArticleAd />
+
 
 A vision-guided robotic system uses a camera to locate workpieces for automated pick-and-place operations in a manufacturing cell.
 
@@ -1233,7 +1239,7 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 - **Task:** Calculate torch orientation at 4 key waypoints (top, side, bottom, side) around pipe circumference
 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
   <TailwindWrapper>
-	![Robotic Pipe Welding Setup](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/robotic-pipe-welding.jpg)
+	![Robotic Pipe Welding Setup](https://pub-b1eb899abc464b5baf5b9521d163efd9.r2.dev/spatial-mechanics/robotic-pipe-welding.png)
   </TailwindWrapper>
 </div>
 **What we need to calculate:**
@@ -1497,7 +1503,7 @@ A 3-axis welding robot must perform orbital welding around a horizontal pipe wit
 6. **Important pattern to recognize:**
 
    **Look at the second column** of all the matrices - it's always $(1, 0, 0)$!
-   - This is the Y-axis, which always points along the pipe axis
+   - This is the tool Y-axis, which always points along the pipe X-axis
    - This column never changes because the pipe axis remains fixed in world coordinates
 
    **The key insight:**
@@ -1694,15 +1700,12 @@ This application demonstrates **systematic 3D orientation control** for orbital 
 
 **Practical Advantage:** Understanding where singularities occur helps plan collision-free, singularity-free weld paths. Real industrial applications may use different tool frame conventions or start positions to optimize accessibility.
 
-**Next step:** Students can extend this to inclined pipes or use quaternion representations to eliminate gimbal lock entirely!
+**Next step:** You can extend this to inclined pipes or use quaternion representations to eliminate gimbal lock entirely!
 :::
 
 </details>
 
 ## 🏭 Application 4: Drone Camera Gimbal Stabilization (Aerial Photography)
-
-<InArticleAd />
-
 
 A 2-axis camera gimbal must compensate for drone tilting to keep the camera pointing straight down at the ground.
 
