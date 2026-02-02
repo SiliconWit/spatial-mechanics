@@ -846,27 +846,27 @@ $$
 
    $$= \begin{bmatrix} 0.707 & 0 & 0.707 & 0 \\ 0 & 1 & 0 & 0 \\ -0.707 & 0 & 0.707 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 & -1 & 0 & 3 \\ 1 & 0 & 0 & 5 \\ 0 & 0 & -1 & 4 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
-   $$= \begin{bmatrix} 0 & -0.707 & -0.707 & 4.95 \\ 1 & 0 & 0 & 5 \\ 0 & -0.707 & 0.707 & -0.70 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+   $$= \begin{bmatrix} 0 & -0.707 & -0.707 & 4.95 \\ 1 & 0 & 0 & 5 \\ 0 & 0.707 & -0.707 & 0.71 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
 
 5. **Workpiece position in robot frame (after camera rotation):**
 
    $$H_{workpiece}^{robot\,new} = H_2^{-1} \cdot H_1'$$
 
-   $$= \begin{bmatrix} 1 & 0 & 0 & 5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 & -0.707 & -0.707 & 4.95 \\ 1 & 0 & 0 & 5 \\ 0 & -0.707 & 0.707 & -0.70 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+   $$= \begin{bmatrix} 1 & 0 & 0 & 5 \\ 0 & -1 & 0 & 10 \\ 0 & 0 & -1 & 8 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 0 & -0.707 & -0.707 & 4.95 \\ 1 & 0 & 0 & 5 \\ 0 & 0.707 & -0.707 & 0.71 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
 
    **Computing the rotation part (R):**
-   - Row 1: $(1)(0) + (0)(1) + (0)(0) = 0$, $(1)(-0.707) + (0)(0) + (0)(-0.707) = -0.707$, $(1)(-0.707) + (0)(0) + (0)(0.707) = -0.707$
-   - Row 2: $(0)(0) + (-1)(1) + (0)(0) = -1$, $(0)(-0.707) + (-1)(0) + (0)(-0.707) = 0$, $(0)(-0.707) + (-1)(0) + (0)(0.707) = 0$
-   - Row 3: $(0)(0) + (0)(1) + (-1)(0) = 0$, $(0)(-0.707) + (0)(0) + (-1)(-0.707) = 0.707$, $(0)(-0.707) + (0)(0) + (-1)(0.707) = -0.707$
+   - Row 1: $(1)(0) + (0)(1) + (0)(0) = 0$, $(1)(-0.707) + (0)(0) + (0)(0.707) = -0.707$, $(1)(-0.707) + (0)(0) + (0)(-0.707) = -0.707$
+   - Row 2: $(0)(0) + (-1)(1) + (0)(0) = -1$, $(0)(-0.707) + (-1)(0) + (0)(0.707) = 0$, $(0)(-0.707) + (-1)(0) + (0)(-0.707) = 0$
+   - Row 3: $(0)(0) + (0)(1) + (-1)(0) = 0$, $(0)(-0.707) + (0)(0) + (-1)(0.707) = -0.707$, $(0)(-0.707) + (0)(0) + (-1)(-0.707) = 0.707$
 
    **Computing the translation part (t):**
-   - $t_x = (1)(4.95) + (0)(5) + (0)(-0.70) + (5)(1) = 4.95 + 5 = 9.95$
-   - $t_y = (0)(4.95) + (-1)(5) + (0)(-0.70) + (10)(1) = -5 + 10 = 5$
-   - $t_z = (0)(4.95) + (0)(5) + (-1)(-0.70) + (8)(1) = 0.70 + 8 = 8.70$
+   - $t_x = (1)(4.95) + (0)(5) + (0)(0.71) + (5)(1) = 4.95 + 5 = 9.95$
+   - $t_y = (0)(4.95) + (-1)(5) + (0)(0.71) + (10)(1) = -5 + 10 = 5$
+   - $t_z = (0)(4.95) + (0)(5) + (-1)(0.71) + (8)(1) = -0.71 + 8 = 7.29$
 
-   $$H_{workpiece}^{robot\,new} = \begin{bmatrix} 0 & -0.707 & -0.707 & 9.95 \\ -1 & 0 & 0 & 5 \\ 0 & 0.707 & -0.707 & 8.70 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
+   $$H_{workpiece}^{robot\,new} = \begin{bmatrix} 0 & -0.707 & -0.707 & 9.95 \\ -1 & 0 & 0 & 5 \\ 0 & -0.707 & 0.707 & 7.29 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$ ✅
 
-   **Interpretation:** After the 45° camera rotation, the workpiece appears at position **(9.95, 5, 8.70) mm** in robot base coordinates, with an altered orientation shown by the rotation matrix.
+   **Interpretation:** After the 45° camera rotation, the workpiece appears at position **(9.95, 5, 7.29) mm** in robot base coordinates, with an altered orientation shown by the rotation matrix.
 
 6. **Practical implication:**
 
@@ -960,9 +960,9 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
 </div>
 **Given transformation sequence:**
 
-1. **Initial rotation:** 45° about base Z-axis
-2. **Second rotation:** 60° about resulting Y-axis
-3. **Third rotation:** 30° about resulting X-axis
+1. **Initial rotation:** 45° about fixed Z-axis
+2. **Second rotation:** 60° about fixed Y-axis
+3. **Third rotation:** 30° about fixed X-axis
 4. **Translation:** (2, 3, 1) units in final coordinate frame
 5. **Sensor point:** P(1, 1, 0) to be transformed
 </Card>
@@ -1068,11 +1068,11 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
 
 1. **Multiplication order (CRITICAL):**
 
-   Rotations are applied from **right to left** in matrix multiplication:
+   For **extrinsic (fixed-frame) rotations**, rotations are applied from **right to left** in matrix multiplication:
 
    $$R_{composite} = R_x(30°) \cdot R_y(60°) \cdot R_z(45°)$$
 
-   **Meaning:** Apply Z-rotation first, then Y, then X ✅
+   **Meaning:** Apply Z-rotation first, then Y, then X (all about the original fixed axes) ✅
 
 2. **Step 1: Multiply R_y × R_z:**
 
@@ -1107,18 +1107,18 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
    $$[0.354, -0.354, 0.866]$$ ✅
 
    **Row 2 calculations:**
-   - $(2,1): 0.866(0.707) + (-0.5)(-0.612) = 0.612 + 0.306 = 0.927$ ✅ (corrected for precision)
-   - $(2,2): 0.866(0.707) + (-0.5)(0.612) = 0.612 - 0.306 = 0.134$ ✅ (corrected: should use different intermediate values)
-   - $(2,3): 0.866(0) + (-0.5)(0.5) = -0.5$ ✅
+   - $(2,1): 0.866(0.707) + (-0.5)(-0.612) = 0.612 + 0.306 = 0.918$ ✅
+   - $(2,2): 0.866(0.707) + (-0.5)(0.612) = 0.612 - 0.306 = 0.306$ ✅
+   - $(2,3): 0.866(0) + (-0.5)(0.5) = 0 - 0.25 = -0.25$ ✅
 
    **Row 3 calculations:**
-   - $(3,1): 0.5(0.707) + 0.866(-0.612) = 0.354 - 0.530 = 0.134$ ✅
-   - $(3,2): 0.5(0.707) + 0.866(0.612) = 0.354 + 0.530 = 0.927$ ✅ (corrected for precision)
-   - $(3,3): 0.5(0) + 0.866(0.5) = 0$ ✅ (rounded)
+   - $(3,1): 0.5(0.707) + 0.866(-0.612) = 0.354 - 0.530 = -0.177$ ✅
+   - $(3,2): 0.5(0.707) + 0.866(0.612) = 0.354 + 0.530 = 0.884$ ✅
+   - $(3,3): 0.5(0) + 0.866(0.5) = 0 + 0.433 = 0.433$ ✅
 
 4. **Final composite rotation matrix:**
 
-   $$R_{composite} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.927 & 0.134 & -0.5 \\ 0.134 & 0.927 & 0 \end{bmatrix}$$ ✅
+   $$R_{composite} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.918 & 0.306 & -0.25 \\ -0.177 & 0.884 & 0.433 \end{bmatrix}$$ ✅
 
 </Steps>
 
@@ -1140,8 +1140,8 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
 2. **Combine rotation and translation:**
 
    $$
-   H = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.927 & 0.134 & -0.5 & 3 \\ 0.134 & 0.927 & 0 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix}
-   $$ 
+   H = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.918 & 0.306 & -0.25 & 3 \\ -0.177 & 0.884 & 0.433 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+   $$
    ✅
 
 3. **Physical meaning:**
@@ -1163,7 +1163,7 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
 1. **Apply transformation to sensor point P(1, 1, 0):**
 
    $$
-   \mathbf{P}' = H \begin{bmatrix} 1 \\ 1 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.927 & 0.134 & -0.5 & 3 \\ 0.134 & 0.927 & 0 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 0 \\ 1 \end{bmatrix}
+   \mathbf{P}' = H \begin{bmatrix} 1 \\ 1 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0.354 & -0.354 & 0.866 & 2 \\ 0.918 & 0.306 & -0.25 & 3 \\ -0.177 & 0.884 & 0.433 & 1 \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 0 \\ 1 \end{bmatrix}
    $$
 
 2. **Calculate each component:**
@@ -1172,42 +1172,42 @@ A 3-DOF robot manipulator performs a pick-and-place operation requiring composit
    $$x' = 0.354(1) + (-0.354)(1) + 0.866(0) + 2(1) = 0.354 - 0.354 + 0 + 2 = 2.0$$ ✅
 
    **Y-coordinate:**
-   $$y' = 0.927(1) + 0.134(1) + (-0.5)(0) + 3(1) = 0.927 + 0.134 + 0 + 3 = 4.061$$ ✅
+   $$y' = 0.918(1) + 0.306(1) + (-0.25)(0) + 3(1) = 0.918 + 0.306 + 0 + 3 = 4.224$$ ✅
 
    **Z-coordinate:**
-   $$z' = 0.134(1) + 0.927(1) + 0(0) + 1(1) = 0.134 + 0.927 + 0 + 1 = 2.061$$ ✅
+   $$z' = (-0.177)(1) + 0.884(1) + 0.433(0) + 1(1) = -0.177 + 0.884 + 0 + 1 = 1.707$$ ✅
 
 3. **Final sensor position:**
 
-   $$\mathbf{P}' = (2.0, 4.061, 2.061)$$ ✅
+   $$\mathbf{P}' = (2.0, 4.224, 1.707)$$ ✅
 
 4. **Verify distance preservation (rotation only):**
 
    **Original distance from origin:**
-   $$\|\mathbf{P}\| = \sqrt{1^2 + 1^2 + 0^2} = \sqrt{2} = 1.414$$ ✅
+   $$\|\mathbf{P}\| = \sqrt{1^2 + 1^2 + 0^2} = \sqrt{2} \approx 1.414$$ ✅
 
    **After rotation (before translation):**
 
    Apply only rotation part:
-   $$\mathbf{P}_{rot} = R_{composite} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.927 & 0.134 & -0.5 \\ 0.134 & 0.927 & 0 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix}$$
+   $$\mathbf{P}_{rot} = R_{composite} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0.354 & -0.354 & 0.866 \\ 0.918 & 0.306 & -0.25 \\ -0.177 & 0.884 & 0.433 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix}$$
 
    **Computing each component:**
    - Row 1: $0.354(1) + (-0.354)(1) + 0.866(0) = 0.354 - 0.354 + 0 = 0$
-   - Row 2: $0.927(1) + 0.134(1) + (-0.5)(0) = 0.927 + 0.134 + 0 = 1.061$
-   - Row 3: $0.134(1) + 0.927(1) + 0(0) = 0.134 + 0.927 + 0 = 1.061$
+   - Row 2: $0.918(1) + 0.306(1) + (-0.25)(0) = 0.918 + 0.306 + 0 = 1.224$
+   - Row 3: $(-0.177)(1) + 0.884(1) + 0.433(0) = -0.177 + 0.884 + 0 = 0.707$
 
-   $$\mathbf{P}_{rot} = \begin{bmatrix} 0 \\ 1.061 \\ 1.061 \end{bmatrix}$$
+   $$\mathbf{P}_{rot} = \begin{bmatrix} 0 \\ 1.224 \\ 0.707 \end{bmatrix}$$
 
    **Distance after rotation:**
-   $$\|\mathbf{P}_{rot}\| = \sqrt{0^2 + 1.061^2 + 1.061^2} = \sqrt{2.25} \approx 1.5$$
+   $$\|\mathbf{P}_{rot}\| = \sqrt{0^2 + 1.224^2 + 0.707^2} = \sqrt{0 + 1.498 + 0.500} = \sqrt{1.998} \approx 1.414$$ ✅
 
-   **Note:** The slight numerical difference from $\sqrt{2} = 1.414$ is due to rounding in the intermediate matrix calculations. With full precision, rotation matrices preserve distances exactly.
+   **Verification:** The distance $\sqrt{1.998} \approx 1.414 = \sqrt{2}$ matches the original distance, confirming that the rotation matrix preserves distances as expected.
 
 5. **Property confirmation:**
 
    **Theoretical guarantee:** Rotation matrices preserve distances because they are orthogonal: $\|R\mathbf{v}\| = \|\mathbf{v}\|$
 
-   The small numerical discrepancy observed is due to rounding approximations in the intermediate calculations. ✅
+   The distance verification above confirms this property holds for our composite rotation matrix. ✅
 
 </Steps>
 
@@ -1222,9 +1222,11 @@ This application demonstrates **composite 3D rotations** for robot manipulator c
 4. **Distance preservation** is a fundamental property of rotations (orthogonal matrices)
 
 **Matrix Multiplication Order:** The order $R_x(30°) \cdot R_y(60°) \cdot R_z(45°)$ means:
-- **First:** Rotate 45° about Z (base frame)
-- **Second:** Rotate 60° about the new Y-axis (rotated frame)
-- **Third:** Rotate 30° about the final X-axis (twice-rotated frame)
+- **First:** Rotate 45° about the fixed Z-axis
+- **Second:** Rotate 60° about the fixed Y-axis
+- **Third:** Rotate 30° about the fixed X-axis
+
+This is the **extrinsic (fixed-frame) convention** where all rotations are about the original coordinate axes, and the matrix multiplication order is the reverse of the physical rotation sequence.
 
 **Practical Implementation:** Industrial robots use **forward kinematics** to compute end-effector position from joint angles. The mathematics here shows how to:
 - Build individual rotation matrices from joint angles
