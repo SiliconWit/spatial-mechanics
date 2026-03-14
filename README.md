@@ -12,6 +12,8 @@ sidebar:
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Contributors Welcome](https://img.shields.io/badge/contributors-welcome-orange)
 
+**Read this course at:** [https://siliconwit.com/education/spatial-mechanics/](https://siliconwit.com/education/spatial-mechanics/)
+
 A course on 3D kinematics and spatial mechanism analysis for mechatronic systems. Covers kinematic joints, degrees of freedom, transformation matrices, spatial rotations, matrix methods for link modeling, advanced spatial mechanisms, and computer simulation with Python.
 
 ## Lessons
