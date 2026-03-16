@@ -16,7 +16,7 @@ import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/components';
+import { Card, CardGrid, Badge, Steps, LinkButton, FileTree } from '@astrojs/starlight/components';
 
 <UniversalContentContributors 
   contributors={frontmatter.contributors}
@@ -24,9 +24,9 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
 
 
 
-Learn 3D rotation mathematics through coordinate axis rotations, Euler angles, arbitrary axis methods (decomposition and Rodrigues formula), and homogeneous transformations applied to robotic welding, drone gimbals, and satellite attitude control.
+Describing a 2D rotation takes one number: the angle. Describing a 3D rotation is far harder. Euler angles are intuitive but suffer from gimbal lock, a singularity where two axes align and the system loses a degree of freedom, which is exactly the bug that caused Apollo-era navigation headaches and still crashes drone control loops today. Rotation matrices avoid gimbal lock entirely but require careful composition order, because 3D rotations do not commute (rotating X then Y gives a different result than Y then X). In this lesson you will work through every major 3D rotation representation: coordinate axis rotations, Euler angle sequences, the Rodrigues formula for arbitrary axis rotation, and 4x4 homogeneous transformations, applied to robotic welding, drone gimbals, and satellite attitude control. #3DRotations #EulerAngles #GimbalLock
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 
@@ -35,7 +35,7 @@ By the end of this lesson, you will be able to:
 3. **Compose** <Badge text="4×4 homogeneous transformation matrices" variant="caution" /> for <Badge text="unified spatial motion" variant="tip" />
 4. **Analyze** <Badge text="transformation sequences" variant="caution" /> understanding <Badge text="order-dependent composition" variant="tip" />
 
-## 🔧 Real-World Engineering Challenge: 3D Spatial Orientation Control
+## Real-World Engineering Challenge: 3D Spatial Orientation Control
 
 <InArticleAd />
 
@@ -84,7 +84,7 @@ These systems require precise control of:
 - **Unified framework** applicable across robotics, aerospace, and graphics
 - **Foundation for advanced topics** (quaternions, screws, differential kinematics)
 
-## 📚 Fundamental Theory: 3D Rotation Mathematics
+## Fundamental Theory: 3D Rotation Mathematics
 
 <InArticleAd />
 
@@ -657,7 +657,7 @@ $$
 
 **General recommendation:** Use Rodrigues' formula for all computational work (robot control, graphics engines, simulation). Use decomposition approach for teaching, learning, and analytical derivations.
 
-## 🏭 Application 1: Vision-Guided Robotic Pick-and-Place System (Manufacturing Automation)
+## Application 1: Vision-Guided Robotic Pick-and-Place System (Manufacturing Automation)
 
 <InArticleAd />
 
@@ -927,7 +927,7 @@ This application demonstrates **coordinate frame transformation chains** in visi
 **Real-world consideration:** Vision systems use **feature detection** (edges, corners, patterns) to determine workpiece pose. The transformation mathematics shown here is applied after visual detection to convert pixel coordinates to robot coordinates for grasping.
 :::
 
-## 🏭 Application 2: 3-DOF Robot Manipulator Composite Transformations (Assembly Automation)
+## Application 2: 3-DOF Robot Manipulator Composite Transformations (Assembly Automation)
 
 <InArticleAd />
 
@@ -1237,7 +1237,7 @@ This is the **extrinsic (fixed-frame) convention** where all rotations are about
 **Real-world consideration:** Actual robot control systems use **quaternions** for interpolation (avoiding gimbal lock) but convert to rotation matrices for final position calculation. The systematic matrix approach shown here is fundamental to all robot motion planning algorithms.
 :::
 
-## 🏭 Application 3: Robotic Welding of Pipe Joints (Manufacturing)
+## Application 3: Robotic Welding of Pipe Joints (Manufacturing)
 
 <InArticleAd />
 
@@ -1716,7 +1716,7 @@ This application demonstrates **systematic 3D orientation control** for orbital 
 
 </details>
 
-## 🏭 Application 4: Drone Camera Gimbal Stabilization (Aerial Photography)
+## Application 4: Drone Camera Gimbal Stabilization (Aerial Photography)
 
 <InArticleAd />
 
@@ -2089,7 +2089,7 @@ This simplified application demonstrates **gimbal stabilization** fundamentals:
 
 </details>
 
-## 🏭 Application 5: Satellite Attitude Control for Solar Tracking (Space Systems)
+## Application 5: Satellite Attitude Control for Solar Tracking (Space Systems)
 
 <InArticleAd />
 
@@ -2397,7 +2397,7 @@ This application demonstrates **arbitrary axis rotation** for spacecraft attitud
 
 </details>
 
-## 📋 Summary and Next Steps
+## Summary and Next Steps
 
 <InArticleAd />
 

@@ -15,7 +15,7 @@ import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/components';
+import { Card, CardGrid, Badge, Steps, LinkButton, FileTree } from '@astrojs/starlight/components';
 
 <UniversalContentContributors 
   contributors={frontmatter.contributors}
@@ -23,9 +23,9 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
 
 
 
-Learn systematic kinematic modeling through Stewart Platform design, covering elementary transformation matrices, DH parameter methodology, and parallel mechanism analysis for precision positioning systems.
+Serial robots (like the SCARA in Lesson 2) are straightforward to model: you chain transformations from base to tip. Parallel mechanisms like the Stewart Platform are fundamentally different. Six actuators connect the base to the platform simultaneously, and changing one actuator's length affects the position and orientation of the entire platform. Modeling this requires a systematic framework: Denavit-Hartenberg parameters assign a coordinate frame to every joint, and elementary transformation matrices chain those frames into a single equation that relates actuator lengths to platform pose. In this lesson you will apply DH parameters and matrix methods to a Stewart Platform for precision positioning. #StewartPlatform #DHParameters #ParallelKinematics
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 
@@ -34,7 +34,7 @@ By the end of this lesson, you will be able to:
 3. **Analyze** <Badge text="parallel mechanisms" variant="caution" /> using <Badge text="constraint-based matrix methods" variant="tip" />
 4. **Design** <Badge text="Stewart Platform systems" variant="caution" /> for <Badge text="precision motion control" variant="tip" /> applications
 
-## 🔧 Real-World System Problem: Stewart Platform Flight Simulator
+## Real-World System Problem: Stewart Platform Flight Simulator
 
 <InArticleAd />
 
@@ -82,7 +82,7 @@ Stewart Platform design requires sophisticated analysis:
 - **Scalable methods** applicable to any parallel mechanism
 - **Reliable analysis** with well-understood mathematical foundations
 
-## 📚 Fundamental Theory: Systematic Kinematic Modeling
+## Fundamental Theory: Systematic Kinematic Modeling
 
 <InArticleAd />
 
@@ -209,7 +209,7 @@ Parallel mechanisms like Stewart Platforms require different modeling approaches
   </TabItem>
 </Tabs>
 
-## 🔧 Application: Stewart Platform Design and Analysis
+## Application: Stewart Platform Design and Analysis
 
 <InArticleAd />
 
@@ -402,7 +402,7 @@ Let's design a precision Stewart Platform for semiconductor manufacturing.
 
 </details>
 
-## 📊 Stewart Platform Analysis Summary
+## Stewart Platform Analysis Summary
 
 <InArticleAd />
 
@@ -430,7 +430,7 @@ Let's design a precision Stewart Platform for semiconductor manufacturing.
   </Card>
 </CardGrid>
 
-## 🎯 Advanced Analysis: Multi-Body System Modeling
+## Advanced Analysis: Multi-Body System Modeling
 
 <InArticleAd />
 
@@ -531,7 +531,7 @@ Complex mechanisms with multiple interconnected bodies require systematic modeli
   </TabItem>
 </Tabs>
 
-## 🛠️ Design Guidelines for Systematic Modeling
+## Design Guidelines for Systematic Modeling
 
 <InArticleAd />
 
@@ -590,7 +590,7 @@ Complex mechanisms with multiple interconnected bodies require systematic modeli
   </TabItem>
 </Tabs>
 
-## 📋 Summary and Next Steps
+## Summary and Next Steps
 
 <InArticleAd />
 

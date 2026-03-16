@@ -15,7 +15,7 @@ import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/components';
+import { Card, CardGrid, Badge, Steps, LinkButton, FileTree } from '@astrojs/starlight/components';
 
 <UniversalContentContributors 
   contributors={frontmatter.contributors}
@@ -23,9 +23,9 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
 
 
 
-Master computational spatial mechanics through multi-robot coordination system design, covering numerical simulation methods, real-time kinematics, and distributed system integration for complex manufacturing applications.
+Closed-form kinematic solutions work for simple serial chains, but a manufacturing cell with three robot arms sharing a workspace has no neat analytical answer: collisions must be predicted, trajectories must be synchronized, and timing constraints must be met in real time. Numerical simulation is the only practical way to verify that the system works before building it, and getting the integration method wrong (too large a time step, an unstable solver) produces results that look correct but diverge from physical reality. In this lesson you will design a multi-robot coordination system, covering numerical simulation methods, real-time kinematics, and distributed control integration for manufacturing. #Simulation #MultiRobot #RealTimeKinematics
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 
@@ -34,7 +34,7 @@ By the end of this lesson, you will be able to:
 3. **Integrate** <Badge text="complex spatial kinematics" variant="caution" /> with <Badge text="collision detection" variant="tip" /> and <Badge text="path planning" variant="note" />
 4. **Optimize** <Badge text="computational performance" variant="caution" /> for <Badge text="large-scale multi-body simulations" variant="tip" />
 
-## 🔧 Real-World System Problem: Multi-Robot Manufacturing Cell
+## Real-World System Problem: Multi-Robot Manufacturing Cell
 
 <InArticleAd />
 
@@ -83,7 +83,7 @@ Coordinated multi-robot systems involve computational complexity:
 - **Predictable behavior** enabling reliable production planning
 - **Rapid deployment** with pre-validated system configurations
 
-## 📚 Fundamental Theory: Numerical Simulation Methods
+## Fundamental Theory: Numerical Simulation Methods
 
 <InArticleAd />
 
@@ -240,7 +240,7 @@ Multi-robot systems require sophisticated collision detection algorithms capable
 **Physical Meaning:** Hierarchical detection balances accuracy with computational efficiency, enabling real-time performance for complex multi-robot systems.
 </Card>
 
-## 🔧 Application: Multi-Robot Cell Simulation and Control
+## Application: Multi-Robot Cell Simulation and Control
 
 <InArticleAd />
 
@@ -474,7 +474,7 @@ Let's develop a complete multi-robot coordination system.
 
 </details>
 
-## 📊 Multi-Robot System Performance Analysis
+## Multi-Robot System Performance Analysis
 
 <InArticleAd />
 
@@ -502,7 +502,7 @@ Let's develop a complete multi-robot coordination system.
   </Card>
 </CardGrid>
 
-## 🎯 Advanced Analysis: Computational Optimization
+## Advanced Analysis: Computational Optimization
 
 <InArticleAd />
 
@@ -620,7 +620,7 @@ Large-scale multi-robot simulations require advanced computational techniques to
   </TabItem>
 </Tabs>
 
-## 🛠️ Design Guidelines for Computational Systems
+## Design Guidelines for Computational Systems
 
 <InArticleAd />
 
@@ -685,7 +685,7 @@ Large-scale multi-robot simulations require advanced computational techniques to
   </TabItem>
 </Tabs>
 
-## 📋 Summary and Course Conclusion
+## Summary and Course Conclusion
 
 <InArticleAd />
 
@@ -697,7 +697,7 @@ In this final lesson, you learned to:
 3. **Integrate** complex spatial kinematics with collision detection and optimization
 4. **Optimize** computational performance for large-scale multi-body applications
 
-## 🎓 **Complete Spatial Mechanics Mastery Achieved**
+## **Complete Spatial Mechanics Mastery Achieved**
 
 <InArticleAd />
 

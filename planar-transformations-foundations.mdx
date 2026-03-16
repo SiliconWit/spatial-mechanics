@@ -15,7 +15,7 @@ import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/components';
+import { Card, CardGrid, Badge, Steps, LinkButton, FileTree } from '@astrojs/starlight/components';
 
 <UniversalContentContributors 
   contributors={frontmatter.contributors}
@@ -23,9 +23,9 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
 
 
 
-Master planar transformation mathematics through SCARA robot PCB assembly programming. Learn complex number rotations, 2D rotation matrices, forward and inverse kinematics calculations, and precision pick-and-place programming for electronics manufacturing applications.
+A SCARA robot arm picks a component from a feeder tray and places it on a PCB pad with sub-millimeter accuracy. To do that, the controller must convert a target position in board coordinates into the joint angles that move the end-effector there, accounting for link lengths, joint offsets, and the orientation of every frame in the chain. That conversion is built entirely on 2D transformation matrices. Get the math wrong and the arm places the component on the wrong pad or crashes into the board. In this lesson you will learn planar transformations through SCARA robot programming: complex number rotations, 2D rotation matrices, and forward and inverse kinematics for precision pick-and-place. #PlanarTransformations #SCARA #Kinematics
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 
@@ -35,7 +35,7 @@ By the end of this lesson, you will be able to:
 4. **Compose** <Badge text="2D rotation matrices" variant="caution" /> for <Badge text="orientation control" variant="tip" />
 5. **Program** <Badge text="pick-and-place operations" variant="caution" /> with <Badge text="sub-millimeter accuracy" variant="note" />
 
-## 🔧 Real-World Engineering Challenge: Planar Motion Control
+## Real-World Engineering Challenge: Planar Motion Control
 
 <InArticleAd />
 
@@ -84,7 +84,7 @@ These systems require precise control of:
 - **Scalable programming methods** applicable to complex 3D systems
 - **Unified approach** for diverse applications (robotics, CNC, navigation)
 
-## 📚 Fundamental Theory: Planar Transformation Mathematics
+## Fundamental Theory: Planar Transformation Mathematics
 
 <InArticleAd />
 
@@ -174,7 +174,7 @@ $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} \cos\theta & -\sin\th
 4. **Inverse:** $R^{-1}(\theta) = R(-\theta) = R^T(\theta)$ (reverse rotation)
 :::
 
-## 🏭 Application 1: PCB Assembly Pick-and-Place Programming (Electronics Manufacturing)
+## Application 1: PCB Assembly Pick-and-Place Programming (Electronics Manufacturing)
 
 <InArticleAd />
 
@@ -383,7 +383,7 @@ This application demonstrates the power of **complex number mathematics** for sy
 
 </details>
 
-## 🏭 Application 2: CNC Router Elliptical Tool Path Generation (Manufacturing)
+## Application 2: CNC Router Elliptical Tool Path Generation (Manufacturing)
 
 <InArticleAd />
 
@@ -660,7 +660,7 @@ This application demonstrates **complex number elegance** for parametric curve g
 
 </details>
 
-## 🏭 Application 3: Mobile Robot Navigation Path Planning (Autonomous Systems)
+## Application 3: Mobile Robot Navigation Path Planning (Autonomous Systems)
 
 <InArticleAd />
 
@@ -1041,7 +1041,7 @@ This application demonstrates **complex number distance calculations** for colli
 
 </details>
 
-## 📋 Summary and Next Steps
+## Summary and Next Steps
 
 <InArticleAd />
 

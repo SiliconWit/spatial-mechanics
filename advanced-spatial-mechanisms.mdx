@@ -15,7 +15,7 @@ import Copyright from '../../../../components/Copyright.astro';
 import BionicText from '../../../../components/BionicText.astro';
 import TailwindWrapper from '../../../../components/TailwindWrapper.jsx';
 import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/components';
+import { Card, CardGrid, Badge, Steps, LinkButton, FileTree } from '@astrojs/starlight/components';
 
 <UniversalContentContributors 
   contributors={frontmatter.contributors}
@@ -23,9 +23,9 @@ import { Card, CardGrid, Badge, Steps, LinkButton } from '@astrojs/starlight/com
 
 
 
-Master advanced spatial mechanism analysis through humanoid robot hand design, covering spherical joint modeling, universal joint kinematics, and complex multi-body coordination for dexterous manipulation.
+A robotic gripper with two parallel fingers can pick up a box, but it cannot turn a doorknob, thread a needle, or handle objects of unknown shape. Dexterous manipulation requires fingers with multiple joints moving in three dimensions simultaneously, coordinated so they do not fight each other. Modeling these systems means working with spherical joints (3 DOF per joint), universal joints (2 DOF), and kinematic chains where each finger's motion depends on the positions of all the others. In this lesson you will analyze a humanoid robot hand, covering spherical and universal joint kinematics and multi-finger coordination for dexterous manipulation. #SpatialMechanisms #RobotHand #DexterousManipulation
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 
@@ -34,7 +34,7 @@ By the end of this lesson, you will be able to:
 3. **Design** <Badge text="multi-finger coordination systems" variant="caution" /> for <Badge text="dexterous object manipulation" variant="tip" />
 4. **Optimize** <Badge text="workspace" variant="caution" /> and <Badge text="singularity avoidance" variant="tip" /> in complex spatial mechanisms
 
-## 🔧 Real-World System Problem: Humanoid Robot Hand Design
+## Real-World System Problem: Humanoid Robot Hand Design
 
 <InArticleAd />
 
@@ -83,7 +83,7 @@ Humanoid hand design involves unprecedented complexity:
 - **Predictable behavior** through comprehensive kinematic analysis  
 - **Robust control** with singularity avoidance and graceful degradation
 
-## 📚 Fundamental Theory: Advanced Joint Modeling
+## Fundamental Theory: Advanced Joint Modeling
 
 <InArticleAd />
 
@@ -227,7 +227,7 @@ $$\mathbf{L}_1 + \mathbf{L}_2 + \mathbf{L}_3 + \mathbf{L}_4 = \mathbf{0}$$
 **Physical Meaning:** Spatial four-bars can generate complex 3D trajectories and orientations, useful for prosthetic fingers and robotic limbs.
 </Card>
 
-## 🔧 Application: Humanoid Robot Hand Analysis
+## Application: Humanoid Robot Hand Analysis
 
 <InArticleAd />
 
@@ -456,7 +456,7 @@ Let's analyze a complete multi-finger humanoid hand system.
 
 </details>
 
-## 📊 Humanoid Hand Analysis Summary
+## Humanoid Hand Analysis Summary
 
 <InArticleAd />
 
@@ -484,7 +484,7 @@ Let's analyze a complete multi-finger humanoid hand system.
   </Card>
 </CardGrid>
 
-## 🎯 Advanced Analysis: Complex Spatial Mechanisms
+## Advanced Analysis: Complex Spatial Mechanisms
 
 <InArticleAd />
 
@@ -583,7 +583,7 @@ Real-world mechanisms often contain multiple closed loops, creating complex cons
   </TabItem>
 </Tabs>
 
-## 🛠️ Design Guidelines for Advanced Mechanisms
+## Design Guidelines for Advanced Mechanisms
 
 <InArticleAd />
 
@@ -647,7 +647,7 @@ Real-world mechanisms often contain multiple closed loops, creating complex cons
   </TabItem>
 </Tabs>
 
-## 📋 Summary and Next Steps
+## Summary and Next Steps
 
 <InArticleAd />
 
