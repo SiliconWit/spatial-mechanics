@@ -2397,6 +2397,10 @@ This application demonstrates **arbitrary axis rotation** for spacecraft attitud
 
 </details>
 
+:::tip[Instrument it]
+The rotation matrices and quaternions here are exactly what an IMU reports. A 9-axis IMU (accelerometer, gyroscope, and magnetometer, such as the BNO055 or ICM-20948) fuses its readings into the same orientation you compute by hand, so you can check your transforms against a real board you tilt in your fingers. Wire it to an [ESP32 or STM32](/education/sensor-actuator-interfacing-stm32/) over I2C, and you can [watch the live orientation on siliconwit.io](https://siliconwit.io) and see the gyro drift that makes the magnetometer correction necessary.
+:::
+
 ## Summary and Next Steps
 
 <InArticleAd />

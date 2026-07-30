@@ -697,6 +697,10 @@ In this final lesson, you learned to:
 3. **Integrate** complex spatial kinematics with collision detection and optimization
 4. **Optimize** computational performance for large-scale multi-body applications
 
+:::tip[Instrument it]
+A simulation is only trustworthy once it agrees with the real machine, which means feeding it real measurements. Put encoders on the driven joints and an IMU on the moving link, and the measured angles and orientation become the ground truth your model is checked against, the first step toward a digital twin. An [ESP32 or STM32](/education/sensor-actuator-interfacing-stm32/) collects the joint data and [pushes it to a running model on siliconwit.io](https://siliconwit.io), so the simulation and the hardware stay in step and any divergence points straight at a worn joint or a slipping belt.
+:::
+
 ## **Complete Spatial Mechanics Mastery Achieved**
 
 <InArticleAd />
